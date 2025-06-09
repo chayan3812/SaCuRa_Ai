@@ -616,6 +616,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const days = parseInt(req.query.days as string) || 7;
       
+      console.log(`Fetching analytics for user ${userId}, ${days} days`);
+      
       const { analyticsService } = await import('./analyticsService');
       const analyticsData = await analyticsService.getAnalyticsData(userId, days);
       

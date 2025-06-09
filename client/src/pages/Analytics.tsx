@@ -110,6 +110,10 @@ export default function Analytics() {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  // Safe access to real-time data
+  const alerts = realtimeData?.alerts || [];
+  const hasAlerts = alerts.length > 0;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -196,7 +200,7 @@ export default function Analytics() {
       </div>
 
       {/* Real-time Alerts */}
-      {realtimeData?.alerts && realtimeData.alerts.length > 0 && (
+      {hasAlerts && (
         <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
           <CardHeader className="pb-3">
             <div className="flex items-center space-x-2">
@@ -206,7 +210,7 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {realtimeData.alerts.map((alert: any, index: number) => (
+              {alerts.map((alert: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded">
                   <span className="text-sm">{alert.message}</span>
                   <Badge variant={alert.severity === 'high' ? 'destructive' : 'secondary'}>

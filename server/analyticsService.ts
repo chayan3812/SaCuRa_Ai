@@ -99,9 +99,9 @@ export class AnalyticsService {
       const adMetrics = await storage.getLatestAdMetrics(userId);
       
       // Calculate aggregated metrics
-      const totalSpend = adMetrics.reduce((sum, metric) => sum + parseFloat(metric.spend), 0);
-      const totalImpressions = adMetrics.reduce((sum, metric) => sum + parseInt(metric.impressions), 0);
-      const totalClicks = adMetrics.reduce((sum, metric) => sum + parseInt(metric.clicks), 0);
+      const totalSpend = adMetrics.reduce((sum, metric) => sum + parseFloat(metric.spend || '0'), 0);
+      const totalImpressions = adMetrics.reduce((sum, metric) => sum + parseInt(metric.impressions || '0'), 0);
+      const totalClicks = adMetrics.reduce((sum, metric) => sum + parseInt(metric.clicks || '0'), 0);
       
       // Calculate derived metrics
       const ctr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;

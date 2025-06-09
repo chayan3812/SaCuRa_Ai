@@ -3,10 +3,15 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializePageWatcher } from "./pageWatcher";
 import { initializeContentScheduler } from "./contentScheduler";
+import { productionOptimizer } from "./productionOptimizer";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Production optimization middleware
+app.use(productionOptimizer.performanceMiddleware());
+app.use(productionOptimizer.rateLimitMiddleware(1000, 60000)); // 1000 requests per minute
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -41,13 +46,8 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
+  // Production error handling middleware
+  app.use(productionOptimizer.errorHandlingMiddleware());
 
   // Initialize Page Watcher Engine
   try {

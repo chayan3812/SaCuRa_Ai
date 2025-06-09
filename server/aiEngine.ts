@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import { storage } from './storage';
-import { sendWebSocketMessage } from './websocket';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -85,7 +84,7 @@ export class AIEngine {
     try {
       const audienceData = await this.getAudienceInsights(userId);
       const performanceData = await this.getContentPerformanceData(userId, '30d');
-      const trends = await this.getMarketTrends(userId);
+      const trends = await this.detectMarketTrends(userId);
 
       const prompt = `
         Generate 5 high-performing ${contentType} content suggestions for a Facebook page.

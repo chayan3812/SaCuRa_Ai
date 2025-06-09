@@ -756,6 +756,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Production System Monitoring Routes
+  app.get('/api/system/health', async (req, res) => {
+    try {
+      const { productionOptimizer } = await import('./productionOptimizer');
+      const health = await productionOptimizer.getSystemHealth();
+      res.json(health);
+    } catch (error) {
+      console.error("Error getting system health:", error);
+      res.status(500).json({ message: "Failed to get system health" });
+    }
+  });
+
+  app.get('/api/system/optimization-recommendations', async (req, res) => {
+    try {
+      const { productionOptimizer } = await import('./productionOptimizer');
+      const recommendations = productionOptimizer.generateOptimizationRecommendations();
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  app.get('/api/system/scaling-status', async (req, res) => {
+    try {
+      const { productionOptimizer } = await import('./productionOptimizer');
+      const scalingCheck = await productionOptimizer.checkAutoScaling();
+      res.json(scalingCheck);
+    } catch (error) {
+      console.error("Error checking scaling status:", error);
+      res.status(500).json({ message: "Failed to check scaling status" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

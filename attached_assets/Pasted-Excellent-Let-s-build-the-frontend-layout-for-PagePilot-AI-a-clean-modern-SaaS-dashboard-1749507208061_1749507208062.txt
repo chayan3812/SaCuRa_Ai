@@ -1,0 +1,176 @@
+Excellent. Let’s **build the frontend layout** for **PagePilot AI** — a clean, modern SaaS dashboard interface that supports:
+
+✅ Facebook Page Overview
+✅ Ad Recommendations
+✅ Warnings / Restrictions
+✅ Auto Posting
+✅ SEO Assistant
+✅ Customer Discovery
+✅ Alerts from Page Watcher
+
+---
+
+## 🎨 Tech Stack
+
+* **Vite + React + TypeScript**
+* **TailwindCSS** (for modern styling)
+* **React Router** (for multi-page routing)
+
+---
+
+## 📁 Folder Structure
+
+```
+client/
+├── src/
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   └── Sidebar.tsx
+│   ├── pages/
+│   │   ├── Dashboard.tsx
+│   │   ├── AdsOptimizer.tsx
+│   │   ├── AutoPoster.tsx
+│   │   ├── SEOAssistant.tsx
+│   │   ├── PageAlerts.tsx
+│   │   └── CustomerFinder.tsx
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+```
+
+---
+
+## ✅ `App.tsx` — Router Layout
+
+```tsx
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+
+import Dashboard from "./pages/Dashboard";
+import AdsOptimizer from "./pages/AdsOptimizer";
+import AutoPoster from "./pages/AutoPoster";
+import SEOAssistant from "./pages/SEOAssistant";
+import PageAlerts from "./pages/PageAlerts";
+import CustomerFinder from "./pages/CustomerFinder";
+
+export default function App() {
+  return (
+    <Router>
+      <div className="flex h-screen">
+        <Sidebar />
+        <div className="flex-1 overflow-y-auto bg-gray-100">
+          <Navbar />
+          <main className="p-6">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/ads" element={<AdsOptimizer />} />
+              <Route path="/auto-post" element={<AutoPoster />} />
+              <Route path="/seo" element={<SEOAssistant />} />
+              <Route path="/alerts" element={<PageAlerts />} />
+              <Route path="/customers" element={<CustomerFinder />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </Router>
+  );
+}
+```
+
+---
+
+## ✅ `Sidebar.tsx`
+
+```tsx
+import { Link } from "react-router-dom";
+
+export default function Sidebar() {
+  return (
+    <aside className="w-64 bg-white border-r p-4 space-y-4">
+      <h2 className="text-xl font-bold text-blue-600">PagePilot AI</h2>
+      <nav className="flex flex-col space-y-2 text-sm">
+        <Link to="/">📊 Dashboard</Link>
+        <Link to="/ads">📈 Ads Optimizer</Link>
+        <Link to="/auto-post">📝 Auto Poster</Link>
+        <Link to="/seo">🔍 SEO Assistant</Link>
+        <Link to="/alerts">🚨 Page Alerts</Link>
+        <Link to="/customers">👥 Customer Finder</Link>
+      </nav>
+    </aside>
+  );
+}
+```
+
+---
+
+## ✅ `Navbar.tsx`
+
+```tsx
+export default function Navbar() {
+  return (
+    <header className="w-full h-16 bg-white border-b flex items-center justify-between px-6">
+      <h1 className="text-lg font-semibold">Welcome Back</h1>
+      <div className="text-sm text-gray-500">Connected to Facebook Business</div>
+    </header>
+  );
+}
+```
+
+---
+
+## ✅ Example Page: `Dashboard.tsx`
+
+```tsx
+export default function Dashboard() {
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">📊 Facebook Page Overview</h2>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white p-4 shadow rounded">Engagement: 4.2k</div>
+        <div className="bg-white p-4 shadow rounded">Followers: 12.3k</div>
+        <div className="bg-white p-4 shadow rounded">Restrictions: None</div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## ✅ Tailwind Setup (if not done)
+
+Inside `client/`, run:
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+In `tailwind.config.js`:
+
+```js
+content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+```
+
+In `src/index.css`:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+Would you like me to:
+
+* **Generate the rest of the pages (`AdsOptimizer`, `AutoPoster`, etc.)?**
+* **Connect dummy API response placeholders to simulate Replit AI agent responses?**
+* **Start Phase 2: Facebook Auth + Page Connection Flow?**
+
+Just say:
+
+* **“Finish frontend pages”**
+* **“Simulate AI responses”**
+* **“Start Phase 2 now”**

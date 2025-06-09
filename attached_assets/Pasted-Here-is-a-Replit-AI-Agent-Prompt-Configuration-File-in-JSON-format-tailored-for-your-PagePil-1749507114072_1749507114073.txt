@@ -1,0 +1,76 @@
+Here is a **Replit AI Agent Prompt Configuration File** (in JSON format) tailored for your **PagePilot AI** project. This will help the Replit AI Agent handle different modules of your Facebook Page Management SaaS platform efficiently and intelligently:
+
+---
+
+### 📁 `replit_agent/prompts/config.json`
+
+```json
+{
+  "agent_name": "PagePilot AI",
+  "version": "1.0.0",
+  "description": "An AI agent that assists with Facebook Page management including ad optimization, warning removals, SEO, posting, and customer discovery.",
+  "task_routes": {
+    "analyze_ads": {
+      "trigger": "optimize ads",
+      "prompt": "Given the following Facebook Ads data: {ads_data}, analyze performance and suggest changes for better reach and engagement. Recommend copy changes, audience targeting, or image type."
+    },
+    "appeal_warning": {
+      "trigger": "generate warning appeal",
+      "prompt": "A Facebook Page has received the following restriction: {restriction_reason}. Draft a professional and persuasive appeal requesting review and reinstatement."
+    },
+    "monitor_health": {
+      "trigger": "watch page health",
+      "prompt": "Periodically review the Facebook Page health using Graph API. If any restriction, flag, or notification is found, summarize the issue and recommend steps to resolve it."
+    },
+    "schedule_posts": {
+      "trigger": "auto post",
+      "prompt": "Generate a scheduled post for the Facebook Page in the {industry} industry. Make the post engaging, SEO-optimized, and relevant to the current week’s trends."
+    },
+    "seo_suggest": {
+      "trigger": "seo boost",
+      "prompt": "Analyze this post content: {post_text}. Suggest 3 SEO improvements including better hashtags, keywords, and alt text."
+    },
+    "find_customers": {
+      "trigger": "discover customers",
+      "prompt": "Based on the niche '{niche}' and this related Facebook Page data: {related_pages}, suggest potential customer segments or business accounts to engage with."
+    },
+    "watch_competitors": {
+      "trigger": "analyze competitors",
+      "prompt": "Analyze these competitor page posts: {competitor_posts}. Extract successful patterns, hashtags, post timing, and CTA strategies."
+    }
+  },
+  "error_handling": {
+    "on_fail": "Log error, retry once, then alert user with troubleshooting tips.",
+    "log_path": "./replit_agent/history.log"
+  },
+  "output_format": {
+    "type": "markdown",
+    "template": "**Task:** {task}\n\n**AI Output:**\n{output}"
+  },
+  "auto_save": true,
+  "test_mode": false
+}
+```
+
+---
+
+### ✅ How to Use with Replit AI
+
+* **Path**: Save this file in your project at `replit_agent/prompts/config.json`
+* The Replit AI Agent should read from this config file to:
+
+  * Detect task types based on user triggers or API input
+  * Use structured prompts to call OpenAI or other AI models
+  * Save logs for audit/tracking
+  * Maintain a consistent formatting output
+
+---
+
+Would you like me to now:
+
+* Generate the `task_router.ts` file that reads this config and routes accordingly?
+* Add sample prompt invocations?
+* Build Phase 1 folders and starter files to continue?
+
+Just say:
+**“Start Phase 1 now”** or **“Build task\_router.ts”** to proceed.

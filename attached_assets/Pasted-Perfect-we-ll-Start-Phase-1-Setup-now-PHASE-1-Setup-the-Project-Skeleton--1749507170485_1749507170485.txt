@@ -1,0 +1,119 @@
+Perfect — we’ll **Start Phase 1: Setup** now.
+
+---
+
+## 🚀 PHASE 1: Setup the Project Skeleton + Replit AI Agent Integration
+
+### ✅ Goals
+
+* Create the core folder structure
+* Set up the entry files for frontend, backend, and agent
+* Install essential dependencies
+* Build the `task_router.ts` to use your `config.json` for Replit AI Agent prompt dispatching
+
+---
+
+## 📁 FILE & FOLDER STRUCTURE (Phase 1)
+
+```
+PagePilotAI/
+├── client/                        ← React-based frontend (Vite)
+│   └── src/
+│       └── App.tsx
+├── server/                        ← Express API backend
+│   └── index.ts
+├── replit_agent/
+│   ├── prompts/
+│   │   └── config.json            ← Prompt configurations (already created)
+│   ├── task_router.ts            ← Handles AI prompt routing
+│   └── history.log
+├── database/
+│   └── schema.sql                 ← Will be built in Phase 2
+├── .env.example
+├── README.md
+```
+
+---
+
+## 🧠 `replit_agent/task_router.ts` — Prompt Dispatcher
+
+```ts
+import fs from "fs";
+import path from "path";
+
+const configPath = path.resolve(__dirname, "prompts", "config.json");
+const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+
+interface TaskInput {
+  task: keyof typeof config.task_routes;
+  data: Record<string, any>;
+}
+
+export function runAgentTask({ task, data }: TaskInput): string {
+  const route = config.task_routes[task];
+  if (!route) {
+    throw new Error(`Unknown task: ${task}`);
+  }
+
+  const interpolatedPrompt = route.prompt.replace(/\{(.*?)\}/g, (_, key) => {
+    return data[key] ?? `<missing ${key}>`;
+  });
+
+  // For demonstration, we simulate output here
+  const simulatedAIOutput = `🔍 [SIMULATED AI OUTPUT for task "${task}"]\n\nPrompt:\n${interpolatedPrompt}`;
+
+  if (config.auto_save) {
+    fs.appendFileSync(
+      path.resolve(__dirname, "history.log"),
+      `\n=== ${new Date().toISOString()} ===\nTask: ${task}\n${interpolatedPrompt}\n\n`
+    );
+  }
+
+  return simulatedAIOutput;
+}
+```
+
+---
+
+## 📦 Dependencies (Install These)
+
+For backend:
+
+```bash
+npm install express dotenv cors fs
+```
+
+For frontend (React/Vite):
+
+```bash
+npm create vite@latest client --template react-ts
+cd client && npm install
+```
+
+---
+
+## 🔧 `.env.example`
+
+```
+META_CLIENT_ID=your-facebook-app-id
+META_CLIENT_SECRET=your-facebook-app-secret
+OPENAI_API_KEY=sk-...
+SUPABASE_URL=...
+SUPABASE_KEY=...
+```
+
+---
+
+## ✅ NEXT STEP
+
+Would you like me to:
+
+* **Generate the complete `client/src/App.tsx`** and basic UI layout?
+* **Add server routing boilerplate (Express)**?
+* **Start Phase 2: Facebook Auth & Page Connection Flow**?
+
+Just say:
+
+* **“Build frontend layout”**
+* **“Start server endpoints”**
+* **“Start Phase 2 now”**

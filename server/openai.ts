@@ -397,6 +397,27 @@ export async function generateSEOOptimizedContent(
 
     return response.choices[0].message.content || originalContent;
   } catch (error) {
-    throw new Error("Failed to optimize content for SEO: " + error.message);
+    throw new Error("Failed to optimize content for SEO: " + (error as Error).message);
+  }
+}
+
+export async function generateImage(prompt: string): Promise<{ url: string; prompt: string; style: string; dimensions: string }> {
+  try {
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "standard",
+    });
+
+    return {
+      url: response.data[0].url || '',
+      prompt: prompt,
+      style: 'realistic',
+      dimensions: '1024x1024'
+    };
+  } catch (error) {
+    throw new Error("Failed to generate image: " + (error as Error).message);
   }
 }

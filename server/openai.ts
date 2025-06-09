@@ -272,3 +272,131 @@ export async function analyzeSentiment(text: string): Promise<{
     };
   }
 }
+
+export interface GeneratedPost {
+  content: string;
+  hashtags: string[];
+  callToAction: string;
+  suggestedImages: string[];
+  seoScore: number;
+  bestPostTime: string;
+  estimatedReach: string;
+}
+
+export interface PostAnalysis {
+  sentiment: 'positive' | 'negative' | 'neutral';
+  readabilityScore: number;
+  engagementPrediction: string;
+  improvementSuggestions: string[];
+}
+
+export async function generateFacebookPost(
+  topic: string,
+  audience: string,
+  postType: string
+): Promise<GeneratedPost> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are a Facebook marketing expert. Generate optimized social media content based on the given parameters. 
+          Create engaging, platform-appropriate content that drives engagement and conversions.
+          
+          Respond with JSON in this exact format:
+          {
+            "content": "the main post text (150-300 words, engaging and platform-optimized)",
+            "hashtags": ["array", "of", "relevant", "hashtags", "without", "hash", "symbol"],
+            "callToAction": "specific call to action suggestion",
+            "suggestedImages": ["array of image type suggestions like 'product showcase', 'behind the scenes', etc"],
+            "seoScore": 85,
+            "bestPostTime": "time suggestion like '2-4 PM weekdays'",
+            "estimatedReach": "reach estimate like '500-1,200 users'"
+          }`,
+        },
+        {
+          role: "user",
+          content: `Generate a Facebook post for:
+          Topic: ${topic}
+          Target Audience: ${audience}
+          Post Type: ${postType}
+          
+          Make it engaging, relevant, and optimized for Facebook's algorithm.`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    return result;
+  } catch (error) {
+    throw new Error("Failed to generate Facebook post: " + error.message);
+  }
+}
+
+export async function analyzePostContent(content: string): Promise<PostAnalysis> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are a social media analytics expert. Analyze the given post content for engagement potential, readability, and provide improvement suggestions.
+          
+          Respond with JSON in this exact format:
+          {
+            "sentiment": "positive" | "negative" | "neutral",
+            "readabilityScore": 85,
+            "engagementPrediction": "High" | "Medium" | "Low",
+            "improvementSuggestions": ["array of specific suggestions to improve the post"]
+          }`,
+        },
+        {
+          role: "user",
+          content: `Analyze this Facebook post content:
+          
+          ${content}
+          
+          Provide detailed analysis and actionable improvement suggestions.`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    return result;
+  } catch (error) {
+    throw new Error("Failed to analyze post content: " + error.message);
+  }
+}
+
+export async function generateSEOOptimizedContent(
+  originalContent: string,
+  keywords: string[]
+): Promise<string> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are an SEO expert. Optimize the given content for better search visibility while maintaining readability and engagement. Include relevant keywords naturally.",
+        },
+        {
+          role: "user",
+          content: `Optimize this content for SEO:
+          
+          Original: ${originalContent}
+          Keywords to include: ${keywords.join(', ')}
+          
+          Return only the optimized content, maintaining the original tone and message.`,
+        },
+      ],
+    });
+
+    return response.choices[0].message.content || originalContent;
+  } catch (error) {
+    throw new Error("Failed to optimize content for SEO: " + error.message);
+  }
+}

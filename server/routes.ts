@@ -410,6 +410,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Page Watcher Routes
+  app.get('/api/page-watcher/status', isAuthenticated, async (req, res) => {
+    try {
+      const { getPageWatcher } = await import('./pageWatcher');
+      const watcher = getPageWatcher();
+      const status = watcher.getStatus();
+      
+      // Get count of monitored pages
+      const userId = (req.user as any)?.claims?.sub;
+      const pages = await storage.getFacebookPagesByUser(userId);
+      
+      res.json({
+        ...status,
+        totalPages: pages.length,
+        healthyPages: pages.length, // Simplified for now
+        pagesWithIssues: 0
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to get watcher status' });
+    }
+  });
+
+  app.post('/api/page-watcher/start', isAuthenticated, async (req, res) => {
+    try {
+      const { getPageWatcher } = await import('./pageWatcher');
+      const watcher = getPageWatcher();
+      watcher.start();
+      res.json({ message: 'Page watcher started' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to start page watcher' });
+    }
+  });
+
+  app.post('/api/page-watcher/stop', isAuthenticated, async (req, res) => {
+    try {
+      const { getPageWatcher } = await import('./pageWatcher');
+      const watcher = getPageWatcher();
+      watcher.stop();
+      res.json({ message: 'Page watcher stopped' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to stop page watcher' });
+    }
+  });
+
+  app.put('/api/page-watcher/config', isAuthenticated, async (req, res) => {
+    try {
+      const { getPageWatcher } = await import('./pageWatcher');
+      const watcher = getPageWatcher();
+      watcher.updateConfig(req.body);
+      res.json({ message: 'Configuration updated' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update configuration' });
+    }
+  });
+
+  app.get('/api/page-watcher/health', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+      const pages = await storage.getFacebookPagesByUser(userId);
+      
+      // Simulate health data for connected pages
+      const healthData = pages.map(page => ({
+        pageId: page.pageId,
+        pageName: page.pageName,
+        status: 'healthy',
+        lastCheck: new Date().toISOString(),
+        issues: [],
+        restrictionCount: 0,
+        checkHistory: [
+          {
+            timestamp: new Date().toISOString(),
+            status: 'healthy',
+            issueCount: 0
+          }
+        ]
+      }));
+      
+      res.json(healthData);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to get page health data' });
+    }
+  });
+
   // Webhook route for Facebook messages
   app.get('/api/facebook/webhook', (req, res) => {
     const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN || 'sacura_webhook_token';

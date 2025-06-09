@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initializePageWatcher } from "./pageWatcher";
 
 const app = express();
 app.use(express.json());
@@ -46,6 +47,19 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
+
+  // Initialize Page Watcher Engine
+  try {
+    initializePageWatcher({
+      checkInterval: 10, // 10 minutes
+      alertThreshold: 3,
+      enableEmailAlerts: true,
+      enableSlackAlerts: false
+    });
+    log("Page Watcher Engine started successfully");
+  } catch (error) {
+    log("Failed to start Page Watcher Engine: " + error);
+  }
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

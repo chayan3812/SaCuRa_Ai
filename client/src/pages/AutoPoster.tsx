@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { Loader2, Send, RefreshCw, Eye, Hash, Target, Image, Calendar } from "lucide-react";
+import type { FacebookPage } from "@shared/schema";
 
 interface GeneratedPost {
   content: string;
@@ -36,7 +36,7 @@ export default function AutoPoster() {
   const [customContent, setCustomContent] = useState("");
   const { toast } = useToast();
 
-  const { data: facebookPages = [] } = useQuery({
+  const { data: facebookPages = [] } = useQuery<FacebookPage[]>({
     queryKey: ["/api/facebook/pages"],
   });
 
@@ -45,11 +45,14 @@ export default function AutoPoster() {
       topic: string;
       audience: string;
       postType: string;
-    }) => {
-      return await apiRequest("/api/ai/generate-post", {
+    }): Promise<GeneratedPost> => {
+      const response = await fetch("/api/ai/generate-post", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error("Failed to generate post");
+      return response.json();
     },
     onSuccess: (data: GeneratedPost) => {
       setGeneratedPost(data);
@@ -69,11 +72,14 @@ export default function AutoPoster() {
   });
 
   const analyzePostMutation = useMutation({
-    mutationFn: async (content: string) => {
-      return await apiRequest("/api/ai/analyze-post", {
+    mutationFn: async (content: string): Promise<PostAnalysis> => {
+      const response = await fetch("/api/ai/analyze-post", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       });
+      if (!response.ok) throw new Error("Failed to analyze post");
+      return response.json();
     },
     onSuccess: (data: PostAnalysis) => {
       toast({
@@ -89,10 +95,13 @@ export default function AutoPoster() {
       content: string;
       scheduledTime?: string;
     }) => {
-      return await apiRequest("/api/facebook/publish-post", {
+      const response = await fetch("/api/facebook/publish-post", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error("Failed to publish post");
+      return response.json();
     },
     onSuccess: () => {
       toast({

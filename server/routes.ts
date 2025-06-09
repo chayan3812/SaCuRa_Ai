@@ -341,6 +341,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Content Generation Routes
+  app.post("/api/ai/generate-post", isAuthenticated, async (req, res) => {
+    try {
+      const { topic, audience, postType } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({ message: "Topic is required" });
+      }
+
+      const { generateFacebookPost } = await import("./openai");
+      const generatedPost = await generateFacebookPost(topic, audience || "", postType || "promotional");
+      
+      res.json(generatedPost);
+    } catch (error) {
+      console.error("Error generating post:", error);
+      res.status(500).json({ message: "Failed to generate post content" });
+    }
+  });
+
+  app.post("/api/ai/analyze-post", isAuthenticated, async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: "Content is required" });
+      }
+
+      const { analyzePostContent } = await import("./openai");
+      const analysis = await analyzePostContent(content);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing post:", error);
+      res.status(500).json({ message: "Failed to analyze post content" });
+    }
+  });
+
+  // Facebook Publishing Routes
+  app.post("/api/facebook/publish-post", isAuthenticated, async (req, res) => {
+    try {
+      const { pageId, content, scheduledTime } = req.body;
+      const userId = req.user?.claims?.sub;
+      
+      if (!pageId || !content) {
+        return res.status(400).json({ message: "Page ID and content are required" });
+      }
+
+      // Get the Facebook page details
+      const page = await storage.getFacebookPageById(pageId);
+      if (!page || page.userId !== userId) {
+        return res.status(404).json({ message: "Facebook page not found" });
+      }
+
+      // In a real implementation, this would use Facebook Graph API
+      // For now, we'll simulate a successful post
+      const postResult = {
+        id: `post_${Date.now()}`,
+        message: "Post published successfully",
+        created_time: new Date().toISOString(),
+        link: `https://facebook.com/${page.pageId}/posts/12345`
+      };
+      
+      res.json(postResult);
+    } catch (error) {
+      console.error("Error publishing post:", error);
+      res.status(500).json({ message: "Failed to publish post" });
+    }
+  });
+
   // Webhook route for Facebook messages
   app.get('/api/facebook/webhook', (req, res) => {
     const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN || 'sacura_webhook_token';

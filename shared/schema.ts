@@ -1,0 +1,218 @@
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  jsonb,
+  index,
+  serial,
+  integer,
+  boolean,
+  decimal,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+// Session storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Facebook Pages connected to user accounts
+export const facebookPages = pgTable("facebook_pages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  pageId: varchar("page_id").notNull(),
+  pageName: varchar("page_name").notNull(),
+  accessToken: text("access_token").notNull(),
+  category: varchar("category"),
+  followerCount: integer("follower_count"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Facebook Ad Accounts
+export const facebookAdAccounts = pgTable("facebook_ad_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  adAccountId: varchar("ad_account_id").notNull(),
+  adAccountName: varchar("ad_account_name").notNull(),
+  accessToken: text("access_token").notNull(),
+  currency: varchar("currency"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Ad Performance Metrics
+export const adMetrics = pgTable("ad_metrics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  adAccountId: varchar("ad_account_id").notNull().references(() => facebookAdAccounts.adAccountId),
+  campaignId: varchar("campaign_id"),
+  campaignName: varchar("campaign_name"),
+  spend: decimal("spend", { precision: 10, scale: 2 }),
+  impressions: integer("impressions"),
+  clicks: integer("clicks"),
+  conversions: integer("conversions"),
+  cpm: decimal("cpm", { precision: 10, scale: 2 }),
+  cpc: decimal("cpc", { precision: 10, scale: 2 }),
+  ctr: decimal("ctr", { precision: 5, scale: 4 }),
+  date: timestamp("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Customer Interactions
+export const customerInteractions = pgTable("customer_interactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pageId: varchar("page_id").notNull().references(() => facebookPages.pageId),
+  customerId: varchar("customer_id"),
+  customerName: varchar("customer_name"),
+  message: text("message").notNull(),
+  response: text("response"),
+  respondedBy: varchar("responded_by"), // 'ai' or employee id
+  responseTime: integer("response_time"), // in seconds
+  sentiment: varchar("sentiment"), // 'positive', 'negative', 'neutral'
+  status: varchar("status").default("pending"), // 'pending', 'responded', 'escalated'
+  isAutoResponse: boolean("is_auto_response").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Employee Performance Tracking
+export const employees = pgTable("employees", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  role: varchar("role").notNull(),
+  profileImageUrl: varchar("profile_image_url"),
+  avgResponseTime: integer("avg_response_time"), // in seconds
+  totalResponses: integer("total_responses").default(0),
+  isActive: boolean("is_active").default(true),
+  lastActive: timestamp("last_active"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// AI Learning Data
+export const aiLearningData = pgTable("ai_learning_data", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  interactionId: uuid("interaction_id").references(() => customerInteractions.id),
+  inputText: text("input_text").notNull(),
+  outputText: text("output_text").notNull(),
+  feedback: varchar("feedback"), // 'positive', 'negative', 'neutral'
+  confidence: decimal("confidence", { precision: 3, scale: 2 }),
+  category: varchar("category"), // 'customer_service', 'ad_copy', 'policy_check'
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Restriction Monitoring
+export const restrictionAlerts = pgTable("restriction_alerts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pageId: varchar("page_id").references(() => facebookPages.pageId),
+  adAccountId: varchar("ad_account_id").references(() => facebookAdAccounts.adAccountId),
+  alertType: varchar("alert_type").notNull(), // 'policy_violation', 'ad_rejected', 'account_warning'
+  severity: varchar("severity").notNull(), // 'low', 'medium', 'high', 'critical'
+  message: text("message").notNull(),
+  isResolved: boolean("is_resolved").default(false),
+  aiSuggestion: text("ai_suggestion"),
+  createdAt: timestamp("created_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
+// Competitor Analysis Data
+export const competitorData = pgTable("competitor_data", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  competitorName: varchar("competitor_name").notNull(),
+  competitorPageId: varchar("competitor_page_id"),
+  adData: jsonb("ad_data"),
+  engagement: jsonb("engagement_data"),
+  lastScanned: timestamp("last_scanned"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// AI Recommendations
+export const aiRecommendations = pgTable("ai_recommendations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  type: varchar("type").notNull(), // 'budget', 'timing', 'content', 'audience'
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  priority: varchar("priority").notNull(), // 'low', 'medium', 'high'
+  actionable: jsonb("actionable_data"),
+  isImplemented: boolean("is_implemented").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  implementedAt: timestamp("implemented_at"),
+});
+
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
+export const insertFacebookPageSchema = createInsertSchema(facebookPages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAdMetricsSchema = createInsertSchema(adMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCustomerInteractionSchema = createInsertSchema(customerInteractions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmployeeSchema = createInsertSchema(employees).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertRestrictionAlertSchema = createInsertSchema(restrictionAlerts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAIRecommendationSchema = createInsertSchema(aiRecommendations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FacebookPage = typeof facebookPages.$inferSelect;
+export type InsertFacebookPage = z.infer<typeof insertFacebookPageSchema>;
+export type AdMetrics = typeof adMetrics.$inferSelect;
+export type InsertAdMetrics = z.infer<typeof insertAdMetricsSchema>;
+export type CustomerInteraction = typeof customerInteractions.$inferSelect;
+export type InsertCustomerInteraction = z.infer<typeof insertCustomerInteractionSchema>;
+export type Employee = typeof employees.$inferSelect;
+export type InsertEmployee = z.infer<typeof insertEmployeeSchema>;
+export type RestrictionAlert = typeof restrictionAlerts.$inferSelect;
+export type InsertRestrictionAlert = z.infer<typeof insertRestrictionAlertSchema>;
+export type AIRecommendation = typeof aiRecommendations.$inferSelect;
+export type InsertAIRecommendation = z.infer<typeof insertAIRecommendationSchema>;

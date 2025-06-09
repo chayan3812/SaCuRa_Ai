@@ -227,7 +227,7 @@ export class DatabaseStorage implements IStorage {
         isAutoResponse: customerInteractions.isAutoResponse
       })
       .from(customerInteractions)
-      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.pageId))
+      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.id))
       .where(eq(facebookPages.userId, userId))
       .orderBy(desc(customerInteractions.createdAt))
       .limit(limit);
@@ -511,7 +511,7 @@ export class DatabaseStorage implements IStorage {
     const spendResult = await db
       .select({ totalSpend: sql<number>`COALESCE(SUM(${adMetrics.spend}), 0)` })
       .from(adMetrics)
-      .innerJoin(facebookAdAccounts, eq(adMetrics.adAccountId, facebookAdAccounts.adAccountId))
+      .innerJoin(facebookAdAccounts, eq(adMetrics.adAccountId, facebookAdAccounts.id))
       .where(and(
         eq(facebookAdAccounts.userId, userId),
         gte(adMetrics.date, today)

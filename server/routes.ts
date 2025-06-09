@@ -528,6 +528,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Content Queue routes
+  app.get('/api/content-queue', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const contentQueue = await storage.getContentQueueByUser(userId);
+      res.json(contentQueue);
+    } catch (error) {
+      console.error("Error fetching content queue:", error);
+      res.status(500).json({ message: "Failed to fetch content queue" });
+    }
+  });
+
+  app.post('/api/content-queue', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const postData = { ...req.body, userId };
+      const newPost = await storage.createContentPost(postData);
+      res.json(newPost);
+    } catch (error) {
+      console.error("Error creating content post:", error);
+      res.status(500).json({ message: "Failed to create content post" });
+    }
+  });
+
+  app.delete('/api/content-queue/:id', isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteContentPost(req.params.id);
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting content post:", error);
+      res.status(500).json({ message: "Failed to delete content post" });
+    }
+  });
+
+  // Content Templates routes
+  app.get('/api/content-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const templates = await storage.getContentTemplatesByUser(userId);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching content templates:", error);
+      res.status(500).json({ message: "Failed to fetch content templates" });
+    }
+  });
+
+  app.post('/api/content-templates', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const templateData = { ...req.body, userId };
+      const newTemplate = await storage.createContentTemplate(templateData);
+      res.json(newTemplate);
+    } catch (error) {
+      console.error("Error creating content template:", error);
+      res.status(500).json({ message: "Failed to create content template" });
+    }
+  });
+
+  // Posting Schedules routes
+  app.get('/api/posting-schedules', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const schedules = await storage.getPostingSchedulesByUser(userId);
+      res.json(schedules);
+    } catch (error) {
+      console.error("Error fetching posting schedules:", error);
+      res.status(500).json({ message: "Failed to fetch posting schedules" });
+    }
+  });
+
+  app.post('/api/posting-schedules', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const scheduleData = { ...req.body, userId };
+      const newSchedule = await storage.createPostingSchedule(scheduleData);
+      res.json(newSchedule);
+    } catch (error) {
+      console.error("Error creating posting schedule:", error);
+      res.status(500).json({ message: "Failed to create posting schedule" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

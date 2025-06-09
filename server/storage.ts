@@ -55,6 +55,7 @@ export interface IStorage {
   // Customer Interactions
   createCustomerInteraction(interaction: InsertCustomerInteraction): Promise<CustomerInteraction>;
   getCustomerInteractionsByPage(pageId: string, limit: number): Promise<CustomerInteraction[]>;
+  getAllCustomerInteractionsByUser(userId: string, limit: number): Promise<CustomerInteraction[]>;
   updateCustomerInteractionResponse(id: string, response: string, respondedBy: string, responseTime: number): Promise<void>;
   getPendingInteractions(pageId: string): Promise<CustomerInteraction[]>;
   
@@ -206,6 +207,32 @@ export class DatabaseStorage implements IStorage {
       .where(eq(customerInteractions.pageId, pageId))
       .orderBy(desc(customerInteractions.createdAt))
       .limit(limit);
+  }
+
+  async getAllCustomerInteractionsByUser(userId: string, limit: number): Promise<CustomerInteraction[]> {
+    const results = await db
+      .select({
+        id: customerInteractions.id,
+        createdAt: customerInteractions.createdAt,
+        updatedAt: customerInteractions.updatedAt,
+        pageId: customerInteractions.pageId,
+        message: customerInteractions.message,
+        status: customerInteractions.status,
+        customerId: customerInteractions.customerId,
+        customerName: customerInteractions.customerName,
+        response: customerInteractions.response,
+        respondedBy: customerInteractions.respondedBy,
+        responseTime: customerInteractions.responseTime,
+        sentiment: customerInteractions.sentiment,
+        isAutoResponse: customerInteractions.isAutoResponse
+      })
+      .from(customerInteractions)
+      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.pageId))
+      .where(eq(facebookPages.userId, userId))
+      .orderBy(desc(customerInteractions.createdAt))
+      .limit(limit);
+    
+    return results;
   }
 
   async updateCustomerInteractionResponse(

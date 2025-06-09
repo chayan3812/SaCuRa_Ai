@@ -135,8 +135,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { pageId } = req.params;
       const limit = parseInt(req.query.limit as string) || 50;
-      const interactions = await storage.getCustomerInteractionsByPage(pageId, limit);
-      res.json(interactions);
+      
+      // Handle "all" pageId case
+      if (pageId === 'all') {
+        const userId = (req.user as any).claims.sub;
+        const interactions = await storage.getAllCustomerInteractionsByUser(userId, limit);
+        res.json(interactions);
+      } else {
+        const interactions = await storage.getCustomerInteractionsByPage(pageId, limit);
+        res.json(interactions);
+      }
     } catch (error) {
       console.error('Error fetching interactions:', error);
       res.status(500).json({ message: 'Failed to fetch customer interactions' });

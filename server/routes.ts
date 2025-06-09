@@ -790,6 +790,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hybrid AI Engine Routes
+  app.post('/api/hybrid-ai/generate-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, contentType, options } = req.body;
+      
+      const { hybridAI } = await import('./hybridAI');
+      const result = await hybridAI.generateEnhancedContent(prompt, contentType, options || {});
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating hybrid AI content:", error);
+      res.status(500).json({ message: "Failed to generate content" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/customer-response', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, context, tone } = req.body;
+      
+      const { hybridAI } = await import('./hybridAI');
+      const result = await hybridAI.generateCustomerServiceResponse(message, context, tone);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating hybrid customer response:", error);
+      res.status(500).json({ message: "Failed to generate customer response" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/analyze-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const { content } = req.body;
+      
+      const { hybridAI } = await import('./hybridAI');
+      const result = await hybridAI.analyzeContentAdvanced(content);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error analyzing content with hybrid AI:", error);
+      res.status(500).json({ message: "Failed to analyze content" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/optimize-ad', isAuthenticated, async (req: any, res) => {
+    try {
+      const { adCopy, objective, targetAudience } = req.body;
+      
+      const { hybridAI } = await import('./hybridAI');
+      const result = await hybridAI.optimizeAdCampaign(adCopy, objective, targetAudience);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error optimizing ad with hybrid AI:", error);
+      res.status(500).json({ message: "Failed to optimize ad" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/multi-language', isAuthenticated, async (req: any, res) => {
+    try {
+      const { content, targetLanguages, culturalAdaptation } = req.body;
+      
+      const { hybridAI } = await import('./hybridAI');
+      const result = await hybridAI.generateMultiLanguageContent(content, targetLanguages, culturalAdaptation);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating multi-language content:", error);
+      res.status(500).json({ message: "Failed to generate multi-language content" });
+    }
+  });
+
+  app.get('/api/hybrid-ai/provider-health', isAuthenticated, async (req, res) => {
+    try {
+      const { hybridAI } = await import('./hybridAI');
+      const health = hybridAI.getProviderHealth();
+      
+      res.json(health);
+    } catch (error) {
+      console.error("Error getting provider health:", error);
+      res.status(500).json({ message: "Failed to get provider health" });
+    }
+  });
+
+  // Claude AI specific routes
+  app.post('/api/claude/generate-strategy', isAuthenticated, async (req: any, res) => {
+    try {
+      const { businessType, goals, currentMetrics } = req.body;
+      
+      const { claudeAI } = await import('./claudeAI');
+      const strategy = await claudeAI.generateMarketingStrategy(businessType, goals, currentMetrics);
+      
+      res.json(strategy);
+    } catch (error) {
+      console.error("Error generating marketing strategy:", error);
+      res.status(500).json({ message: "Failed to generate marketing strategy" });
+    }
+  });
+
+  app.post('/api/claude/competitor-insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const { competitorData, industry } = req.body;
+      
+      const { claudeAI } = await import('./claudeAI');
+      const insights = await claudeAI.generateCompetitorInsights(competitorData, industry);
+      
+      res.json(insights);
+    } catch (error) {
+      console.error("Error generating competitor insights:", error);
+      res.status(500).json({ message: "Failed to generate competitor insights" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

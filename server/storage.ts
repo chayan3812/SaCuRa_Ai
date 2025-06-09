@@ -140,9 +140,23 @@ export class DatabaseStorage implements IStorage {
 
   async getLatestAdMetrics(userId: string): Promise<AdMetrics[]> {
     return await db
-      .select()
+      .select({
+        id: adMetrics.id,
+        adAccountId: adMetrics.adAccountId,
+        campaignId: adMetrics.campaignId,
+        campaignName: adMetrics.campaignName,
+        spend: adMetrics.spend,
+        impressions: adMetrics.impressions,
+        clicks: adMetrics.clicks,
+        conversions: adMetrics.conversions,
+        cpm: adMetrics.cpm,
+        cpc: adMetrics.cpc,
+        ctr: adMetrics.ctr,
+        date: adMetrics.date,
+        createdAt: adMetrics.createdAt,
+      })
       .from(adMetrics)
-      .innerJoin(facebookAdAccounts, eq(adMetrics.adAccountId, facebookAdAccounts.adAccountId))
+      .innerJoin(facebookAdAccounts, eq(adMetrics.adAccountId, facebookAdAccounts.id))
       .where(eq(facebookAdAccounts.userId, userId))
       .orderBy(desc(adMetrics.date))
       .limit(10);
@@ -236,9 +250,20 @@ export class DatabaseStorage implements IStorage {
 
   async getRestrictionAlertsByUser(userId: string): Promise<RestrictionAlert[]> {
     return await db
-      .select()
+      .select({
+        id: restrictionAlerts.id,
+        pageId: restrictionAlerts.pageId,
+        adAccountId: restrictionAlerts.adAccountId,
+        alertType: restrictionAlerts.alertType,
+        severity: restrictionAlerts.severity,
+        message: restrictionAlerts.message,
+        isResolved: restrictionAlerts.isResolved,
+        aiSuggestion: restrictionAlerts.aiSuggestion,
+        createdAt: restrictionAlerts.createdAt,
+        resolvedAt: restrictionAlerts.resolvedAt,
+      })
       .from(restrictionAlerts)
-      .innerJoin(facebookPages, eq(restrictionAlerts.pageId, facebookPages.pageId))
+      .innerJoin(facebookPages, eq(restrictionAlerts.pageId, facebookPages.id))
       .where(eq(facebookPages.userId, userId))
       .orderBy(desc(restrictionAlerts.createdAt));
   }

@@ -902,6 +902,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Auto Poster API routes
+  app.post('/api/ai/generate-image', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, style, size } = req.body;
+      
+      const { generateImage } = await import('./openai');
+      const result = await generateImage(prompt);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating image:", error);
+      res.status(500).json({ message: "Failed to generate image" });
+    }
+  });
+
+  app.get('/api/templates', isAuthenticated, async (req, res) => {
+    try {
+      // Return pre-built templates
+      const templates = [
+        {
+          id: "promotional",
+          name: "Product Promotion",
+          category: "Sales",
+          structure: "🎉 Exciting news! {productName} is now available!\n\n{description}\n\n✨ Special offer: {offer}\n\n{callToAction}",
+          variables: ["productName", "description", "offer", "callToAction"],
+          description: "Perfect for promoting new products or services"
+        },
+        {
+          id: "educational",
+          name: "Educational Content",
+          category: "Education",
+          structure: "💡 Did you know?\n\n{fact}\n\n{explanation}\n\n{actionableAdvice}\n\nWhat's your experience with this? Share below! 👇",
+          variables: ["fact", "explanation", "actionableAdvice"],
+          description: "Share valuable insights and knowledge"
+        },
+        {
+          id: "behind-scenes",
+          name: "Behind the Scenes",
+          category: "Engagement",
+          structure: "🎬 Behind the scenes at {companyName}!\n\n{description}\n\n{personalTouch}\n\n{question}",
+          variables: ["companyName", "description", "personalTouch", "question"],
+          description: "Show the human side of your business"
+        },
+        {
+          id: "testimonial",
+          name: "Customer Testimonial",
+          category: "Social Proof",
+          structure: "⭐ Amazing feedback from {customerName}!\n\n\"{testimonial}\"\n\n{productService} continues to {benefit}\n\n{callToAction}",
+          variables: ["customerName", "testimonial", "productService", "benefit", "callToAction"],
+          description: "Showcase positive customer experiences"
+        },
+        {
+          id: "event-announcement",
+          name: "Event Announcement",
+          category: "Events",
+          structure: "📅 Mark your calendar! {eventName} is happening!\n\n📍 {location}\n⏰ {dateTime}\n\n{eventDescription}\n\n{registrationInfo}",
+          variables: ["eventName", "location", "dateTime", "eventDescription", "registrationInfo"],
+          description: "Announce upcoming events and activities"
+        }
+      ];
+      
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      res.status(500).json({ message: "Failed to fetch templates" });
+    }
+  });
+
+  app.post('/api/templates/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { templateId, variables } = req.body;
+      
+      // Get the template structure and fill in variables
+      const templates = [
+        {
+          id: "promotional",
+          structure: "🎉 Exciting news! {productName} is now available!\n\n{description}\n\n✨ Special offer: {offer}\n\n{callToAction}",
+        },
+        {
+          id: "educational",
+          structure: "💡 Did you know?\n\n{fact}\n\n{explanation}\n\n{actionableAdvice}\n\nWhat's your experience with this? Share below! 👇",
+        },
+        {
+          id: "behind-scenes",
+          structure: "🎬 Behind the scenes at {companyName}!\n\n{description}\n\n{personalTouch}\n\n{question}",
+        },
+        {
+          id: "testimonial",
+          structure: "⭐ Amazing feedback from {customerName}!\n\n\"{testimonial}\"\n\n{productService} continues to {benefit}\n\n{callToAction}",
+        },
+        {
+          id: "event-announcement",
+          structure: "📅 Mark your calendar! {eventName} is happening!\n\n📍 {location}\n⏰ {dateTime}\n\n{eventDescription}\n\n{registrationInfo}",
+        }
+      ];
+      
+      const template = templates.find(t => t.id === templateId);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      
+      // Replace variables in template structure
+      let content = template.structure;
+      Object.entries(variables).forEach(([key, value]) => {
+        content = content.replace(new RegExp(`{${key}}`, 'g'), value as string);
+      });
+      
+      // Generate hashtags based on content
+      const hashtags = [];
+      if (content.toLowerCase().includes('product')) hashtags.push('#product', '#launch');
+      if (content.toLowerCase().includes('special')) hashtags.push('#specialoffer', '#deal');
+      if (content.toLowerCase().includes('behind')) hashtags.push('#behindthescenes', '#team');
+      if (content.toLowerCase().includes('event')) hashtags.push('#event', '#community');
+      
+      const result = {
+        content,
+        hashtags,
+        callToAction: "Engage with us!",
+        suggestedImages: [],
+        seoScore: 85,
+        bestPostTime: "2:00 PM",
+        estimatedReach: "500-1000"
+      };
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating from template:", error);
+      res.status(500).json({ message: "Failed to generate from template" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

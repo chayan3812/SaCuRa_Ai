@@ -68,7 +68,7 @@ export const facebookAdAccounts = pgTable("facebook_ad_accounts", {
 // Ad Performance Metrics
 export const adMetrics = pgTable("ad_metrics", {
   id: uuid("id").primaryKey().defaultRandom(),
-  adAccountId: varchar("ad_account_id").notNull().references(() => facebookAdAccounts.adAccountId),
+  adAccountId: uuid("ad_account_id").notNull().references(() => facebookAdAccounts.id),
   campaignId: varchar("campaign_id"),
   campaignName: varchar("campaign_name"),
   spend: decimal("spend", { precision: 10, scale: 2 }),
@@ -85,7 +85,7 @@ export const adMetrics = pgTable("ad_metrics", {
 // Customer Interactions
 export const customerInteractions = pgTable("customer_interactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  pageId: varchar("page_id").notNull().references(() => facebookPages.pageId),
+  pageId: uuid("page_id").notNull().references(() => facebookPages.id),
   customerId: varchar("customer_id"),
   customerName: varchar("customer_name"),
   message: text("message").notNull(),
@@ -131,8 +131,8 @@ export const aiLearningData = pgTable("ai_learning_data", {
 // Restriction Monitoring
 export const restrictionAlerts = pgTable("restriction_alerts", {
   id: uuid("id").primaryKey().defaultRandom(),
-  pageId: varchar("page_id").references(() => facebookPages.pageId),
-  adAccountId: varchar("ad_account_id").references(() => facebookAdAccounts.adAccountId),
+  pageId: uuid("page_id").references(() => facebookPages.id),
+  adAccountId: uuid("ad_account_id").references(() => facebookAdAccounts.id),
   alertType: varchar("alert_type").notNull(), // 'policy_violation', 'ad_rejected', 'account_warning'
   severity: varchar("severity").notNull(), // 'low', 'medium', 'high', 'critical'
   message: text("message").notNull(),

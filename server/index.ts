@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializePageWatcher } from "./pageWatcher";
+import { initializeContentScheduler } from "./contentScheduler";
 
 const app = express();
 app.use(express.json());
@@ -59,6 +60,19 @@ app.use((req, res, next) => {
     log("Page Watcher Engine started successfully");
   } catch (error) {
     log("Failed to start Page Watcher Engine: " + error);
+  }
+
+  // Initialize Content Scheduler
+  try {
+    initializeContentScheduler({
+      enabled: true,
+      checkInterval: '*/5 * * * *', // Every 5 minutes
+      maxRetries: 3,
+      retryDelay: 30
+    });
+    log("Content Scheduler started successfully");
+  } catch (error) {
+    log("Failed to start Content Scheduler: " + error);
   }
 
   // importantly only setup vite in development and after

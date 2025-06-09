@@ -12,13 +12,15 @@ import {
   Brain,
   Settings,
   LogOut,
-  Send
+  Send,
+  Calendar
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: ChartLine },
   { name: "Ad Optimizer", href: "/ads", icon: Megaphone, badge: "AI" },
   { name: "Auto Poster", href: "/auto-poster", icon: Send, badge: "NEW" },
+  { name: "Content Queue", href: "/content-queue", icon: Calendar, badge: "QUEUE" },
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },

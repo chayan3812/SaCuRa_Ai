@@ -393,7 +393,7 @@ export default function AutoPoster() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {facebookPages.map((page: any) => (
+              {facebookPages.map((page) => (
                 <div key={page.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <div className="font-medium">{page.pageName}</div>

@@ -15,6 +15,7 @@ import RestrictionMonitor from "@/pages/RestrictionMonitor";
 import EmployeeMonitor from "@/pages/EmployeeMonitor";
 import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
 import AIInsights from "@/pages/AIInsights";
+import AutoPoster from "@/pages/AutoPoster";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +36,7 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/ads" component={AdOptimizer} />
+          <Route path="/auto-poster" component={AutoPoster} />
           <Route path="/customer-service" component={CustomerService} />
           <Route path="/restrictions" component={RestrictionMonitor} />
           <Route path="/employees" component={EmployeeMonitor} />

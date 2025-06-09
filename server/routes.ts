@@ -382,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/facebook/publish-post", isAuthenticated, async (req, res) => {
     try {
       const { pageId, content, scheduledTime } = req.body;
-      const userId = req.user?.claims?.sub;
+      const userId = (req.user as any)?.claims?.sub;
       
       if (!pageId || !content) {
         return res.status(400).json({ message: "Page ID and content are required" });

@@ -11,12 +11,14 @@ import {
   Search, 
   Brain,
   Settings,
-  LogOut
+  LogOut,
+  Send
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: ChartLine },
   { name: "Ad Optimizer", href: "/ads", icon: Megaphone, badge: "AI" },
+  { name: "Auto Poster", href: "/auto-poster", icon: Send, badge: "NEW" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },

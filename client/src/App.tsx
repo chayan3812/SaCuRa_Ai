@@ -38,6 +38,7 @@ function Router() {
           <Route path="/" component={Dashboard} />
           <Route path="/ads" component={AdOptimizer} />
           <Route path="/auto-poster" component={AutoPoster} />
+          <Route path="/page-status" component={PageStatus} />
           <Route path="/customer-service" component={CustomerService} />
           <Route path="/restrictions" component={RestrictionMonitor} />
           <Route path="/employees" component={EmployeeMonitor} />

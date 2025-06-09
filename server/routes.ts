@@ -666,6 +666,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced AI Engine Routes
+  app.get('/api/ai/insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const timeframe = req.query.timeframe as string || '30d';
+      
+      const { aiEngine } = await import('./aiEngine');
+      const insights = await aiEngine.generateAdvancedInsights(userId, timeframe);
+      
+      res.json(insights);
+    } catch (error) {
+      console.error("Error generating AI insights:", error);
+      res.status(500).json({ message: "Failed to generate AI insights" });
+    }
+  });
+
+  app.post('/api/ai/content-suggestions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const { contentType, targetAudience } = req.body;
+      
+      const { aiEngine } = await import('./aiEngine');
+      const suggestions = await aiEngine.generateContentSuggestions(userId, contentType, targetAudience);
+      
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Error generating content suggestions:", error);
+      res.status(500).json({ message: "Failed to generate content suggestions" });
+    }
+  });
+
+  app.get('/api/ai/market-trends', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const industry = req.query.industry as string;
+      
+      const { aiEngine } = await import('./aiEngine');
+      const trends = await aiEngine.detectMarketTrends(userId, industry);
+      
+      res.json(trends);
+    } catch (error) {
+      console.error("Error detecting market trends:", error);
+      res.status(500).json({ message: "Failed to detect market trends" });
+    }
+  });
+
+  app.post('/api/ai/translate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { content, targetLanguages, culturalAdaptation } = req.body;
+      
+      const { aiEngine } = await import('./aiEngine');
+      const translations = await aiEngine.generateMultiLanguageContent(content, targetLanguages, culturalAdaptation);
+      
+      res.json(translations);
+    } catch (error) {
+      console.error("Error translating content:", error);
+      res.status(500).json({ message: "Failed to translate content" });
+    }
+  });
+
+  app.get('/api/ai/sentiment-analysis', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const timeframe = req.query.timeframe as string || '30d';
+      
+      const { aiEngine } = await import('./aiEngine');
+      const analysis = await aiEngine.analyzeSentimentTrends(userId, timeframe);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing sentiment:", error);
+      res.status(500).json({ message: "Failed to analyze sentiment" });
+    }
+  });
+
+  app.post('/api/ai/predict-performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const contentData = req.body;
+      
+      const { aiEngine } = await import('./aiEngine');
+      const prediction = await aiEngine.predictPerformance(userId, contentData);
+      
+      res.json(prediction);
+    } catch (error) {
+      console.error("Error predicting performance:", error);
+      res.status(500).json({ message: "Failed to predict performance" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

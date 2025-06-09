@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   Send,
-  Calendar
+  Calendar,
+  BarChart3
 } from "lucide-react";
 
 const navigation = [
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Ad Optimizer", href: "/ads", icon: Megaphone, badge: "AI" },
   { name: "Auto Poster", href: "/auto-poster", icon: Send, badge: "NEW" },
   { name: "Content Queue", href: "/content-queue", icon: Calendar, badge: "QUEUE" },
+  { name: "Analytics", href: "/analytics", icon: BarChart3, badge: "LIVE" },
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },

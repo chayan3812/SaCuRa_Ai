@@ -610,6 +610,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics routes
+  app.get('/api/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const days = parseInt(req.query.days as string) || 7;
+      
+      const { analyticsService } = await import('./analyticsService');
+      const analyticsData = await analyticsService.getAnalyticsData(userId, days);
+      
+      res.json(analyticsData);
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+      res.status(500).json({ message: "Failed to fetch analytics data" });
+    }
+  });
+
+  app.get('/api/analytics/realtime', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const { analyticsService } = await import('./analyticsService');
+      const realtimeData = await analyticsService.getRealtimeData(userId);
+      
+      res.json(realtimeData);
+    } catch (error) {
+      console.error("Error fetching realtime data:", error);
+      res.status(500).json({ message: "Failed to fetch realtime data" });
+    }
+  });
+
+  app.get('/api/analytics/insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const days = parseInt(req.query.days as string) || 7;
+      
+      const { analyticsService } = await import('./analyticsService');
+      const analyticsData = await analyticsService.getAnalyticsData(userId, days);
+      const insights = await analyticsService.generateInsights(userId, analyticsData);
+      
+      res.json(insights);
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      res.status(500).json({ message: "Failed to generate insights" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

@@ -20,6 +20,15 @@ import {
   aiRecommendations,
   type AIRecommendation,
   type InsertAIRecommendation,
+  contentQueue,
+  type ContentQueue,
+  type InsertContentQueue,
+  contentTemplates,
+  type ContentTemplate,
+  type InsertContentTemplate,
+  postingSchedules,
+  type PostingSchedule,
+  type InsertPostingSchedule,
   competitorData,
   aiLearningData,
   facebookAdAccounts,
@@ -64,6 +73,28 @@ export interface IStorage {
   createAIRecommendation(recommendation: InsertAIRecommendation): Promise<AIRecommendation>;
   getAIRecommendationsByUser(userId: string): Promise<AIRecommendation[]>;
   markRecommendationImplemented(recommendationId: string): Promise<void>;
+  
+  // Content Queue Management
+  createContentPost(post: InsertContentQueue): Promise<ContentQueue>;
+  getContentQueueByUser(userId: string): Promise<ContentQueue[]>;
+  getContentQueueByPage(pageId: string): Promise<ContentQueue[]>;
+  getScheduledPosts(userId: string, days: number): Promise<ContentQueue[]>;
+  updatePostStatus(postId: string, status: string, publishedAt?: Date, actualReach?: number, engagement?: any): Promise<void>;
+  deleteContentPost(postId: string): Promise<void>;
+  
+  // Content Templates
+  createContentTemplate(template: InsertContentTemplate): Promise<ContentTemplate>;
+  getContentTemplatesByUser(userId: string): Promise<ContentTemplate[]>;
+  getPublicContentTemplates(): Promise<ContentTemplate[]>;
+  updateTemplateUsage(templateId: string): Promise<void>;
+  deleteContentTemplate(templateId: string): Promise<void>;
+  
+  // Posting Schedules
+  createPostingSchedule(schedule: InsertPostingSchedule): Promise<PostingSchedule>;
+  getPostingSchedulesByUser(userId: string): Promise<PostingSchedule[]>;
+  getActiveSchedules(): Promise<PostingSchedule[]>;
+  updateScheduleStatus(scheduleId: string, isActive: boolean): Promise<void>;
+  deletePostingSchedule(scheduleId: string): Promise<void>;
   
   // Dashboard Analytics
   getDashboardMetrics(userId: string): Promise<{
@@ -301,6 +332,142 @@ export class DatabaseStorage implements IStorage {
         implementedAt: new Date() 
       })
       .where(eq(aiRecommendations.id, recommendationId));
+  }
+
+  // Content Queue Management
+  async createContentPost(post: InsertContentQueue): Promise<ContentQueue> {
+    const [result] = await db.insert(contentQueue).values(post).returning();
+    return result;
+  }
+
+  async getContentQueueByUser(userId: string): Promise<ContentQueue[]> {
+    return await db
+      .select()
+      .from(contentQueue)
+      .where(eq(contentQueue.userId, userId))
+      .orderBy(desc(contentQueue.scheduledFor));
+  }
+
+  async getContentQueueByPage(pageId: string): Promise<ContentQueue[]> {
+    return await db
+      .select()
+      .from(contentQueue)
+      .where(eq(contentQueue.pageId, pageId))
+      .orderBy(desc(contentQueue.scheduledFor));
+  }
+
+  async getScheduledPosts(userId: string, days: number): Promise<ContentQueue[]> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    
+    return await db
+      .select()
+      .from(contentQueue)
+      .where(
+        and(
+          eq(contentQueue.userId, userId),
+          eq(contentQueue.status, "scheduled"),
+          gte(contentQueue.scheduledFor, new Date())
+        )
+      )
+      .orderBy(contentQueue.scheduledFor);
+  }
+
+  async updatePostStatus(
+    postId: string, 
+    status: string, 
+    publishedAt?: Date, 
+    actualReach?: number, 
+    engagement?: any
+  ): Promise<void> {
+    const updateData: any = { 
+      status, 
+      updatedAt: new Date() 
+    };
+    
+    if (publishedAt) updateData.publishedAt = publishedAt;
+    if (actualReach) updateData.actualReach = actualReach;
+    if (engagement) updateData.engagement = engagement;
+    
+    await db
+      .update(contentQueue)
+      .set(updateData)
+      .where(eq(contentQueue.id, postId));
+  }
+
+  async deleteContentPost(postId: string): Promise<void> {
+    await db.delete(contentQueue).where(eq(contentQueue.id, postId));
+  }
+
+  // Content Templates
+  async createContentTemplate(template: InsertContentTemplate): Promise<ContentTemplate> {
+    const [result] = await db.insert(contentTemplates).values(template).returning();
+    return result;
+  }
+
+  async getContentTemplatesByUser(userId: string): Promise<ContentTemplate[]> {
+    return await db
+      .select()
+      .from(contentTemplates)
+      .where(eq(contentTemplates.userId, userId))
+      .orderBy(desc(contentTemplates.createdAt));
+  }
+
+  async getPublicContentTemplates(): Promise<ContentTemplate[]> {
+    return await db
+      .select()
+      .from(contentTemplates)
+      .where(eq(contentTemplates.isPublic, true))
+      .orderBy(desc(contentTemplates.useCount));
+  }
+
+  async updateTemplateUsage(templateId: string): Promise<void> {
+    await db
+      .update(contentTemplates)
+      .set({ 
+        useCount: sql`${contentTemplates.useCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(contentTemplates.id, templateId));
+  }
+
+  async deleteContentTemplate(templateId: string): Promise<void> {
+    await db.delete(contentTemplates).where(eq(contentTemplates.id, templateId));
+  }
+
+  // Posting Schedules
+  async createPostingSchedule(schedule: InsertPostingSchedule): Promise<PostingSchedule> {
+    const [result] = await db.insert(postingSchedules).values(schedule).returning();
+    return result;
+  }
+
+  async getPostingSchedulesByUser(userId: string): Promise<PostingSchedule[]> {
+    return await db
+      .select()
+      .from(postingSchedules)
+      .where(eq(postingSchedules.userId, userId))
+      .orderBy(desc(postingSchedules.createdAt));
+  }
+
+  async getActiveSchedules(): Promise<PostingSchedule[]> {
+    return await db
+      .select()
+      .from(postingSchedules)
+      .where(eq(postingSchedules.isActive, true));
+  }
+
+  async updateScheduleStatus(scheduleId: string, isActive: boolean): Promise<void> {
+    await db
+      .update(postingSchedules)
+      .set({ 
+        isActive,
+        updatedAt: new Date()
+      })
+      .where(eq(postingSchedules.id, scheduleId));
+  }
+
+  async deletePostingSchedule(scheduleId: string): Promise<void> {
+    await db.delete(postingSchedules).where(eq(postingSchedules.id, scheduleId));
   }
 
   // Dashboard Analytics

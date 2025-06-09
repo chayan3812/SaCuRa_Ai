@@ -168,6 +168,60 @@ export const aiRecommendations = pgTable("ai_recommendations", {
   implementedAt: timestamp("implemented_at"),
 });
 
+// Content Queue and Scheduled Posts
+export const contentQueue = pgTable("content_queue", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: varchar("user_id").notNull(),
+  pageId: varchar("page_id").notNull(),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  hashtags: text("hashtags").array(),
+  images: text("images").array(),
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  status: varchar("status", { enum: ["draft", "scheduled", "published", "failed", "cancelled"] }).notNull().default("draft"),
+  postType: varchar("post_type", { enum: ["text", "image", "video", "link", "carousel"] }).notNull().default("text"),
+  targetAudience: jsonb("target_audience"),
+  seoScore: integer("seo_score"),
+  estimatedReach: varchar("estimated_reach"),
+  actualReach: integer("actual_reach"),
+  engagement: jsonb("engagement"),
+  publishedAt: timestamp("published_at"),
+  failureReason: text("failure_reason"),
+  retryCount: integer("retry_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const contentTemplates = pgTable("content_templates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: varchar("user_id").notNull(),
+  name: varchar("name").notNull(),
+  category: varchar("category", { enum: ["promotion", "engagement", "educational", "seasonal", "announcement"] }).notNull(),
+  content: text("content").notNull(),
+  hashtags: text("hashtags").array(),
+  variables: text("variables").array(), // Placeholders like {product_name}, {discount}
+  isPublic: boolean("is_public").default(false),
+  useCount: integer("use_count").default(0),
+  avgPerformance: jsonb("avg_performance"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const postingSchedules = pgTable("posting_schedules", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: varchar("user_id").notNull(),
+  pageId: varchar("page_id").notNull(),
+  name: varchar("name").notNull(),
+  timezone: varchar("timezone").notNull().default("UTC"),
+  frequency: varchar("frequency", { enum: ["daily", "weekly", "monthly", "custom"] }).notNull(),
+  timeSlots: jsonb("time_slots").notNull(), // Array of {day: number, hour: number, minute: number}
+  isActive: boolean("is_active").default(true),
+  autoGenerate: boolean("auto_generate").default(false), // Auto-generate content for slots
+  contentType: varchar("content_type", { enum: ["mixed", "promotional", "educational", "engagement"] }).default("mixed"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
@@ -204,6 +258,25 @@ export const insertAIRecommendationSchema = createInsertSchema(aiRecommendations
   createdAt: true,
 });
 
+export const insertContentQueueSchema = createInsertSchema(contentQueue).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+});
+
+export const insertContentTemplateSchema = createInsertSchema(contentTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPostingScheduleSchema = createInsertSchema(postingSchedules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type FacebookPage = typeof facebookPages.$inferSelect;
 export type InsertFacebookPage = z.infer<typeof insertFacebookPageSchema>;
 export type AdMetrics = typeof adMetrics.$inferSelect;
@@ -216,3 +289,9 @@ export type RestrictionAlert = typeof restrictionAlerts.$inferSelect;
 export type InsertRestrictionAlert = z.infer<typeof insertRestrictionAlertSchema>;
 export type AIRecommendation = typeof aiRecommendations.$inferSelect;
 export type InsertAIRecommendation = z.infer<typeof insertAIRecommendationSchema>;
+export type ContentQueue = typeof contentQueue.$inferSelect;
+export type InsertContentQueue = z.infer<typeof insertContentQueueSchema>;
+export type ContentTemplate = typeof contentTemplates.$inferSelect;
+export type InsertContentTemplate = z.infer<typeof insertContentTemplateSchema>;
+export type PostingSchedule = typeof postingSchedules.$inferSelect;
+export type InsertPostingSchedule = z.infer<typeof insertPostingScheduleSchema>;

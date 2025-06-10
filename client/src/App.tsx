@@ -16,6 +16,7 @@ import EmployeeMonitor from "@/pages/EmployeeMonitor";
 import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
 import AIInsights from "@/pages/AIInsights";
 import HybridAI from "@/pages/HybridAI";
+import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
 import PageStatus from "@/pages/PageStatus";
 import ContentQueue from "@/pages/ContentQueue";
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/competitors" component={CompetitorAnalysis} />
           <Route path="/insights" component={AIInsights} />
           <Route path="/hybrid-ai" component={HybridAI} />
+          <Route path="/ml-intelligence" component={MLIntelligence} />
         </>
       )}
       <Route component={NotFound} />

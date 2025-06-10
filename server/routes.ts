@@ -17,6 +17,10 @@ import {
 } from "./openai";
 import { initializeWebSocket } from "./websocket";
 import { systemOptimizer } from "./systemOptimizer";
+import { mlEngine } from "./mlEngine";
+import { intelligentTrainer } from "./intelligentTrainer";
+import { aiEngine } from "./aiEngine";
+import { hybridAI } from "./hybridAI";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -782,6 +786,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting system health:", error);
       res.status(500).json({ message: "Failed to get system health" });
+    }
+  });
+
+  // Advanced ML Intelligence API Routes
+  app.get('/api/ml/status', isAuthenticated, async (req, res) => {
+    try {
+      const modelStatus = await mlEngine.getModelStatus();
+      res.json(modelStatus);
+    } catch (error) {
+      console.error("Error getting ML status:", error);
+      res.status(500).json({ message: "Failed to get ML status" });
+    }
+  });
+
+  app.get('/api/ml/training-status', isAuthenticated, async (req, res) => {
+    try {
+      const trainingMetrics = await intelligentTrainer.getTrainingStatus();
+      res.json(trainingMetrics);
+    } catch (error) {
+      console.error("Error getting training status:", error);
+      res.status(500).json({ message: "Failed to get training status" });
+    }
+  });
+
+  app.get('/api/ml/training-sessions', isAuthenticated, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const sessions = await intelligentTrainer.getRecentTrainingSessions(limit);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error getting training sessions:", error);
+      res.status(500).json({ message: "Failed to get training sessions" });
+    }
+  });
+
+  app.post('/api/ml/predict-engagement', isAuthenticated, async (req, res) => {
+    try {
+      const contentFeatures = req.body;
+      const prediction = await mlEngine.predictEngagement(contentFeatures);
+      res.json(prediction);
+    } catch (error) {
+      console.error("Error predicting engagement:", error);
+      res.status(500).json({ message: "Failed to predict engagement" });
+    }
+  });
+
+  app.post('/api/ml/optimize-conversion', isAuthenticated, async (req, res) => {
+    try {
+      const campaignData = req.body;
+      const optimization = await mlEngine.optimizeConversion(campaignData);
+      res.json(optimization);
+    } catch (error) {
+      console.error("Error optimizing conversion:", error);
+      res.status(500).json({ message: "Failed to optimize conversion" });
+    }
+  });
+
+  app.post('/api/ml/analyze-sentiment-advanced', isAuthenticated, async (req, res) => {
+    try {
+      const { text, context } = req.body;
+      const analysis = await mlEngine.analyzeSentimentAdvanced(text, context);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing sentiment:", error);
+      res.status(500).json({ message: "Failed to analyze sentiment" });
+    }
+  });
+
+  app.post('/api/ml/predict-performance', isAuthenticated, async (req, res) => {
+    try {
+      const campaignConfig = req.body;
+      const prediction = await mlEngine.predictPerformance(campaignConfig);
+      res.json(prediction);
+    } catch (error) {
+      console.error("Error predicting performance:", error);
+      res.status(500).json({ message: "Failed to predict performance" });
+    }
+  });
+
+  app.post('/api/ml/retrain', isAuthenticated, async (req, res) => {
+    try {
+      await intelligentTrainer.forceRetraining();
+      res.json({ message: "Model retraining initiated successfully" });
+    } catch (error) {
+      console.error("Error initiating retraining:", error);
+      res.status(500).json({ message: "Failed to initiate retraining" });
+    }
+  });
+
+  // Hybrid AI Routes for Advanced Intelligence
+  app.post('/api/hybrid-ai/generate-content', isAuthenticated, async (req, res) => {
+    try {
+      const { prompt, contentType, targetAudience, preferences } = req.body;
+      const content = await hybridAI.generateEnhancedContent(prompt, contentType, targetAudience, preferences);
+      res.json(content);
+    } catch (error) {
+      console.error("Error generating enhanced content:", error);
+      res.status(500).json({ message: "Failed to generate enhanced content" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/customer-service', isAuthenticated, async (req, res) => {
+    try {
+      const { message, customerHistory, context } = req.body;
+      const response = await hybridAI.generateCustomerServiceResponse(message, customerHistory, context);
+      res.json(response);
+    } catch (error) {
+      console.error("Error generating customer service response:", error);
+      res.status(500).json({ message: "Failed to generate customer service response" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/analyze-content', isAuthenticated, async (req, res) => {
+    try {
+      const { content } = req.body;
+      const analysis = await hybridAI.analyzeContentAdvanced(content);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing content:", error);
+      res.status(500).json({ message: "Failed to analyze content" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/optimize-campaign', isAuthenticated, async (req, res) => {
+    try {
+      const { campaignData, goals, constraints } = req.body;
+      const optimization = await hybridAI.optimizeAdCampaign(campaignData, goals, constraints);
+      res.json(optimization);
+    } catch (error) {
+      console.error("Error optimizing campaign:", error);
+      res.status(500).json({ message: "Failed to optimize campaign" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/multi-language-content', isAuthenticated, async (req, res) => {
+    try {
+      const { content, targetLanguages, culturalAdaptation } = req.body;
+      const translations = await hybridAI.generateMultiLanguageContent(content, targetLanguages, culturalAdaptation);
+      res.json(translations);
+    } catch (error) {
+      console.error("Error generating multi-language content:", error);
+      res.status(500).json({ message: "Failed to generate multi-language content" });
+    }
+  });
+
+  app.get('/api/hybrid-ai/provider-health', isAuthenticated, async (req, res) => {
+    try {
+      const health = hybridAI.getProviderHealth();
+      res.json(health);
+    } catch (error) {
+      console.error("Error getting provider health:", error);
+      res.status(500).json({ message: "Failed to get provider health" });
     }
   });
 

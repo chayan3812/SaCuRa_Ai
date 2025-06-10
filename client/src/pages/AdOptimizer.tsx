@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { 
   TrendingUp, 
+  TrendingDown,
   Target, 
   DollarSign, 
   Eye, 
@@ -15,7 +16,11 @@ import {
   Wand2,
   Shield,
   BarChart3,
-  AlertTriangle
+  AlertTriangle,
+  Loader2,
+  Activity,
+  Bell,
+  Zap
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -198,16 +203,205 @@ export default function AdOptimizer() {
         
         <div className="p-6 space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Ad Optimizer</h1>
               <p className="text-muted-foreground">AI-powered Facebook ad optimization and recommendations</p>
             </div>
-            <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              AI Powered
-            </Badge>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary">
+                <TrendingUp className="w-4 h-4 mr-1" />
+                AI Powered
+              </Badge>
+              <Button 
+                onClick={handleAdvancedOptimize}
+                disabled={isAdvancedOptimizing}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                {isAdvancedOptimizing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Target className="mr-2 h-4 w-4" />
+                    Advanced Optimize
+                  </>
+                )}
+              </Button>
+              <Button 
+                onClick={handleAutoFixPageIssues}
+                disabled={isAutoFixing}
+                variant="outline"
+                className="border-orange-500 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950"
+              >
+                {isAutoFixing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Fixing...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Auto-Fix Issues
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Real-time Performance Metrics */}
+          {performanceMetrics && (
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-blue-200 dark:border-blue-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                  Real-time Performance Metrics
+                  <Badge variant="secondary" className="ml-auto">Live</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{performanceMetrics.metrics?.impressions?.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Impressions</div>
+                    <div className="text-xs text-green-600 flex items-center justify-center gap-1">
+                      <TrendingUp className="h-3 w-3" />
+                      {performanceMetrics.trends?.impressionsTrend}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{performanceMetrics.metrics?.clicks?.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Clicks</div>
+                    <div className="text-xs text-blue-600 flex items-center justify-center gap-1">
+                      <Activity className="h-3 w-3" />
+                      {performanceMetrics.metrics?.ctr}% CTR
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">{performanceMetrics.metrics?.conversions}</div>
+                    <div className="text-sm text-muted-foreground">Conversions</div>
+                    <div className="text-xs text-green-600 flex items-center justify-center gap-1">
+                      <TrendingUp className="h-3 w-3" />
+                      {performanceMetrics.trends?.conversionTrend}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">${performanceMetrics.metrics?.spend?.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Spend</div>
+                    <div className="text-xs text-red-600 flex items-center justify-center gap-1">
+                      <TrendingDown className="h-3 w-3" />
+                      {performanceMetrics.trends?.costTrend}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-600">{performanceMetrics.metrics?.roas}x</div>
+                    <div className="text-sm text-muted-foreground">ROAS</div>
+                    <div className="text-xs text-green-600">Quality: {performanceMetrics.metrics?.qualityScore}/10</div>
+                  </div>
+                </div>
+
+                {performanceMetrics.alerts?.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Bell className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-800 dark:text-blue-200">Performance Alert</span>
+                    </div>
+                    {performanceMetrics.alerts.map((alert: any, index: number) => (
+                      <div key={index} className="text-sm text-blue-700 dark:text-blue-300">
+                        <div>{alert.message}</div>
+                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">{alert.recommendation}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Page Health Status */}
+          {pageHealth && (
+            <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200 dark:border-green-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-green-600" />
+                  Page Health Status
+                  <Badge 
+                    variant={pageHealth.overallScore >= 80 ? "default" : pageHealth.overallScore >= 60 ? "secondary" : "destructive"}
+                    className="ml-auto"
+                  >
+                    {pageHealth.overallScore}/100
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Health Metrics</div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span>Engagement Rate</span>
+                        <span className="font-medium">{pageHealth.metrics?.engagementRate}%</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>Content Quality</span>
+                        <span className="font-medium">{pageHealth.metrics?.contentQuality}/10</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>Compliance Score</span>
+                        <span className="font-medium">{pageHealth.metrics?.complianceScore}/10</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Trends</div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span>Engagement</span>
+                        <span className={`font-medium ${
+                          pageHealth.trends?.engagement === 'improving' ? 'text-green-600' : 
+                          pageHealth.trends?.engagement === 'declining' ? 'text-red-600' : 'text-yellow-600'
+                        }`}>
+                          {pageHealth.trends?.engagement}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>Growth</span>
+                        <span className={`font-medium ${
+                          pageHealth.trends?.growth === 'improving' ? 'text-green-600' : 
+                          pageHealth.trends?.growth === 'declining' ? 'text-red-600' : 'text-yellow-600'
+                        }`}>
+                          {pageHealth.trends?.growth}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>Compliance</span>
+                        <span className={`font-medium ${
+                          pageHealth.trends?.compliance === 'improving' ? 'text-green-600' : 
+                          pageHealth.trends?.compliance === 'declining' ? 'text-red-600' : 'text-yellow-600'
+                        }`}>
+                          {pageHealth.trends?.compliance}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Active Issues</div>
+                    <div className="text-xs text-muted-foreground">
+                      {pageHealth.issues?.length || 0} issues detected
+                    </div>
+                    {pageHealth.issues?.slice(0, 3).map((issue: any, index: number) => (
+                      <div key={index} className="text-xs p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
+                        <div className="font-medium">{issue.title}</div>
+                        <div className="text-yellow-700 dark:text-yellow-300">{issue.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Current Performance Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -360,13 +554,107 @@ export default function AdOptimizer() {
             </Card>
           </div>
 
-          {/* Optimization Suggestions */}
+          {/* Advanced Optimization Suggestions */}
+          {advancedSuggestions.length > 0 && (
+            <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950 border-purple-200 dark:border-purple-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-purple-600" />
+                  Advanced Optimization Strategies
+                  <Badge variant="secondary" className="ml-auto bg-purple-100 text-purple-700">AI Enhanced</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {advancedSuggestions.map((suggestion: any, index: number) => (
+                    <div key={index} className="p-4 border border-purple-200 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-800">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge 
+                              variant={suggestion.priority === 'critical' ? 'destructive' : 
+                                     suggestion.priority === 'high' ? 'default' : 
+                                     suggestion.priority === 'medium' ? 'secondary' : 'outline'}
+                            >
+                              {suggestion.priority}
+                            </Badge>
+                            <Badge variant="outline" className="capitalize">{suggestion.type}</Badge>
+                            <Badge variant="outline" className={`capitalize ${
+                              suggestion.implementationComplexity === 'easy' ? 'bg-green-100 text-green-700' :
+                              suggestion.implementationComplexity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {suggestion.implementationComplexity}
+                            </Badge>
+                          </div>
+                          <h4 className="font-semibold text-foreground">{suggestion.title}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{suggestion.description}</p>
+                          
+                          {suggestion.expectedImpact && (
+                            <p className="text-sm text-purple-600 dark:text-purple-400 mt-2 font-medium">
+                              Expected Impact: {suggestion.expectedImpact}
+                            </p>
+                          )}
+
+                          {suggestion.estimatedResults && (
+                            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                              {suggestion.estimatedResults.costReduction && (
+                                <div className="bg-green-50 dark:bg-green-900 p-2 rounded">
+                                  <span className="text-green-700 dark:text-green-300">Cost Reduction: -{suggestion.estimatedResults.costReduction}%</span>
+                                </div>
+                              )}
+                              {suggestion.estimatedResults.performanceIncrease && (
+                                <div className="bg-blue-50 dark:bg-blue-900 p-2 rounded">
+                                  <span className="text-blue-700 dark:text-blue-300">Performance: +{suggestion.estimatedResults.performanceIncrease}%</span>
+                                </div>
+                              )}
+                              {suggestion.estimatedResults.roasImprovement && (
+                                <div className="bg-purple-50 dark:bg-purple-900 p-2 rounded">
+                                  <span className="text-purple-700 dark:text-purple-300">ROAS: +{suggestion.estimatedResults.roasImprovement}%</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {suggestion.actionSteps && suggestion.actionSteps.length > 0 && (
+                            <div className="mt-3">
+                              <div className="text-xs font-medium text-muted-foreground mb-1">Action Steps:</div>
+                              <ul className="text-xs text-muted-foreground space-y-1">
+                                {suggestion.actionSteps.slice(0, 3).map((step: string, stepIndex: number) => (
+                                  <li key={stepIndex} className="flex items-start gap-1">
+                                    <span className="text-purple-500 mt-0.5">•</span>
+                                    <span>{step}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                        {suggestion.autoImplementable && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleAutoImplement(suggestion.id || `suggestion_${index}`)}
+                            className="ml-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                          >
+                            <Zap className="mr-1 h-3 w-3" />
+                            Auto-Apply
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Basic Optimization Suggestions */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
                   <BarChart3 className="w-5 h-5 text-sacura-primary" />
-                  <span>AI Optimization Suggestions</span>
+                  <span>Basic AI Optimization Suggestions</span>
                 </CardTitle>
                 <Button 
                   onClick={handleOptimizeAds}

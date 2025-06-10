@@ -260,7 +260,7 @@ export class AdvancedPageFixer {
     }
   }
 
-  private async executeAutomaticFix(issue: PageIssue, page: any): Promise<void> {
+  public async executeAutomaticFix(issue: PageIssue, page: any): Promise<FixAttempt | void> {
     try {
       issue.status = 'fixing';
       issue.autoFixAttempts++;

@@ -1,139 +1,177 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Headphones, Bot, User, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Headphones, Bot, User, Clock, MessageCircle, Activity, CheckCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMemo, useCallback } from "react";
 import { CustomerInteraction } from "@/types";
-import { getWebSocket } from "@/lib/websocket";
 
 export default function CustomerServiceMonitor() {
-  const [interactions, setInteractions] = useState<CustomerInteraction[]>([]);
-  
-  const { data: initialInteractions = [] } = useQuery<CustomerInteraction[]>({
+  const { data: interactions = [], isLoading } = useQuery<CustomerInteraction[]>({
     queryKey: ['/api/customer-service/interactions/all'],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 15000,
+    staleTime: 10000,
   });
 
-  useEffect(() => {
-    setInteractions(initialInteractions);
-  }, [initialInteractions]);
+  const stats = useMemo(() => {
+    const totalInteractions = interactions.length;
+    const pending = interactions.filter(i => i.status === 'pending').length;
+    const resolved = interactions.filter(i => i.status === 'resolved').length;
+    const avgResponseTime = interactions.length > 0 
+      ? interactions.reduce((sum, i) => sum + (i.responseTime || 0), 0) / interactions.length 
+      : 0;
 
-  useEffect(() => {
-    const ws = getWebSocket();
-    
-    const handleNewMessage = (data: CustomerInteraction) => {
-      setInteractions(prev => [data, ...prev.slice(0, 9)]);
-    };
+    return { totalInteractions, pending, resolved, avgResponseTime };
+  }, [interactions]);
 
-    const handleAIResponse = (data: any) => {
-      setInteractions(prev => 
-        prev.map(interaction => 
-          interaction.id === data.id 
-            ? { ...interaction, ...data }
-            : interaction
-        )
-      );
-    };
+  const recentInteractions = useMemo(() => 
+    interactions.slice(0, 5), 
+    [interactions]
+  );
 
-    ws.on('new-customer-message', handleNewMessage);
-    ws.on('ai-response-generated', handleAIResponse);
-    ws.on('interaction-updated', handleAIResponse);
-
-    return () => {
-      ws.off('new-customer-message', handleNewMessage);
-      ws.off('ai-response-generated', handleAIResponse);
-      ws.off('interaction-updated', handleAIResponse);
-    };
-  }, []);
-
-  const formatTimeAgo = (dateString: string) => {
+  const formatTimeAgo = useCallback((dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
-    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
-  };
+    if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  }, []);
 
-  const getStatusBadge = (interaction: CustomerInteraction) => {
-    if (interaction.status === 'pending') {
-      return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Pending</Badge>;
-    }
-    if (interaction.isAutoResponse) {
-      return <Badge variant="secondary" className="text-green-600 border-green-200 bg-green-50">Auto</Badge>;
-    }
-    return <Badge variant="default" className="text-blue-600 border-blue-200 bg-blue-50">Human</Badge>;
-  };
+  const getStatusBadge = useCallback((status: string) => {
+    const variants = {
+      pending: { variant: "secondary" as const, icon: Clock },
+      resolved: { variant: "default" as const, icon: CheckCircle },
+      escalated: { variant: "destructive" as const, icon: Activity }
+    };
+    
+    const config = variants[status as keyof typeof variants] || variants.pending;
+    const Icon = config.icon;
+    
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <Icon className="h-3 w-3" />
+        {status}
+      </Badge>
+    );
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Headphones className="h-5 w-5" />
+            <span>Customer Service Monitor</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="animate-pulse">
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="text-center">
+                    <div className="h-8 w-16 bg-muted rounded mx-auto mb-2"></div>
+                    <div className="h-4 w-20 bg-muted rounded mx-auto"></div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-16 bg-muted rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-sacura-secondary/10 rounded-lg flex items-center justify-center">
-              <Headphones className="text-sacura-secondary w-4 h-4" />
-            </div>
-            <span>Live Customer Service</span>
-          </CardTitle>
-          <Badge variant="secondary" className="bg-sacura-secondary/10 text-sacura-secondary">
-            <div className="w-2 h-2 bg-sacura-secondary rounded-full notification-dot mr-2"></div>
-            AI Handling 89%
-          </Badge>
-        </div>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Headphones className="h-5 w-5" />
+            <span>Customer Service Monitor</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-muted-foreground">Live</span>
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {interactions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Headphones className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No recent customer interactions.</p>
-              <p className="text-sm">Interactions will appear here in real-time.</p>
+        <div className="space-y-6">
+          {/* Enhanced Summary Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{stats.totalInteractions}</div>
+              <div className="text-sm text-muted-foreground">Total Today</div>
             </div>
-          ) : (
-            interactions.slice(0, 6).map((interaction) => (
-              <div 
-                key={interaction.id} 
-                className={`flex items-start space-x-3 p-3 rounded-lg transition-colors ${
-                  interaction.status === 'pending' ? 'bg-amber-50 border border-amber-200' : 'hover:bg-muted'
-                }`}
-              >
-                <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                  {interaction.isAutoResponse ? (
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Bot className="text-green-600 w-4 h-4" />
-                    </div>
-                  ) : interaction.status === 'responded' ? (
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="text-blue-600 w-4 h-4" />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                      <Clock className="text-amber-600 w-4 h-4" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    {interaction.isAutoResponse 
-                      ? 'AI responded to inquiry'
-                      : interaction.status === 'responded' 
-                        ? 'Employee handled inquiry'
-                        : 'Awaiting response'
-                    }
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {interaction.customerName} • {formatTimeAgo(interaction.createdAt)}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    "{interaction.response || interaction.message}"
-                  </p>
-                </div>
-                {getStatusBadge(interaction)}
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-sm text-muted-foreground">Pending</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+              <div className="text-sm text-muted-foreground">Resolved</div>
+            </div>
+            <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold">{Math.round(stats.avgResponseTime)}s</div>
+              <div className="text-sm text-muted-foreground">Avg Response</div>
+            </div>
+          </div>
+
+          {/* Recent Interactions */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium flex items-center space-x-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Recent Interactions</span>
+              </h4>
+              <Button variant="outline" size="sm">View All</Button>
+            </div>
+            
+            {recentInteractions.length === 0 ? (
+              <div className="text-center p-8 text-muted-foreground">
+                <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No recent interactions</p>
               </div>
-            ))
-          )}
+            ) : (
+              <div className="space-y-3">
+                {recentInteractions.map((interaction) => (
+                  <div key={interaction.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+                        {interaction.customerName?.charAt(0) || 'U'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">{interaction.customerName || 'Anonymous User'}</div>
+                        <div className="text-sm text-muted-foreground truncate max-w-xs">
+                          {interaction.message || 'No message content'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      {interaction.aiGenerated && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Bot className="h-3 w-3" />
+                          AI
+                        </Badge>
+                      )}
+                      {getStatusBadge(interaction.status || 'pending')}
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatTimeAgo(interaction.createdAt || new Date().toISOString())}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

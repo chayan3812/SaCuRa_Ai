@@ -4,6 +4,7 @@ import { hybridAI } from "./hybridAI";
 import { storage } from "./storage";
 import { db } from "./db";
 import { sql, eq, gte, desc } from "drizzle-orm";
+import { memoryOptimizer, optimizeDataStructure } from "./memoryOptimizer";
 
 // Advanced Self-Learning Training System
 interface TrainingSession {
@@ -70,28 +71,36 @@ export class IntelligentTrainer {
     }, 300000); // Update every 5 minutes
   }
 
-  // Collect Real Performance Data
+  // Collect Real Performance Data with Memory Optimization
   private async collectRealTimeData(): Promise<void> {
     try {
-      // Collect engagement performance data
+      // Check memory before data collection
+      const memoryStats = memoryOptimizer.getCurrentMemoryStats();
+      if (memoryStats.percentage > 85) {
+        console.log('High memory usage detected - optimizing before data collection');
+        memoryOptimizer.forceOptimization();
+      }
+      
+      // Collect data with memory-efficient batching
       const engagementData = await this.collectEngagementPerformance();
-      
-      // Collect conversion outcomes
       const conversionData = await this.collectConversionOutcomes();
-      
-      // Collect customer interaction results
       const interactionData = await this.collectInteractionResults();
-      
-      // Collect ad performance metrics
       const adPerformanceData = await this.collectAdPerformanceData();
 
-      // Add to learning queue with performance feedback
-      this.learningQueue.push(
-        ...engagementData.map(d => ({ ...d, type: 'engagement' })),
-        ...conversionData.map(d => ({ ...d, type: 'conversion' })),
-        ...interactionData.map(d => ({ ...d, type: 'interaction' })),
-        ...adPerformanceData.map(d => ({ ...d, type: 'ad_performance' }))
-      );
+      // Optimize data structures for memory efficiency
+      const optimizedData = [
+        ...optimizeDataStructure(engagementData).map(d => ({ ...d, type: 'engagement' })),
+        ...optimizeDataStructure(conversionData).map(d => ({ ...d, type: 'conversion' })),
+        ...optimizeDataStructure(interactionData).map(d => ({ ...d, type: 'interaction' })),
+        ...optimizeDataStructure(adPerformanceData).map(d => ({ ...d, type: 'ad_performance' }))
+      ];
+
+      // Limit queue size for memory management
+      if (this.learningQueue.length > 500) {
+        this.learningQueue = this.learningQueue.slice(-250); // Keep only recent 250 items
+      }
+
+      this.learningQueue.push(...optimizedData);
 
       console.log(`📊 Collected ${this.learningQueue.length} real data points for learning`);
       
@@ -100,28 +109,43 @@ export class IntelligentTrainer {
     }
   }
 
-  // Process Learning Queue with Intelligent Analysis
+  // Process Learning Queue with Memory-Optimized Intelligent Analysis
   private async processLearningQueue(): Promise<void> {
-    if (this.learningQueue.length < 10) return;
+    if (this.learningQueue.length < 5) return; // Reduced threshold for memory efficiency
 
     try {
-      console.log(`🔄 Processing ${this.learningQueue.length} learning samples...`);
-
-      // Group by type for specialized training
-      const groupedData = this.groupDataByType(this.learningQueue);
-
-      // Train each model type with relevant data
-      for (const [type, data] of Object.entries(groupedData)) {
-        await this.trainModelWithRealData(type, data);
+      // Critical memory check before processing
+      const memoryStats = memoryOptimizer.getCurrentMemoryStats();
+      if (memoryStats.percentage > 90) {
+        console.log('Critical memory usage - forcing optimization');
+        memoryOptimizer.forceOptimization();
+        // Emergency queue reduction
+        this.learningQueue = this.learningQueue.slice(-50);
       }
 
-      // Clear processed queue
+      console.log(`Processing ${this.learningQueue.length} learning samples...`);
+
+      // Group by type for specialized training with memory optimization
+      const groupedData = this.groupDataByType(this.learningQueue);
+
+      // Train each model type with relevant data in memory-efficient batches
+      for (const [type, data] of Object.entries(groupedData)) {
+        if (data.length > 3) { // Reduced minimum threshold
+          const batchSize = Math.min(25, data.length); // Smaller batches
+          const batch = data.slice(0, batchSize);
+          await this.trainModelWithRealData(type, batch);
+        }
+      }
+
+      // Clear processed queue immediately for memory management
       this.learningQueue = [];
 
-      console.log('✅ Learning queue processed successfully');
+      console.log('Learning queue processed successfully');
       
     } catch (error) {
       console.error('Error processing learning queue:', error);
+      // Emergency cleanup on error
+      this.learningQueue = [];
     }
   }
 

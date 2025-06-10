@@ -124,7 +124,10 @@ export class MemoryOptimizer extends EventEmitter {
     const now = Date.now();
     let cleanedCount = 0;
 
-    for (const [key, value] of this.memoryCache.entries()) {
+    // Convert to array to avoid iterator issues
+    const entries = Array.from(this.memoryCache.entries());
+    
+    for (const [key, value] of entries) {
       if (now - value.timestamp > value.ttl) {
         this.memoryCache.delete(key);
         cleanedCount++;
@@ -132,7 +135,7 @@ export class MemoryOptimizer extends EventEmitter {
     }
 
     if (cleanedCount > 0) {
-      console.log(`🧹 Cleaned ${cleanedCount} expired cache entries`);
+      console.log(`Cleaned ${cleanedCount} expired cache entries`);
     }
   }
 
@@ -165,8 +168,9 @@ export class MemoryOptimizer extends EventEmitter {
   }
 
   public getCacheStats(): { size: number; keys: number } {
+    const values = Array.from(this.memoryCache.values());
     return {
-      size: JSON.stringify([...this.memoryCache.values()]).length,
+      size: JSON.stringify(values).length,
       keys: this.memoryCache.size
     };
   }

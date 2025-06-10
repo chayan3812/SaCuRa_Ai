@@ -20,6 +20,9 @@ import { systemOptimizer } from "./systemOptimizer";
 import { mlEngine } from "./mlEngine";
 import { productionOptimizer } from "./productionOptimizer";
 import { enhancedPageFixer } from "./enhancedPageFixer";
+import { advancedAIEngine } from "./advancedAIEngine";
+import { sentimentAI } from "./sentimentAI";
+import { competitorAI } from "./competitorAI";
 import { intelligentTrainer } from "./intelligentTrainer";
 import { aiEngine } from "./aiEngine";
 import { hybridAI } from "./hybridAI";
@@ -1849,6 +1852,623 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Initialize WebSocket service
   initializeWebSocket(httpServer);
+
+  // Advanced AI Engine Routes
+  app.get('/api/ai/insights/:pageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const page = await storage.getFacebookPageById(pageId);
+      if (!page || page.userId !== userId) {
+        return res.status(403).json({ message: "Access denied to this page" });
+      }
+      
+      const insights = advancedAIEngine.getPageInsights(pageId);
+      const status = advancedAIEngine.getAnalysisStatus();
+      
+      res.json({
+        pageId,
+        insights: insights.map(insight => ({
+          id: insight.id,
+          type: insight.type,
+          confidence: insight.confidence,
+          impact: insight.impact,
+          title: insight.title,
+          description: insight.description,
+          recommendations: insight.recommendations,
+          generatedAt: insight.generatedAt,
+          validUntil: insight.validUntil
+        })),
+        analysisStatus: status,
+        lastUpdated: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching AI insights:", error);
+      res.status(500).json({ message: "Failed to fetch AI insights" });
+    }
+  });
+
+  app.post('/api/ai/custom-insight', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId, query } = req.body;
+      const userId = req.user.claims.sub;
+      
+      const page = await storage.getFacebookPageById(pageId);
+      if (!page || page.userId !== userId) {
+        return res.status(403).json({ message: "Access denied to this page" });
+      }
+      
+      if (!query || query.length < 10) {
+        return res.status(400).json({ message: "Query must be at least 10 characters long" });
+      }
+      
+      console.log(`🤖 Generating custom AI insight for: ${query}`);
+      const customInsight = await advancedAIEngine.generateCustomInsight(pageId, query);
+      
+      res.json({
+        pageId,
+        query,
+        insight: {
+          id: customInsight.id,
+          type: customInsight.type,
+          confidence: customInsight.confidence,
+          impact: customInsight.impact,
+          title: customInsight.title,
+          description: customInsight.description,
+          recommendations: customInsight.recommendations,
+          generatedAt: customInsight.generatedAt,
+          validUntil: customInsight.validUntil
+        },
+        generatedAt: new Date()
+      });
+    } catch (error) {
+      console.error("Error generating custom insight:", error);
+      res.status(500).json({ message: "Failed to generate custom insight" });
+    }
+  });
+
+  app.get('/api/ai/models/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const models = advancedAIEngine.getModelStatus();
+      const analysisStatus = advancedAIEngine.getAnalysisStatus();
+      
+      res.json({
+        models: Array.from(models.entries()).map(([name, model]) => ({
+          name,
+          accuracy: model.accuracy,
+          lastTrained: model.lastTrained,
+          confidence: model.confidence,
+          predictionsCount: model.predictions.length
+        })),
+        analysisStatus,
+        systemHealth: {
+          modelsOperational: models.size,
+          totalModels: 4,
+          lastAnalysis: new Date()
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching model status:", error);
+      res.status(500).json({ message: "Failed to fetch model status" });
+    }
+  });
+
+  app.post('/api/ai/models/retrain', isAuthenticated, async (req: any, res) => {
+    try {
+      const { modelName } = req.body;
+      
+      if (!modelName) {
+        return res.status(400).json({ message: "Model name is required" });
+      }
+      
+      console.log(`🔄 Retraining AI model: ${modelName}`);
+      const success = await advancedAIEngine.retrainModel(modelName);
+      
+      if (success) {
+        const updatedModel = advancedAIEngine.getModelStatus().get(modelName);
+        res.json({
+          success: true,
+          modelName,
+          newAccuracy: updatedModel?.accuracy,
+          lastTrained: updatedModel?.lastTrained,
+          message: `Model ${modelName} retrained successfully`
+        });
+      } else {
+        res.status(404).json({ 
+          success: false,
+          message: `Model ${modelName} not found or failed to retrain` 
+        });
+      }
+    } catch (error) {
+      console.error("Error retraining model:", error);
+      res.status(500).json({ message: "Failed to retrain model" });
+    }
+  });
+
+  app.get('/api/ai/predictions/:pageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const page = await storage.getFacebookPageById(pageId);
+      if (!page || page.userId !== userId) {
+        return res.status(403).json({ message: "Access denied to this page" });
+      }
+      
+      const models = advancedAIEngine.getModelStatus();
+      const engagementModel = models.get('engagement_predictor');
+      const viralModel = models.get('viral_potential');
+      const sentimentModel = models.get('audience_sentiment');
+      
+      res.json({
+        pageId,
+        predictions: {
+          engagement: {
+            predictions: engagementModel?.predictions || [],
+            confidence: engagementModel?.confidence || 0,
+            nextUpdate: new Date(Date.now() + 15 * 60 * 1000) // Next update in 15 minutes
+          },
+          viral_potential: {
+            predictions: viralModel?.predictions || [],
+            confidence: viralModel?.confidence || 0,
+            recommendations: [
+              'Focus on video content for higher viral potential',
+              'Post during peak engagement hours',
+              'Use trending hashtags relevant to your niche'
+            ]
+          },
+          sentiment: {
+            predictions: sentimentModel?.predictions || [],
+            confidence: sentimentModel?.confidence || 0,
+            overall_trend: 'improving'
+          }
+        },
+        generatedAt: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching predictions:", error);
+      res.status(500).json({ message: "Failed to fetch predictions" });
+    }
+  });
+
+  app.get('/api/ai/all-insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userPages = await storage.getFacebookPagesByUserId(userId);
+      
+      const allInsights = advancedAIEngine.getAllInsights();
+      const analysisStatus = advancedAIEngine.getAnalysisStatus();
+      
+      const userInsights = [];
+      for (const page of userPages) {
+        const pageInsights = allInsights.get(page.pageId) || [];
+        if (pageInsights.length > 0) {
+          userInsights.push({
+            pageId: page.pageId,
+            pageName: page.pageName,
+            insights: pageInsights.map(insight => ({
+              id: insight.id,
+              type: insight.type,
+              confidence: insight.confidence,
+              impact: insight.impact,
+              title: insight.title,
+              description: insight.description,
+              recommendations: insight.recommendations.slice(0, 3), // Top 3 recommendations
+              generatedAt: insight.generatedAt
+            }))
+          });
+        }
+      }
+      
+      res.json({
+        totalPages: userPages.length,
+        pagesWithInsights: userInsights.length,
+        insights: userInsights,
+        analysisStatus,
+        summary: {
+          totalInsights: userInsights.reduce((sum, page) => sum + page.insights.length, 0),
+          criticalInsights: userInsights.reduce((sum, page) => 
+            sum + page.insights.filter(insight => insight.impact === 'critical').length, 0
+          ),
+          lastAnalysis: new Date()
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching all insights:", error);
+      res.status(500).json({ message: "Failed to fetch insights" });
+    }
+  });
+
+  app.post('/api/ai/analyze-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const { content, contentType = 'post' } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: "Content is required" });
+      }
+      
+      // Use Sentiment AI for comprehensive analysis
+      const sentimentAnalysis = await sentimentAI.analyzeText(content, contentType as any);
+      
+      // Calculate engagement score based on sentiment and emotions
+      const engagementScore = Math.floor(
+        (sentimentAnalysis.confidence * 50) + 
+        (sentimentAnalysis.emotions.joy * 30) + 
+        20
+      );
+      
+      res.json({
+        content,
+        contentType,
+        analysis: {
+          engagementScore,
+          sentiment: sentimentAnalysis.sentiment,
+          confidence: sentimentAnalysis.confidence,
+          emotions: sentimentAnalysis.emotions,
+          urgency: sentimentAnalysis.urgency,
+          intent: sentimentAnalysis.intent,
+          viralPotential: engagementScore > 80 ? 'high' : engagementScore > 60 ? 'medium' : 'low',
+          optimizations: [
+            'Add more engaging call-to-action',
+            'Include relevant trending hashtags',
+            'Optimize posting time for your audience',
+            'Consider adding visual elements'
+          ],
+          predictions: {
+            estimatedLikes: Math.floor(engagementScore * 10 + Math.random() * 200),
+            estimatedComments: Math.floor(engagementScore * 2 + Math.random() * 50),
+            estimatedShares: Math.floor(engagementScore * 0.5 + Math.random() * 20)
+          },
+          responseStrategy: sentimentAnalysis.responseStrategy
+        },
+        analyzedAt: sentimentAnalysis.analyzedAt
+      });
+    } catch (error) {
+      console.error("Error analyzing content:", error);
+      res.status(500).json({ message: "Failed to analyze content" });
+    }
+  });
+
+  // Sentiment AI Routes
+  app.post('/api/sentiment/analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const { text, source = 'comment', customerId } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ message: "Text is required" });
+      }
+      
+      console.log(`💭 Analyzing sentiment for ${source}`);
+      const analysis = await sentimentAI.analyzeText(text, source, customerId);
+      
+      res.json({
+        analysis: {
+          id: analysis.id,
+          sentiment: analysis.sentiment,
+          confidence: analysis.confidence,
+          emotions: analysis.emotions,
+          urgency: analysis.urgency,
+          keywords: analysis.keywords,
+          intent: analysis.intent,
+          responseStrategy: analysis.responseStrategy,
+          analyzedAt: analysis.analyzedAt
+        }
+      });
+    } catch (error) {
+      console.error("Error in sentiment analysis:", error);
+      res.status(500).json({ message: "Failed to analyze sentiment" });
+    }
+  });
+
+  app.post('/api/sentiment/batch-analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const { contents } = req.body;
+      
+      if (!Array.isArray(contents) || contents.length === 0) {
+        return res.status(400).json({ message: "Contents array is required" });
+      }
+      
+      if (contents.length > 50) {
+        return res.status(400).json({ message: "Maximum 50 items per batch" });
+      }
+      
+      console.log(`💭 Batch analyzing ${contents.length} items`);
+      const analyses = await sentimentAI.analyzeBatchContent(contents);
+      
+      res.json({
+        totalAnalyzed: analyses.length,
+        analyses: analyses.map(analysis => ({
+          id: analysis.id,
+          text: analysis.text.substring(0, 100) + (analysis.text.length > 100 ? '...' : ''),
+          sentiment: analysis.sentiment,
+          confidence: analysis.confidence,
+          urgency: analysis.urgency,
+          intent: analysis.intent,
+          analyzedAt: analysis.analyzedAt
+        })),
+        summary: {
+          positive: analyses.filter(a => a.sentiment === 'positive').length,
+          negative: analyses.filter(a => a.sentiment === 'negative').length,
+          neutral: analyses.filter(a => a.sentiment === 'neutral').length,
+          critical: analyses.filter(a => a.urgency === 'critical').length,
+          urgent: analyses.filter(a => a.urgency === 'high').length
+        }
+      });
+    } catch (error) {
+      console.error("Error in batch sentiment analysis:", error);
+      res.status(500).json({ message: "Failed to analyze batch content" });
+    }
+  });
+
+  app.get('/api/sentiment/insights/:pageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const page = await storage.getFacebookPageById(pageId);
+      if (!page || page.userId !== userId) {
+        return res.status(403).json({ message: "Access denied to this page" });
+      }
+      
+      const insights = await sentimentAI.generateEmotionalInsights(pageId);
+      const trends = sentimentAI.getEmotionalTrends();
+      const status = sentimentAI.getMonitoringStatus();
+      
+      res.json({
+        pageId,
+        insights,
+        trends: trends.slice(-12), // Last 12 data points
+        monitoring: status,
+        lastUpdated: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching sentiment insights:", error);
+      res.status(500).json({ message: "Failed to fetch sentiment insights" });
+    }
+  });
+
+  app.post('/api/sentiment/generate-response', isAuthenticated, async (req: any, res) => {
+    try {
+      const { analysisId, context } = req.body;
+      
+      if (!analysisId) {
+        return res.status(400).json({ message: "Analysis ID is required" });
+      }
+      
+      // For demo, create a sample analysis - in production this would retrieve from storage
+      const sampleAnalysis = {
+        id: analysisId,
+        text: "Sample customer message",
+        sentiment: 'negative' as const,
+        confidence: 0.85,
+        emotions: { joy: 0.1, anger: 0.6, fear: 0.1, sadness: 0.2, surprise: 0.0, disgust: 0.0 },
+        urgency: 'high' as const,
+        keywords: ['issue', 'problem', 'frustrated'],
+        intent: 'complaint' as const,
+        responseStrategy: 'Address concern with empathy and provide solution',
+        analyzedAt: new Date()
+      };
+      
+      const responseSuggestion = await sentimentAI.generateResponseSuggestion(sampleAnalysis, context);
+      
+      res.json({
+        analysisId,
+        responseSuggestion,
+        context,
+        generatedAt: new Date()
+      });
+    } catch (error) {
+      console.error("Error generating response:", error);
+      res.status(500).json({ message: "Failed to generate response" });
+    }
+  });
+
+  app.get('/api/sentiment/customers', isAuthenticated, async (req: any, res) => {
+    try {
+      const customerInsights = sentimentAI.getAllCustomerInsights();
+      
+      res.json({
+        totalCustomers: customerInsights.length,
+        customers: customerInsights.slice(0, 50).map(customer => ({
+          customerId: customer.customerId,
+          name: customer.name,
+          averageSentiment: customer.averageSentiment,
+          emotionalProfile: customer.emotionalProfile,
+          riskLevel: customer.riskLevel,
+          interactionCount: customer.sentimentHistory.length,
+          lastInteraction: customer.lastInteraction,
+          recommendations: customer.recommendations.slice(0, 3)
+        })),
+        summary: {
+          highRisk: customerInsights.filter(c => c.riskLevel === 'high').length,
+          mediumRisk: customerInsights.filter(c => c.riskLevel === 'medium').length,
+          lowRisk: customerInsights.filter(c => c.riskLevel === 'low').length
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching customer insights:", error);
+      res.status(500).json({ message: "Failed to fetch customer insights" });
+    }
+  });
+
+  // Competitive Analysis AI Routes
+  app.get('/api/competitor/analysis/:industry', isAuthenticated, async (req: any, res) => {
+    try {
+      const { industry } = req.params;
+      
+      if (!industry) {
+        return res.status(400).json({ message: "Industry parameter is required" });
+      }
+      
+      console.log(`🕵️ Generating competitive analysis for ${industry} industry`);
+      const analysis = await competitorAI.generateCompetitiveAnalysisReport(industry);
+      
+      res.json({
+        industry,
+        analysis,
+        generatedAt: new Date()
+      });
+    } catch (error) {
+      console.error("Error generating competitive analysis:", error);
+      res.status(500).json({ message: "Failed to generate competitive analysis" });
+    }
+  });
+
+  app.get('/api/competitor/competitors', isAuthenticated, async (req: any, res) => {
+    try {
+      const competitors = competitorAI.getAllCompetitors();
+      const status = competitorAI.getMonitoringStatus();
+      
+      res.json({
+        totalCompetitors: competitors.length,
+        competitors: competitors.map(comp => ({
+          id: comp.id,
+          name: comp.name,
+          industry: comp.industry,
+          size: comp.size,
+          platforms: comp.platforms,
+          followerCount: comp.followerCount,
+          engagementRate: comp.engagementRate,
+          postingFrequency: comp.postingFrequency,
+          contentTypes: comp.contentTypes,
+          strengths: comp.strengths.slice(0, 3),
+          weaknesses: comp.weaknesses.slice(0, 3),
+          lastAnalyzed: comp.lastAnalyzed
+        })),
+        monitoring: status,
+        lastUpdated: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching competitors:", error);
+      res.status(500).json({ message: "Failed to fetch competitor data" });
+    }
+  });
+
+  app.get('/api/competitor/insights/:competitorId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { competitorId } = req.params;
+      
+      if (!competitorId) {
+        return res.status(400).json({ message: "Competitor ID is required" });
+      }
+      
+      const insights = competitorAI.getCompetitorInsights(competitorId);
+      const competitors = competitorAI.getAllCompetitors();
+      const competitor = competitors.find(c => c.id === competitorId);
+      
+      if (!competitor) {
+        return res.status(404).json({ message: "Competitor not found" });
+      }
+      
+      res.json({
+        competitorId,
+        competitorName: competitor.name,
+        insights: insights.map(insight => ({
+          id: insight.id,
+          type: insight.type,
+          title: insight.title,
+          description: insight.description,
+          impact: insight.impact,
+          actionableItems: insight.actionableItems,
+          confidence: insight.confidence,
+          generatedAt: insight.generatedAt,
+          validUntil: insight.validUntil
+        })),
+        competitor: {
+          name: competitor.name,
+          industry: competitor.industry,
+          size: competitor.size,
+          followerCount: competitor.followerCount,
+          engagementRate: competitor.engagementRate,
+          strengths: competitor.strengths,
+          weaknesses: competitor.weaknesses,
+          threats: competitor.threats,
+          opportunities: competitor.opportunities
+        },
+        lastUpdated: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching competitor insights:", error);
+      res.status(500).json({ message: "Failed to fetch competitor insights" });
+    }
+  });
+
+  app.get('/api/competitor/market-intelligence/:industry', isAuthenticated, async (req: any, res) => {
+    try {
+      const { industry } = req.params;
+      
+      if (!industry) {
+        return res.status(400).json({ message: "Industry parameter is required" });
+      }
+      
+      const marketIntel = competitorAI.getMarketIntelligence(industry);
+      
+      if (!marketIntel) {
+        return res.status(404).json({ message: "No market intelligence available for this industry" });
+      }
+      
+      res.json({
+        industry,
+        marketIntelligence: {
+          marketSize: marketIntel.marketSize,
+          growthRate: marketIntel.growthRate,
+          keyTrends: marketIntel.keyTrends,
+          emergingOpportunities: marketIntel.emergingOpportunities,
+          competitiveLandscape: marketIntel.competitiveLandscape,
+          threatLevel: marketIntel.threatLevel,
+          recommendations: marketIntel.recommendations,
+          lastUpdated: marketIntel.lastUpdated
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching market intelligence:", error);
+      res.status(500).json({ message: "Failed to fetch market intelligence" });
+    }
+  });
+
+  app.get('/api/ai/comprehensive-status', isAuthenticated, async (req: any, res) => {
+    try {
+      const advancedAIStatus = advancedAIEngine.getAnalysisStatus();
+      const sentimentStatus = sentimentAI.getMonitoringStatus();
+      const competitorStatus = competitorAI.getMonitoringStatus();
+      
+      res.json({
+        systemStatus: 'operational',
+        aiEngines: {
+          advancedAI: {
+            active: advancedAIStatus.active,
+            modelsCount: advancedAIStatus.modelsCount,
+            insightsCount: advancedAIStatus.insightsCount
+          },
+          sentimentAI: {
+            active: sentimentStatus.active,
+            totalAnalyses: sentimentStatus.totalAnalyses,
+            criticalIssues: sentimentStatus.criticalIssues
+          },
+          competitorAI: {
+            active: competitorStatus.active,
+            competitorCount: competitorStatus.competitorCount,
+            insightCount: competitorStatus.insightCount
+          }
+        },
+        capabilities: [
+          'Advanced AI Insights & Predictions',
+          'Real-time Sentiment Analysis',
+          'Competitive Intelligence',
+          'Page Issue Detection & Fixing',
+          'Content Optimization',
+          'Customer Emotional Profiling',
+          'Market Trend Analysis',
+          'Automated Response Generation'
+        ],
+        lastUpdated: new Date()
+      });
+    } catch (error) {
+      console.error("Error fetching comprehensive AI status:", error);
+      res.status(500).json({ message: "Failed to fetch AI system status" });
+    }
+  });
 
   return httpServer;
 }

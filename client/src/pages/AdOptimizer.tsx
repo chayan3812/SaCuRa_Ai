@@ -17,16 +17,33 @@ import {
   BarChart3,
   AlertTriangle
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AdOptimizer() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isAdvancedOptimizing, setIsAdvancedOptimizing] = useState(false);
+  const [isAutoFixing, setIsAutoFixing] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [advancedSuggestions, setAdvancedSuggestions] = useState<any[]>([]);
   const [adCopy, setAdCopy] = useState<any>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState('campaign_123');
   const { toast } = useToast();
+
+  // Fetch real-time performance metrics
+  const { data: performanceMetrics, isLoading: metricsLoading } = useQuery({
+    queryKey: ['/api/ads/performance-metrics', selectedCampaignId],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Fetch page health data
+  const { data: pageHealth, isLoading: healthLoading } = useQuery({
+    queryKey: ['/api/page-health', 'demo_page_123'],
+    refetchInterval: 60000, // Refresh every minute
+  });
 
   const handleGenerateAdCopy = async () => {
     setIsGenerating(true);
@@ -88,6 +105,87 @@ export default function AdOptimizer() {
       });
     } finally {
       setIsOptimizing(false);
+    }
+  };
+
+  const handleAdvancedOptimize = async () => {
+    setIsAdvancedOptimizing(true);
+    try {
+      const response = await apiRequest('POST', '/api/ads/advanced-optimize', {
+        campaignId: selectedCampaignId
+      });
+      
+      const data = await response.json();
+      setAdvancedSuggestions(data);
+      
+      toast({
+        title: "Advanced Optimization Complete",
+        description: `Generated ${data.length} comprehensive optimization strategies.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate advanced optimizations. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAdvancedOptimizing(false);
+    }
+  };
+
+  const handleAutoImplement = async (optimizationId: string) => {
+    try {
+      const response = await apiRequest('POST', '/api/ads/auto-implement', {
+        campaignId: selectedCampaignId,
+        optimizationId
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: "Auto-Implementation Successful",
+          description: "Optimization has been automatically applied to your campaign.",
+        });
+        // Refresh advanced suggestions
+        handleAdvancedOptimize();
+      } else {
+        toast({
+          title: "Auto-Implementation Failed",
+          description: "Could not automatically implement this optimization.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to implement optimization automatically.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAutoFixPageIssues = async () => {
+    setIsAutoFixing(true);
+    try {
+      const response = await apiRequest('POST', '/api/page-health/auto-fix', {
+        pageId: 'demo_page_123'
+      });
+      
+      const data = await response.json();
+      
+      toast({
+        title: "Auto-Fix Complete",
+        description: `Fixed ${data.fixed} issues, ${data.failed} failed attempts.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to auto-fix page issues. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAutoFixing(false);
     }
   };
 

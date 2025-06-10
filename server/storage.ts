@@ -521,7 +521,7 @@ export class DatabaseStorage implements IStorage {
     const responseResult = await db
       .select({ totalResponses: sql<number>`COUNT(*)` })
       .from(customerInteractions)
-      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.pageId))
+      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.id))
       .where(and(
         eq(facebookPages.userId, userId),
         gte(customerInteractions.createdAt, today)
@@ -535,7 +535,7 @@ export class DatabaseStorage implements IStorage {
     const restrictionResult = await db
       .select({ preventedRestrictions: sql<number>`COUNT(*)` })
       .from(restrictionAlerts)
-      .innerJoin(facebookPages, eq(restrictionAlerts.pageId, facebookPages.pageId))
+      .innerJoin(facebookPages, eq(restrictionAlerts.pageId, facebookPages.id))
       .where(and(
         eq(facebookPages.userId, userId),
         eq(restrictionAlerts.isResolved, true),

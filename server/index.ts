@@ -10,9 +10,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Production optimization middleware
-app.use(productionOptimizer.performanceMiddleware());
-app.use(productionOptimizer.rateLimitMiddleware(1000, 60000)); // 1000 requests per minute
+// Production optimization monitoring (no middleware needed)
+// productionOptimizer runs automatically in the background
 
 // Disable system optimizer temporarily to resolve startup issues
 // systemOptimizer.on('optimization', (event) => {
@@ -56,8 +55,11 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Production error handling middleware
-  app.use(productionOptimizer.errorHandlingMiddleware());
+  // Production error handling
+  app.use((err: any, req: any, res: any, next: any) => {
+    console.error('Production error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  });
 
   // Initialize Page Watcher Engine
   try {

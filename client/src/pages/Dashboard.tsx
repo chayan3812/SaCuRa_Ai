@@ -41,179 +41,191 @@ export default function Dashboard() {
       <main className="flex-1 overflow-y-auto">
         <TopBar />
         
-        <div className="p-6 space-y-6">
-          {/* Dashboard Header */}
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">
-                  Comprehensive AI-powered social media management overview
+        <div className="container-responsive space-y-4 md:space-y-6 py-4 md:py-6">
+          {/* Dashboard Header - Responsive */}
+          <div className="flex flex-col space-y-3 md:space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0">
+              <div className="space-y-1">
+                <h1 className="heading-responsive">Dashboard</h1>
+                <p className="text-responsive text-muted-foreground">
+                  AI-powered social media management overview
                 </p>
               </div>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="flex items-center space-x-1">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <Badge variant="outline" className="flex items-center space-x-1 w-fit">
                   <Activity className="h-3 w-3" />
                   <span>Live</span>
                 </Badge>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="button-responsive w-fit">
                   <Settings className="h-4 w-4 mr-2" />
-                  Customize
+                  <span className="hidden sm:inline">Customize</span>
+                  <span className="sm:hidden">Settings</span>
                 </Button>
               </div>
             </div>
             
-            {/* Key Metrics Cards */}
+            {/* Key Metrics Cards - Always responsive */}
             <MetricsCards 
               metrics={metrics || defaultMetrics} 
               isLoading={metricsLoading} 
             />
           </div>
 
-          {/* Enhanced Tabbed Interface */}
+          {/* Enhanced Tabbed Interface - Mobile-first responsive */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
-              <TabsTrigger value="overview" className="flex items-center space-x-2">
-                <BarChart3 className="h-4 w-4" />
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 h-auto p-1">
+              <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 sm:p-3 text-xs sm:text-sm">
+                <BarChart3 className="h-4 w-4 sm:h-3 sm:w-3" />
                 <span className="hidden sm:inline">Overview</span>
+                <span className="sm:hidden text-xs">Overview</span>
               </TabsTrigger>
-              <TabsTrigger value="ai-insights" className="flex items-center space-x-2">
-                <Brain className="h-4 w-4" />
+              <TabsTrigger value="ai-insights" className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 sm:p-3 text-xs sm:text-sm">
+                <Brain className="h-4 w-4 sm:h-3 sm:w-3" />
                 <span className="hidden sm:inline">AI Insights</span>
+                <span className="sm:hidden text-xs">AI</span>
               </TabsTrigger>
-              <TabsTrigger value="customer-service" className="flex items-center space-x-2">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Customer Service</span>
+              <TabsTrigger value="customer-service" className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 sm:p-3 text-xs sm:text-sm">
+                <MessageSquare className="h-4 w-4 sm:h-3 sm:w-3" />
+                <span className="hidden md:inline">Customer Service</span>
+                <span className="md:hidden text-xs">Service</span>
               </TabsTrigger>
-              <TabsTrigger value="team" className="flex items-center space-x-2">
-                <Users className="h-4 w-4" />
+              <TabsTrigger value="team" className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 sm:p-3 text-xs sm:text-sm">
+                <Users className="h-4 w-4 sm:h-3 sm:w-3" />
                 <span className="hidden sm:inline">Team</span>
+                <span className="sm:hidden text-xs">Team</span>
               </TabsTrigger>
-              <TabsTrigger value="automation" className="flex items-center space-x-2">
-                <Zap className="h-4 w-4" />
+              <TabsTrigger value="automation" className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 sm:p-3 text-xs sm:text-sm col-span-2 sm:col-span-1">
+                <Zap className="h-4 w-4 sm:h-3 sm:w-3" />
                 <span className="hidden sm:inline">Automation</span>
+                <span className="sm:hidden text-xs">Auto</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <AdPerformanceChart />
+            {/* Overview Tab - Responsive Grid Layout */}
+            <TabsContent value="overview" className="space-y-4 md:space-y-6 mt-4">
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
+                <div className="xl:col-span-2 space-y-4 md:space-y-6">
+                  <div className="card-responsive">
+                    <AdPerformanceChart />
+                  </div>
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <TrendingUp className="h-5 w-5" />
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-base sm:text-lg">
+                        <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
                         <span>Performance Trends</span>
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-sm">
                         Real-time analytics and performance metrics
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-0">
                       <ConnectedAccounts />
                     </CardContent>
                   </Card>
                 </div>
-                <div className="space-y-6">
-                  <AIRecommendations />
-                  <QuickActions />
+                <div className="space-y-4 md:space-y-6">
+                  <div className="card-responsive">
+                    <AIRecommendations />
+                  </div>
+                  <div className="card-responsive">
+                    <QuickActions />
+                  </div>
                 </div>
               </div>
             </TabsContent>
 
-            {/* AI Insights Tab */}
-            <TabsContent value="ai-insights" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* AI Insights Tab - Responsive Layout */}
+            <TabsContent value="ai-insights" className="space-y-4 md:space-y-6 mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Brain className="h-5 w-5" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-base sm:text-lg">
+                      <Brain className="h-4 w-4 sm:h-5 sm:w-5" />
                       <span>AI Learning Progress</span>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Machine learning model performance and training status
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <AILearningProgress />
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Smart Recommendations</CardTitle>
-                    <CardDescription>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base sm:text-lg">Smart Recommendations</CardTitle>
+                    <CardDescription className="text-sm">
                       AI-powered insights and optimization suggestions
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <AIRecommendations />
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
 
-            {/* Customer Service Tab */}
-            <TabsContent value="customer-service" className="space-y-6">
+            {/* Customer Service Tab - Single Column on Mobile */}
+            <TabsContent value="customer-service" className="space-y-4 md:space-y-6 mt-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <MessageSquare className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-base sm:text-lg">
+                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Customer Service Monitor</span>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     Real-time customer interaction monitoring and response automation
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <CustomerServiceMonitor />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Team Tab */}
-            <TabsContent value="team" className="space-y-6">
+            {/* Team Tab - Single Column Layout */}
+            <TabsContent value="team" className="space-y-4 md:space-y-6 mt-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Users className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-base sm:text-lg">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Team Performance</span>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     Employee productivity and task management overview
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <EmployeeMonitor />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Automation Tab */}
-            <TabsContent value="automation" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Automation Tab - Responsive Two-Column Layout */}
+            <TabsContent value="automation" className="space-y-4 md:space-y-6 mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Zap className="h-5 w-5" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-base sm:text-lg">
+                      <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
                       <span>Connected Accounts</span>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Social media platforms and automation status
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <ConnectedAccounts />
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                    <CardDescription>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
+                    <CardDescription className="text-sm">
                       Fast access to common automation tasks
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <QuickActions />
                   </CardContent>
                 </Card>

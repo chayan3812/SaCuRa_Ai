@@ -56,6 +56,22 @@ export default function AdPerformanceChart() {
       legend: {
         display: true,
         position: 'top' as const,
+        labels: {
+          usePointStyle: true,
+          padding: 15,
+          font: {
+            size: window.innerWidth < 640 ? 11 : 12,
+          },
+        },
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        borderColor: 'hsl(217, 91%, 60%)',
+        borderWidth: 1,
       },
     },
     scales: {
@@ -64,29 +80,44 @@ export default function AdPerformanceChart() {
         grid: {
           color: 'hsl(240, 5.9%, 90%)',
         },
+        ticks: {
+          font: {
+            size: window.innerWidth < 640 ? 10 : 11,
+          },
+        },
       },
       x: {
         grid: {
           display: false,
         },
+        ticks: {
+          font: {
+            size: window.innerWidth < 640 ? 10 : 11,
+          },
+        },
       },
+    },
+    interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
+      intersect: false,
     },
   };
 
   return (
-    <Card className="lg:col-span-2">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">Ad Performance Trends</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button size="sm" variant="default">7D</Button>
-            <Button size="sm" variant="outline">30D</Button>
-            <Button size="sm" variant="outline">90D</Button>
+    <Card className="w-full">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+          <CardTitle className="text-base sm:text-lg font-semibold">Ad Performance Trends</CardTitle>
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <Button size="sm" variant="default" className="text-xs sm:text-sm px-2 sm:px-3">7D</Button>
+            <Button size="sm" variant="outline" className="text-xs sm:text-sm px-2 sm:px-3">30D</Button>
+            <Button size="sm" variant="outline" className="text-xs sm:text-sm px-2 sm:px-3">90D</Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="chart-container">
+      <CardContent className="pt-0">
+        <div className="chart-container h-64 sm:h-72 md:h-80 lg:h-96 w-full">
           <Line data={data} options={options} />
         </div>
       </CardContent>

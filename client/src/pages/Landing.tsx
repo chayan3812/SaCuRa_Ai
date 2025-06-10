@@ -126,76 +126,77 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
-                <Bot className="text-white w-6 h-6" />
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
+                <Bot className="text-white w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">SaCuRa</h1>
-                <p className="text-sm text-muted-foreground">JAm AI</p>
+                <h1 className="text-lg sm:text-xl font-bold text-foreground">SaCuRa</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">JAm AI</p>
               </div>
             </div>
-            <Button onClick={handleLogin} className="bg-sacura-primary hover:bg-sacura-primary/90">
-              Get Started
-              <ArrowRight className="w-4 h-4 ml-2" />
+            <Button onClick={handleLogin} className="bg-sacura-primary hover:bg-sacura-primary/90 text-sm sm:text-base px-3 sm:px-4 py-2">
+              <span className="hidden sm:inline">Get Started</span>
+              <span className="sm:hidden">Start</span>
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
             </Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-sacura-primary/5 via-purple-50 to-background">
-        <div className="container mx-auto px-4">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-sacura-primary/5 via-purple-50 to-background">
+        <div className="container mx-auto px-3 sm:px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary mb-6">
-              <Zap className="w-4 h-4 mr-1" />
+            <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary mb-4 sm:mb-6 text-xs sm:text-sm">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
               AI-Powered Facebook Marketing Automation
             </Badge>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
               The Ultimate AI Agent for 
               <span className="text-sacura-primary"> Facebook Business</span>
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 leading-relaxed px-2 sm:px-0">
               Optimize ads, automate customer service, and prevent restrictions with our AI-powered platform. 
               Transform your Facebook marketing with real-time automation that maximizes performance and minimizes risk.
             </p>
             
-            <div className="flex items-center justify-center space-x-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12">
               <Button 
                 onClick={handleLogin} 
                 size="lg" 
-                className="bg-sacura-primary hover:bg-sacura-primary/90 text-lg px-8 py-3"
+                className="bg-sacura-primary hover:bg-sacura-primary/90 text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto"
               >
                 Start Free Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-                <Play className="w-5 h-5 mr-2" />
+              <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto">
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Watch Demo
               </Button>
             </div>
 
             {/* Key Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-16">
               <div className="text-center">
-                <div className="text-3xl font-bold text-sacura-primary mb-2">2.8K+</div>
-                <div className="text-sm text-muted-foreground">Businesses Trust Us</div>
+                <div className="text-2xl sm:text-3xl font-bold text-sacura-primary mb-1 sm:mb-2">2.8K+</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Businesses Trust Us</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-sacura-secondary mb-2">89%</div>
-                <div className="text-sm text-muted-foreground">AI Response Rate</div>
+                <div className="text-2xl sm:text-3xl font-bold text-sacura-secondary mb-1 sm:mb-2">89%</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">AI Response Rate</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-sacura-accent mb-2">94%</div>
-                <div className="text-sm text-muted-foreground">Issue Prevention</div>
+                <div className="text-2xl sm:text-3xl font-bold text-sacura-accent mb-1 sm:mb-2">94%</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Issue Prevention</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-indigo-600 mb-2">0.8s</div>
-                <div className="text-sm text-muted-foreground">Avg Response Time</div>
+                <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-1 sm:mb-2">0.8s</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Avg Response Time</div>
               </div>
             </div>
           </div>

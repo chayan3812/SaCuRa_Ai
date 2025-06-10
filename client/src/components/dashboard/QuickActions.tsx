@@ -72,28 +72,28 @@ export default function QuickActions() {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Quick Actions</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="pt-0">
+        <div className="space-y-2 sm:space-y-3">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
               <Button
                 key={action.title}
                 variant="ghost"
-                className="w-full justify-start p-3 h-auto hover:bg-muted"
+                className="w-full justify-start p-2 sm:p-3 h-auto hover:bg-muted touch-friendly"
                 onClick={action.action}
               >
-                <div className="flex items-center space-x-3 w-full">
-                  <div className={`w-10 h-10 ${action.bgColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                    <Icon className={`${action.color} w-5 h-5`} />
+                <div className="flex items-center space-x-2 sm:space-x-3 w-full">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 ${action.bgColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <Icon className={`${action.color} w-4 h-4 sm:w-5 sm:h-5`} />
                   </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-foreground">{action.title}</p>
-                    <p className="text-xs text-muted-foreground">{action.description}</p>
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-foreground truncate">{action.title}</p>
+                    <p className="text-xs text-muted-foreground truncate hidden sm:block">{action.description}</p>
                   </div>
                 </div>
               </Button>

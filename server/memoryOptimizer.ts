@@ -221,8 +221,11 @@ export function createMemoryEfficientMap<K, V>(maxSize: number = 1000): Map<K, V
   const originalSet = map.set.bind(map);
   map.set = function(key: K, value: V) {
     if (this.size >= maxSize) {
-      const firstKey = this.keys().next().value;
-      this.delete(firstKey);
+      const keys = Array.from(this.keys());
+      const firstKey = keys[0];
+      if (firstKey !== undefined) {
+        this.delete(firstKey);
+      }
     }
     return originalSet(key, value);
   };

@@ -1067,6 +1067,223 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced AI Features Routes
+  
+  // Smart Campaign Cloning
+  app.get('/api/campaigns/high-performing', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { smartCampaignCloner } = await import('./smartCampaignCloner');
+      const campaigns = await smartCampaignCloner.identifyHighPerformingCampaigns(userId);
+      res.json(campaigns);
+    } catch (error) {
+      console.error('Error fetching high-performing campaigns:', error);
+      res.status(500).json({ message: 'Failed to fetch high-performing campaigns' });
+    }
+  });
+
+  app.post('/api/campaigns/:id/clone', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { smartCampaignCloner } = await import('./smartCampaignCloner');
+      
+      // Get campaign template
+      const campaigns = await smartCampaignCloner.identifyHighPerformingCampaigns(req.user.claims.sub);
+      const campaign = campaigns.find(c => c.id === id);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: 'Campaign not found' });
+      }
+
+      const variations = await smartCampaignCloner.generateAudienceVariations(campaign);
+      const clonedCampaigns = [];
+      
+      for (const variation of variations.slice(0, 3)) {
+        const cloned = await smartCampaignCloner.cloneCampaignWithOptimizations(campaign, variation);
+        clonedCampaigns.push(cloned);
+      }
+      
+      res.json(clonedCampaigns);
+    } catch (error) {
+      console.error('Error cloning campaign:', error);
+      res.status(500).json({ message: 'Failed to clone campaign' });
+    }
+  });
+
+  // Predictive Budget Allocation
+  app.get('/api/budget/analysis', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { predictiveBudgetAllocator } = await import('./predictiveBudgetAllocator');
+      const analysis = await predictiveBudgetAllocator.analyzeCampaignPerformance(userId);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error analyzing budget performance:', error);
+      res.status(500).json({ message: 'Failed to analyze budget performance' });
+    }
+  });
+
+  app.post('/api/budget/optimize', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { totalBudget, constraints } = req.body;
+      const { predictiveBudgetAllocator } = await import('./predictiveBudgetAllocator');
+      const optimization = await predictiveBudgetAllocator.optimizePortfolioBudget(userId, totalBudget, constraints);
+      res.json(optimization);
+    } catch (error) {
+      console.error('Error optimizing budget:', error);
+      res.status(500).json({ message: 'Failed to optimize budget' });
+    }
+  });
+
+  // Competitor Intelligence
+  app.get('/api/competitors', isAuthenticated, async (req: any, res) => {
+    try {
+      // Return demo competitor data
+      const competitors = [
+        {
+          id: 'comp_1',
+          name: 'Market Leader Co',
+          industry: 'E-commerce',
+          website: 'https://marketleader.com',
+          marketShare: 25.3,
+          status: 'active',
+          adsCount: 12,
+          lastUpdated: new Date(),
+          recentActivity: [
+            { type: 'new_ad', timestamp: new Date(), description: 'New summer campaign' },
+            { type: 'price_change', timestamp: new Date(), change: '+15%' }
+          ]
+        },
+        {
+          id: 'comp_2', 
+          name: 'Rising Star Inc',
+          industry: 'SaaS',
+          website: 'https://risingstar.com',
+          marketShare: 18.7,
+          status: 'active',
+          adsCount: 8,
+          lastUpdated: new Date(),
+          recentActivity: [
+            { type: 'new_ad', timestamp: new Date(), description: 'Product launch campaign' }
+          ]
+        }
+      ];
+      res.json(competitors);
+    } catch (error) {
+      console.error('Error fetching competitors:', error);
+      res.status(500).json({ message: 'Failed to fetch competitors' });
+    }
+  });
+
+  app.post('/api/competitors', isAuthenticated, async (req: any, res) => {
+    try {
+      const { website, name, industry } = req.body;
+      const { competitorIntelligence } = await import('./competitorIntelligence');
+      const competitor = await competitorIntelligence.addCompetitor({ website, name, industry });
+      res.json(competitor);
+    } catch (error) {
+      console.error('Error adding competitor:', error);
+      res.status(500).json({ message: 'Failed to add competitor' });
+    }
+  });
+
+  app.get('/api/competitors/intelligence-report', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const competitorIds = ['comp_1', 'comp_2'];
+      const { competitorIntelligence } = await import('./competitorIntelligence');
+      const report = await competitorIntelligence.generateCompetitiveIntelligenceReport(userId, competitorIds);
+      res.json(report);
+    } catch (error) {
+      console.error('Error generating intelligence report:', error);
+      res.status(500).json({ message: 'Failed to generate intelligence report' });
+    }
+  });
+
+  app.get('/api/competitors/trends', isAuthenticated, async (req: any, res) => {
+    try {
+      const { competitorIntelligence } = await import('./competitorIntelligence');
+      const trends = await competitorIntelligence.detectEmergingTrends();
+      res.json(trends);
+    } catch (error) {
+      console.error('Error detecting trends:', error);
+      res.status(500).json({ message: 'Failed to detect trends' });
+    }
+  });
+
+  app.post('/api/competitors/start-monitoring', isAuthenticated, async (req: any, res) => {
+    try {
+      const { competitorIntelligence } = await import('./competitorIntelligence');
+      await competitorIntelligence.startRealTimeMonitoring();
+      res.json({ message: 'Monitoring started successfully' });
+    } catch (error) {
+      console.error('Error starting monitoring:', error);
+      res.status(500).json({ message: 'Failed to start monitoring' });
+    }
+  });
+
+  // Dynamic Creative Optimization
+  app.post('/api/creatives/generate-variations', isAuthenticated, async (req: any, res) => {
+    try {
+      const { campaignId, baseCreative, variationCount } = req.body;
+      const { dynamicCreativeOptimizer } = await import('./dynamicCreativeOptimizer');
+      const variations = await dynamicCreativeOptimizer.generateCreativeVariations(campaignId, baseCreative, variationCount);
+      res.json(variations);
+    } catch (error) {
+      console.error('Error generating creative variations:', error);
+      res.status(500).json({ message: 'Failed to generate creative variations' });
+    }
+  });
+
+  app.post('/api/creatives/optimize', isAuthenticated, async (req: any, res) => {
+    try {
+      const { campaignId } = req.body;
+      const { dynamicCreativeOptimizer } = await import('./dynamicCreativeOptimizer');
+      const optimization = await dynamicCreativeOptimizer.optimizeCreativePerformance(campaignId);
+      res.json(optimization);
+    } catch (error) {
+      console.error('Error optimizing creatives:', error);
+      res.status(500).json({ message: 'Failed to optimize creatives' });
+    }
+  });
+
+  // Crisis Management System
+  app.post('/api/crisis/initialize-monitoring', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageIds } = req.body;
+      const { crisisManagement } = await import('./crisisManagement');
+      await crisisManagement.initializeMonitoring(pageIds);
+      res.json({ message: 'Crisis monitoring initialized successfully' });
+    } catch (error) {
+      console.error('Error initializing crisis monitoring:', error);
+      res.status(500).json({ message: 'Failed to initialize crisis monitoring' });
+    }
+  });
+
+  app.get('/api/crisis/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { crisisManagement } = await import('./crisisManagement');
+      const events = await crisisManagement.detectCrisisEvents();
+      res.json(events);
+    } catch (error) {
+      console.error('Error detecting crisis events:', error);
+      res.status(500).json({ message: 'Failed to detect crisis events' });
+    }
+  });
+
+  app.post('/api/crisis/:id/respond', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { crisisManagement } = await import('./crisisManagement');
+      const response = await crisisManagement.respondToCrisis(id);
+      res.json(response);
+    } catch (error) {
+      console.error('Error responding to crisis:', error);
+      res.status(500).json({ message: 'Failed to respond to crisis' });
+    }
+  });
+
   // Production System Monitoring Routes
   app.get('/api/system/production-health', async (req, res) => {
     try {

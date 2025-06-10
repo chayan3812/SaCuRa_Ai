@@ -1,395 +1,470 @@
-import Sidebar from "@/components/layout/Sidebar";
-import TopBar from "@/components/layout/TopBar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { 
-  Search, 
   Eye, 
   TrendingUp, 
+  TrendingDown, 
+  DollarSign, 
   Users, 
-  Heart,
-  MessageCircle,
-  Share,
-  BarChart3,
+  AlertTriangle,
   Plus,
-  ExternalLink
-} from "lucide-react";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+  Target,
+  BarChart3,
+  Globe,
+  Calendar
+} from 'lucide-react';
 
 export default function CompetitorAnalysis() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const { toast } = useToast();
+  const [newCompetitorUrl, setNewCompetitorUrl] = useState('');
+  const queryClient = useQueryClient();
 
-  // Mock competitor data - in production this would come from API
-  const competitors = [
-    {
-      id: 1,
-      name: "Social Media Pro",
-      pageId: "socialmediapro",
-      followers: 45200,
-      avgEngagement: 3.2,
-      postsPerWeek: 5,
-      topContentType: "Video",
-      lastScanned: "2 hours ago",
-      isTracking: true,
-    },
-    {
-      id: 2,
-      name: "Marketing Mastery",
-      pageId: "marketingmastery",
-      followers: 38500,
-      avgEngagement: 2.8,
-      postsPerWeek: 7,
-      topContentType: "Carousel",
-      lastScanned: "4 hours ago",
-      isTracking: true,
-    },
-    {
-      id: 3,
-      name: "Digital Growth Hub",
-      pageId: "digitalgrowth",
-      followers: 52300,
-      avgEngagement: 4.1,
-      postsPerWeek: 4,
-      topContentType: "Image",
-      lastScanned: "1 hour ago",
-      isTracking: false,
-    },
-  ];
+  const { data: competitors, isLoading: competitorsLoading } = useQuery({
+    queryKey: ['/api/competitors'],
+    refetchInterval: 30000 // Refresh every 30 seconds
+  });
 
-  const insights = [
-    {
-      type: "trending",
-      title: "Video Content Surge",
-      description: "Competitors are posting 40% more video content this month",
-      impact: "High",
-      action: "Consider increasing video production",
-    },
-    {
-      type: "timing",
-      title: "Optimal Posting Times",
-      description: "Best performing posts are between 2-4 PM on weekdays",
-      impact: "Medium",
-      action: "Adjust your posting schedule",
-    },
-    {
-      type: "hashtags",
-      title: "Emerging Hashtags",
-      description: "#MarketingTips and #SmallBusiness trending in your niche",
-      impact: "Medium",
-      action: "Incorporate trending hashtags",
-    },
-  ];
+  const { data: intelligenceReport, isLoading: reportLoading } = useQuery({
+    queryKey: ['/api/competitors/intelligence-report'],
+    refetchInterval: 60000 // Refresh every minute
+  });
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSearching(false);
-      toast({
-        title: "Search Complete",
-        description: `Found potential competitors for "${searchQuery}"`,
+  const { data: trends, isLoading: trendsLoading } = useQuery({
+    queryKey: ['/api/competitors/trends'],
+    refetchInterval: 120000 // Refresh every 2 minutes
+  });
+
+  const addCompetitorMutation = useMutation({
+    mutationFn: async (url: string) => {
+      return apiRequest('/api/competitors', {
+        method: 'POST',
+        body: JSON.stringify({ website: url })
       });
-    }, 2000);
-  };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/competitors'] });
+      setNewCompetitorUrl('');
+    }
+  });
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
+  const startMonitoringMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/competitors/start-monitoring', {
+        method: 'POST'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/competitors'] });
+    }
+  });
 
-  const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      case 'medium': return 'text-amber-600 bg-amber-50 border-amber-200';
-      default: return 'text-green-600 bg-green-50 border-green-200';
+  const handleAddCompetitor = () => {
+    if (newCompetitorUrl) {
+      addCompetitorMutation.mutate(newCompetitorUrl);
     }
   };
 
-  return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <main className="flex-1 overflow-y-auto">
-        <TopBar />
-        
-        <div className="p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Competitor Analysis</h1>
-              <p className="text-muted-foreground">Monitor and analyze competitor activity to stay ahead</p>
+  if (competitorsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading competitor intelligence...</p>
             </div>
-            <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary">
-              <Eye className="w-4 h-4 mr-1" />
-              Monitoring {competitors.filter(c => c.isTracking).length} Competitors
-            </Badge>
-          </div>
-
-          {/* Search and Add Competitors */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Search className="w-5 h-5" />
-                <span>Find Competitors</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-4">
-                <Input
-                  placeholder="Enter competitor page name or URL..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <Button 
-                  onClick={handleSearch} 
-                  disabled={isSearching || !searchQuery.trim()}
-                >
-                  {isSearching ? "Searching..." : "Search"}
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                Search for Facebook pages in your industry to track their performance and strategies
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Competitor Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tracked Competitors</p>
-                    <p className="text-2xl font-bold text-foreground">{competitors.filter(c => c.isTracking).length}</p>
-                    <p className="text-sm text-sacura-secondary">Active monitoring</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Eye className="text-blue-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Avg Engagement</p>
-                    <p className="text-2xl font-bold text-foreground">3.4%</p>
-                    <p className="text-sm text-sacura-secondary">Industry average</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Heart className="text-green-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Top Content Type</p>
-                    <p className="text-2xl font-bold text-foreground">Video</p>
-                    <p className="text-sm text-sacura-secondary">Most engaging</p>
-                  </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="text-purple-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Posting Frequency</p>
-                    <p className="text-2xl font-bold text-foreground">5.3</p>
-                    <p className="text-sm text-sacura-secondary">Posts per week</p>
-                  </div>
-                  <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="text-amber-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Competitor List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="w-5 h-5" />
-                <span>Competitor Performance</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {competitors.map((competitor) => (
-                  <div key={competitor.id} className="p-4 border rounded-lg hover:bg-muted transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                          {competitor.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h4 className="font-semibold text-foreground">{competitor.name}</h4>
-                            {competitor.isTracking && (
-                              <Badge variant="secondary" className="bg-green-100 text-green-700">
-                                Tracking
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">@{competitor.pageId}</p>
-                          <p className="text-xs text-muted-foreground">Last scanned: {competitor.lastScanned}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-muted-foreground">Followers</p>
-                          <p className="text-lg font-bold text-foreground">{formatNumber(competitor.followers)}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-muted-foreground">Engagement</p>
-                          <p className="text-lg font-bold text-sacura-secondary">{competitor.avgEngagement}%</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-muted-foreground">Posts/Week</p>
-                          <p className="text-lg font-bold text-foreground">{competitor.postsPerWeek}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-muted-foreground">Top Content</p>
-                          <p className="text-sm font-bold text-purple-600">{competitor.topContentType}</p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
-                          <Button 
-                            variant={competitor.isTracking ? "destructive" : "default"} 
-                            size="sm"
-                          >
-                            {competitor.isTracking ? "Stop" : "Track"}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Market Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-sacura-primary" />
-                <span>AI Market Insights</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {insights.map((insight, index) => (
-                  <div key={index} className={`p-4 border rounded-lg ${getImpactColor(insight.impact)}`}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Badge variant="outline" className="capitalize">
-                            {insight.type}
-                          </Badge>
-                          <Badge variant="outline" className="capitalize">
-                            {insight.impact} impact
-                          </Badge>
-                        </div>
-                        <h4 className="font-semibold text-foreground mb-1">{insight.title}</h4>
-                        <p className="text-sm text-muted-foreground mb-2">{insight.description}</p>
-                        <p className="text-sm font-medium text-sacura-primary">
-                          Recommended Action: {insight.action}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Performing Content Types</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { type: "Video", engagement: 4.2, change: "+12%" },
-                    { type: "Carousel", engagement: 3.8, change: "+8%" },
-                    { type: "Image", engagement: 3.1, change: "+3%" },
-                    { type: "Text", engagement: 2.4, change: "-2%" },
-                  ].map((content, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                      <div>
-                        <p className="font-medium text-foreground">{content.type}</p>
-                        <p className="text-sm text-muted-foreground">{content.engagement}% avg engagement</p>
-                      </div>
-                      <Badge 
-                        variant={content.change.startsWith('+') ? 'secondary' : 'destructive'}
-                        className={content.change.startsWith('+') ? 'bg-green-100 text-green-700' : ''}
-                      >
-                        {content.change}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Trending Hashtags</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {[
-                    { tag: "#MarketingTips", usage: 89, trend: "up" },
-                    { tag: "#SmallBusiness", usage: 76, trend: "up" },
-                    { tag: "#SocialMediaStrategy", usage: 64, trend: "up" },
-                    { tag: "#DigitalMarketing", usage: 58, trend: "down" },
-                    { tag: "#BusinessGrowth", usage: 45, trend: "up" },
-                  ].map((hashtag, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                      <div>
-                        <p className="font-medium text-sacura-primary">{hashtag.tag}</p>
-                        <p className="text-sm text-muted-foreground">Used {hashtag.usage} times this week</p>
-                      </div>
-                      <TrendingUp 
-                        className={`w-4 h-4 ${
-                          hashtag.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                        }`} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
-      </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Competitor Intelligence
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            Monitor competitor strategies, pricing, and performance in real-time
+          </p>
+        </div>
+
+        {/* Add Competitor Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Add Competitor
+            </CardTitle>
+            <CardDescription>
+              Enter a competitor's website URL to start monitoring their advertising and pricing strategies
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <Input
+                placeholder="https://competitor-website.com"
+                value={newCompetitorUrl}
+                onChange={(e) => setNewCompetitorUrl(e.target.value)}
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleAddCompetitor}
+                disabled={addCompetitorMutation.isPending || !newCompetitorUrl}
+              >
+                {addCompetitorMutation.isPending ? 'Adding...' : 'Add Competitor'}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => startMonitoringMutation.mutate()}
+                disabled={startMonitoringMutation.isPending}
+              >
+                {startMonitoringMutation.isPending ? 'Starting...' : 'Start Monitoring'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="ads">Ad Intelligence</TabsTrigger>
+            <TabsTrigger value="pricing">Pricing Monitor</TabsTrigger>
+            <TabsTrigger value="trends">Market Trends</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Competitors Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {competitors?.map((competitor: any) => (
+                <Card key={competitor.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg">{competitor.name}</CardTitle>
+                        <CardDescription>{competitor.industry}</CardDescription>
+                      </div>
+                      <Badge variant={competitor.status === 'active' ? 'default' : 'secondary'}>
+                        {competitor.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-blue-600" />
+                        <span className="text-gray-600 dark:text-gray-400">Website</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-green-600" />
+                        <span className="font-medium">{competitor.marketShare}% share</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-purple-600" />
+                        <span className="text-gray-600 dark:text-gray-400">Last updated</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Target className="h-4 w-4 text-orange-600" />
+                        <span className="font-medium">{competitor.adsCount || 0} ads</span>
+                      </div>
+                    </div>
+                    
+                    {competitor.recentActivity && (
+                      <div className="border-t pt-4">
+                        <h4 className="font-medium mb-2">Recent Activity</h4>
+                        <div className="space-y-2">
+                          {competitor.recentActivity.slice(0, 2).map((activity: any, index: number) => (
+                            <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                              {activity.type === 'new_ad' && (
+                                <div className="flex items-center gap-2">
+                                  <Eye className="h-3 w-3" />
+                                  New ad campaign detected
+                                </div>
+                              )}
+                              {activity.type === 'price_change' && (
+                                <div className="flex items-center gap-2">
+                                  <DollarSign className="h-3 w-3" />
+                                  Pricing update: {activity.change}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Intelligence Report Summary */}
+            {intelligenceReport && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Intelligence Report Summary
+                  </CardTitle>
+                  <CardDescription>
+                    Generated {new Date(intelligenceReport.generatedAt).toLocaleString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Strategic Insights</h4>
+                      <div className="space-y-1">
+                        {intelligenceReport.strategicInsights?.slice(0, 3).map((insight: any, index: number) => (
+                          <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                            • {insight.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Recommendations</h4>
+                      <div className="space-y-1">
+                        {intelligenceReport.recommendations?.slice(0, 3).map((rec: any, index: number) => (
+                          <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                            • {rec.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Alerts</h4>
+                      <div className="space-y-1">
+                        {intelligenceReport.alerts?.slice(0, 3).map((alert: any, index: number) => (
+                          <Alert key={index} className="py-2">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertDescription className="text-sm">
+                              {alert.title}
+                            </AlertDescription>
+                          </Alert>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="ads" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {competitors?.map((competitor: any) => (
+                <Card key={competitor.id}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{competitor.name} - Ad Analysis</CardTitle>
+                    <CardDescription>Recent advertising activities and strategies</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {competitor.ads && competitor.ads.length > 0 ? (
+                      <div className="space-y-4">
+                        {competitor.ads.slice(0, 3).map((ad: any, index: number) => (
+                          <div key={index} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium">{ad.platform} Campaign</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {ad.adType} • Est. Budget: ${ad.performance.estimatedBudget.daily}/day
+                                </p>
+                              </div>
+                              <Badge variant="outline">{ad.performance.engagementRate}% engagement</Badge>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div>
+                                <span className="font-medium text-sm">Headlines:</span>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                  {ad.creativeAssets.headlines.slice(0, 2).join(' • ')}
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <span className="font-medium text-sm">Strategy:</span>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                  {ad.analysis.strategy}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex justify-between text-sm">
+                              <span>Reach: {ad.performance.estimatedReach.toLocaleString()}</span>
+                              <span>Running {ad.performance.runDuration} days</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                        No ad data available yet
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pricing" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {competitors?.map((competitor: any) => (
+                <Card key={competitor.id}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{competitor.name} - Pricing Analysis</CardTitle>
+                    <CardDescription>Current pricing and recent changes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {competitor.pricing && competitor.pricing.products ? (
+                      <div className="space-y-4">
+                        {competitor.pricing.products.map((product: any, index: number) => (
+                          <div key={index} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium">{product.name}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{product.category}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-lg font-bold">${product.price}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{product.pricingModel}</div>
+                              </div>
+                            </div>
+                            
+                            {product.priceHistory && product.priceHistory.length > 1 && (
+                              <div className="flex items-center gap-2 text-sm">
+                                {product.priceHistory[product.priceHistory.length - 1].price > 
+                                 product.priceHistory[product.priceHistory.length - 2].price ? (
+                                  <TrendingUp className="h-4 w-4 text-red-500" />
+                                ) : (
+                                  <TrendingDown className="h-4 w-4 text-green-500" />
+                                )}
+                                <span>
+                                  Price change: ${product.priceHistory[product.priceHistory.length - 2].price} → ${product.price}
+                                </span>
+                              </div>
+                            )}
+                            
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                              Features: {product.features.slice(0, 3).join(', ')}
+                              {product.features.length > 3 && ` +${product.features.length - 3} more`}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {competitor.pricing.promotions && competitor.pricing.promotions.length > 0 && (
+                          <div className="border-t pt-4">
+                            <h4 className="font-medium mb-2">Active Promotions</h4>
+                            {competitor.pricing.promotions.map((promo: any, index: number) => (
+                              <div key={index} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <span className="font-medium">{promo.description}</span>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                      {promo.discount}% off • Valid until {new Date(promo.validTo).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                  <Badge variant="secondary">{promo.type}</Badge>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                        No pricing data available yet
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="trends" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Market Trends Analysis
+                </CardTitle>
+                <CardDescription>
+                  Emerging trends detected from competitor activities
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {trends && trends.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {trends.map((trend: any, index: number) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium">{trend.type.replace('_', ' ').toUpperCase()}</h4>
+                          <Badge variant={trend.trend === 'rising' ? 'default' : 'secondary'}>
+                            {trend.trend}
+                          </Badge>
+                        </div>
+                        
+                        {trend.platform && (
+                          <div className="text-sm">
+                            <span className="font-medium">Platform:</span> {trend.platform}
+                          </div>
+                        )}
+                        
+                        {trend.adType && (
+                          <div className="text-sm">
+                            <span className="font-medium">Ad Type:</span> {trend.adType}
+                          </div>
+                        )}
+                        
+                        {trend.adCount && (
+                          <div className="text-sm">
+                            <span className="font-medium">Usage:</span> {trend.adCount} ads detected
+                          </div>
+                        )}
+                        
+                        {trend.percentage && (
+                          <div className="text-sm">
+                            <span className="font-medium">Market Share:</span> {trend.percentage.toFixed(1)}%
+                          </div>
+                        )}
+                        
+                        {trend.averageDailyBudget && (
+                          <div className="text-sm">
+                            <span className="font-medium">Avg Budget:</span> ${trend.averageDailyBudget.toFixed(0)}/day
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      No Trends Detected Yet
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Add competitors and start monitoring to detect market trends
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

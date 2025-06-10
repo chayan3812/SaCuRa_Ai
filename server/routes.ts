@@ -16,6 +16,7 @@ import {
   analyzeSentiment
 } from "./openai";
 import { initializeWebSocket } from "./websocket";
+import { systemOptimizer } from "./systemOptimizer";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {

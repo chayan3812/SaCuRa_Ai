@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { initializePageWatcher } from "./pageWatcher";
 import { initializeContentScheduler } from "./contentScheduler";
 import { productionOptimizer } from "./productionOptimizer";
+import { systemOptimizer } from "./systemOptimizer";
 
 const app = express();
 app.use(express.json());
@@ -12,6 +13,15 @@ app.use(express.urlencoded({ extended: false }));
 // Production optimization middleware
 app.use(productionOptimizer.performanceMiddleware());
 app.use(productionOptimizer.rateLimitMiddleware(1000, 60000)); // 1000 requests per minute
+
+// System optimization monitoring
+systemOptimizer.on('optimization', (event) => {
+  console.log(`System optimization executed: ${event.type} at ${event.timestamp}`);
+});
+
+systemOptimizer.on('memory-leak-detected', (event) => {
+  console.warn(`Memory leak detected: ${event.trend * 100}% growth, current heap: ${(event.currentHeap / 1024 / 1024).toFixed(2)}MB`);
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

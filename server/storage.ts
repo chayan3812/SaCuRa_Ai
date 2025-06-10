@@ -513,7 +513,7 @@ export class DatabaseStorage implements IStorage {
       .from(adMetrics)
       .innerJoin(facebookAdAccounts, eq(adMetrics.adAccountId, facebookAdAccounts.id))
       .where(and(
-        eq(facebookAdAccounts.userId, sql`CAST(${userId} AS UUID)`),
+        eq(facebookAdAccounts.userId, userId),
         gte(adMetrics.date, today)
       ));
 
@@ -523,7 +523,7 @@ export class DatabaseStorage implements IStorage {
       .from(customerInteractions)
       .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.pageId))
       .where(and(
-        eq(facebookPages.userId, sql`CAST(${userId} AS UUID)`),
+        eq(facebookPages.userId, userId),
         gte(customerInteractions.createdAt, today)
       ));
 
@@ -537,7 +537,7 @@ export class DatabaseStorage implements IStorage {
       .from(restrictionAlerts)
       .innerJoin(facebookPages, eq(restrictionAlerts.pageId, facebookPages.pageId))
       .where(and(
-        eq(facebookPages.userId, sql`CAST(${userId} AS UUID)`),
+        eq(facebookPages.userId, userId),
         eq(restrictionAlerts.isResolved, true),
         gte(restrictionAlerts.createdAt, monthStart)
       ));

@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
+import { totalmem, freemem } from 'os';
 
 interface SystemMetrics {
   memoryUsage: {
@@ -98,9 +99,10 @@ export class SystemOptimizer extends EventEmitter {
   }
 
   private startMonitoring(): void {
+    // Increased interval to reduce overhead
     this.monitoringInterval = setInterval(() => {
       this.collectMetrics();
-    }, 10000); // Every 10 seconds
+    }, 30000); // Every 30 seconds to reduce system load
   }
 
   private async collectMetrics(): Promise<void> {
@@ -108,8 +110,8 @@ export class SystemOptimizer extends EventEmitter {
     
     // Memory metrics
     const memUsage = process.memoryUsage();
-    const totalMemory = require('os').totalmem();
-    const usedMemory = totalMemory - require('os').freemem();
+    const totalMemory = totalmem();
+    const usedMemory = totalMemory - freemem();
 
     // CPU metrics
     const cpuUsage = process.cpuUsage();
@@ -199,18 +201,25 @@ export class SystemOptimizer extends EventEmitter {
   }
 
   private async performMemoryCleanup(): Promise<void> {
-    // Force garbage collection if exposed
-    if (global.gc) {
-      global.gc();
-    }
+    try {
+      // Force garbage collection if exposed
+      if (global.gc) {
+        global.gc();
+      }
 
-    // Clear caches
-    this.clearInternalCaches();
-    
-    // Reduce metrics history
-    this.metrics = this.metrics.slice(-20);
-    
-    console.log('Emergency memory cleanup completed');
+      // Clear caches
+      this.clearInternalCaches();
+      
+      // Reduce metrics history aggressively
+      this.metrics = this.metrics.slice(-10);
+      
+      // Clear memory leak detector
+      this.memoryLeakDetector.clear();
+      
+      console.log('Emergency memory cleanup completed');
+    } catch (error) {
+      console.error('Memory cleanup failed:', error);
+    }
   }
 
   private async optimizeCache(): Promise<void> {

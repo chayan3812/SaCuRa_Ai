@@ -39,6 +39,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notifications API
+  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Return demo notifications for now
+      const notifications = [
+        {
+          id: 'notif_1',
+          title: 'Campaign Performance Alert',
+          message: 'Your "Summer Sale" campaign has exceeded performance targets by 25%',
+          type: 'success',
+          read: false,
+          createdAt: new Date(Date.now() - 10 * 60 * 1000) // 10 minutes ago
+        },
+        {
+          id: 'notif_2',
+          title: 'Budget Warning',
+          message: 'Daily budget for "Product Launch" campaign is 90% spent',
+          type: 'warning',
+          read: false,
+          createdAt: new Date(Date.now() - 30 * 60 * 1000) // 30 minutes ago
+        },
+        {
+          id: 'notif_3',
+          title: 'AI Optimization Complete',
+          message: 'Automated optimization improved CTR by 18% across 3 campaigns',
+          type: 'info',
+          read: true,
+          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+        },
+        {
+          id: 'notif_4',
+          title: 'Page Health Issue Detected',
+          message: 'Potential policy violation detected on Business Page - Auto-fix attempted',
+          type: 'warning',
+          read: false,
+          createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000) // 4 hours ago
+        },
+        {
+          id: 'notif_5',
+          title: 'Competitor Alert',
+          message: 'Market Leader Co launched new campaign targeting your keywords',
+          type: 'info',
+          read: true,
+          createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
+        }
+      ];
+      
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.post('/api/notifications/:id/mark-read', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.claims.sub;
+      
+      // In a real implementation, this would update the notification in the database
+      res.json({ message: 'Notification marked as read' });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
   // Facebook OAuth routes
   app.get('/api/facebook/auth', isAuthenticated, (req: any, res) => {
     const clientId = process.env.FACEBOOK_APP_ID;

@@ -39,6 +39,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Production health endpoint with detailed system metrics
+  app.get('/api/system/production-health', async (req, res) => {
+    try {
+      const health = await productionOptimizer.getSystemHealth();
+      const recommendations = productionOptimizer.generateOptimizationRecommendations();
+      const scalingRecommendation = await productionOptimizer.checkAutoScaling();
+      
+      res.json({
+        ...health,
+        timestamp: new Date().toISOString(),
+        optimizationRecommendations: recommendations,
+        scalingRecommendation,
+        deployment: {
+          ready: health.status !== 'critical',
+          issues: health.status === 'critical' ? ['High memory usage detected'] : [],
+          version: '1.0.0'
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: 'unhealthy', 
+        error: 'Production health check failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Notifications API
   app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
     try {

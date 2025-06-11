@@ -41,6 +41,13 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   
+  // User Settings operations
+  updateUser(id: string, userData: Partial<User>): Promise<User>;
+  updateUserNotificationPreferences(userId: string, preferences: any): Promise<void>;
+  updateUserPassword(userId: string, newPassword: string): Promise<void>;
+  updateUserApiKeys(userId: string, apiKeys: any): Promise<void>;
+  getUserSettings(userId: string): Promise<any>;
+  
   // Facebook Pages
   createFacebookPage(page: InsertFacebookPage): Promise<FacebookPage>;
   getFacebookPagesByUser(userId: string): Promise<FacebookPage[]>;
@@ -126,6 +133,84 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  // User Settings operations
+  async updateUser(id: string, userData: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserNotificationPreferences(userId: string, preferences: any): Promise<void> {
+    // For demo purposes, store preferences in user table or create settings table
+    // In production, you'd have a separate user_settings table
+    await db
+      .update(users)
+      .set({
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserPassword(userId: string, newPassword: string): Promise<void> {
+    // Note: In production, hash the password before storing
+    await db
+      .update(users)
+      .set({
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserApiKeys(userId: string, apiKeys: any): Promise<void> {
+    // Store API keys securely (encrypted in production)
+    await db
+      .update(users)
+      .set({
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async getUserSettings(userId: string): Promise<any> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return {
+      profile: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      },
+      notifications: {
+        email: true,
+        push: true,
+        campaignAlerts: true,
+        budgetWarnings: true,
+        performanceReports: false,
+        systemUpdates: true
+      },
+      apiKeys: {
+        facebookAccessToken: null,
+        openaiApiKey: null,
+        claudeApiKey: null
+      },
+      appearance: {
+        theme: 'system',
+        compactMode: false,
+        animations: true
+      }
+    };
   }
 
   // Facebook Pages

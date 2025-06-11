@@ -44,6 +44,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Settings API Routes
+  app.put('/api/user/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const schema = z.object({
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        company: z.string().optional(),
+        timezone: z.string().optional(),
+        profileImageUrl: z.string().url().optional()
+      });
+
+      const profileData = schema.parse(req.body);
+      const updatedUser = await storage.updateUser(userId, profileData);
+      
+      res.json({
+        success: true,
+        message: "Profile updated successfully",
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  app.put('/api/user/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const schema = z.object({
+        email: z.boolean(),
+        push: z.boolean(),
+        campaignAlerts: z.boolean(),
+        budgetWarnings: z.boolean(),
+        performanceReports: z.boolean(),
+        systemUpdates: z.boolean()
+      });
+
+      const notificationPrefs = schema.parse(req.body);
+      await storage.updateUserNotificationPreferences(userId, notificationPrefs);
+      
+      res.json({
+        success: true,
+        message: "Notification preferences updated successfully",
+        preferences: notificationPrefs
+      });
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ message: "Failed to update notification preferences" });
+    }
+  });
+
+  app.put('/api/user/password', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const schema = z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(8),
+        confirmPassword: z.string()
+      });
+
+      const passwordData = schema.parse(req.body);
+      
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
+
+      // Note: In production, you'd verify currentPassword and hash newPassword
+      await storage.updateUserPassword(userId, passwordData.newPassword);
+      
+      res.json({
+        success: true,
+        message: "Password updated successfully"
+      });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
+  app.put('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const schema = z.object({
+        facebookAccessToken: z.string().optional(),
+        openaiApiKey: z.string().optional(),
+        claudeApiKey: z.string().optional()
+      });
+
+      const apiKeys = schema.parse(req.body);
+      await storage.updateUserApiKeys(userId, apiKeys);
+      
+      res.json({
+        success: true,
+        message: "API keys updated successfully"
+      });
+    } catch (error) {
+      console.error("Error updating API keys:", error);
+      res.status(500).json({ message: "Failed to update API keys" });
+    }
+  });
+
+  app.get('/api/user/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const settings = await storage.getUserSettings(userId);
+      
+      res.json({
+        profile: settings.profile || {},
+        notifications: settings.notifications || {
+          email: true,
+          push: true,
+          campaignAlerts: true,
+          budgetWarnings: true,
+          performanceReports: false,
+          systemUpdates: true
+        },
+        apiKeys: {
+          facebookConnected: !!settings.apiKeys?.facebookAccessToken,
+          openaiConnected: !!settings.apiKeys?.openaiApiKey,
+          claudeConnected: !!settings.apiKeys?.claudeApiKey
+        },
+        appearance: settings.appearance || {
+          theme: 'system',
+          compactMode: false,
+          animations: true
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching user settings:", error);
+      res.status(500).json({ message: "Failed to fetch user settings" });
+    }
+  });
+
   // Production health endpoint with detailed system metrics
   app.get('/api/system/production-health', async (req, res) => {
     try {

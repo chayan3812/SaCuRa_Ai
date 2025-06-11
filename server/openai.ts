@@ -367,7 +367,7 @@ export async function analyzePostContent(content: string): Promise<PostAnalysis>
     const result = JSON.parse(response.choices[0].message.content || '{}');
     return result;
   } catch (error) {
-    throw new Error("Failed to analyze post content: " + error.message);
+    throw new Error("Failed to analyze post content: " + (error as Error).message);
   }
 }
 
@@ -412,7 +412,7 @@ export async function generateImage(prompt: string): Promise<{ url: string; prom
     });
 
     return {
-      url: response.data[0].url || '',
+      url: response.data?.[0]?.url || '',
       prompt: prompt,
       style: 'realistic',
       dimensions: '1024x1024'

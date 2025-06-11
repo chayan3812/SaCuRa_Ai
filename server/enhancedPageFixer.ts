@@ -347,7 +347,7 @@ export class EnhancedPageFixer {
       const fbService = new FacebookAPIService(page.accessToken);
       
       // Analyze recent content
-      const posts = await fbService.getPagePosts(String(page.pageId), 10, 'posts');
+      const posts = await fbService.getPagePosts(String(page.pageId), 10);
       fixResult.actionsPerformed.push('Analyzed recent post performance');
       
       // Generate content improvements
@@ -458,7 +458,7 @@ export class EnhancedPageFixer {
 
   private async getPageInsights(fbService: FacebookAPIService, pageId: string): Promise<any> {
     try {
-      return await fbService.getPageInsights(pageId, ['page_impressions', 'page_reach', 'page_engagement']);
+      return await fbService.getPageInsights(pageId, 'page_impressions,page_reach,page_engagement', 'day');
     } catch (error) {
       return {};
     }
@@ -466,7 +466,7 @@ export class EnhancedPageFixer {
 
   private async getRecentPosts(fbService: FacebookAPIService, pageId: string): Promise<any[]> {
     try {
-      return await fbService.getPagePosts(pageId, 20, 'posts');
+      return await fbService.getPagePosts(String(pageId), 20);
     } catch (error) {
       return [];
     }

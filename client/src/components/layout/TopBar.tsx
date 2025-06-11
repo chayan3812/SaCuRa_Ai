@@ -49,10 +49,10 @@ export default function TopBar() {
   const getNotificationRoute = (notification: any) => {
     switch (notification.type) {
       case 'success':
-        return '/ad-optimizer'; // Campaign performance alerts
+        return '/ads'; // Campaign performance alerts
       case 'warning':
         if (notification.message.includes('budget')) {
-          return '/ad-optimizer'; // Budget warnings
+          return '/ads'; // Budget warnings
         }
         if (notification.message.includes('policy') || notification.message.includes('Page')) {
           return '/page-status'; // Page health issues
@@ -60,14 +60,14 @@ export default function TopBar() {
         return '/analytics';
       case 'info':
         if (notification.message.includes('optimization')) {
-          return '/ai-insights'; // AI optimization results
+          return '/insights'; // AI optimization results
         }
         if (notification.message.includes('competitor')) {
-          return '/competitor-analysis'; // Competitor alerts
+          return '/competitors'; // Competitor alerts
         }
         return '/analytics';
       default:
-        return '/dashboard';
+        return '/'; // Dashboard
     }
   };
 

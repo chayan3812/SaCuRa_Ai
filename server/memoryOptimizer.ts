@@ -25,10 +25,10 @@ export class MemoryOptimizer extends EventEmitter {
   constructor(config: Partial<OptimizationConfig> = {}) {
     super();
     this.config = {
-      maxMemoryThreshold: 85,
-      criticalMemoryThreshold: 95,
-      gcInterval: 30000, // 30 seconds
-      cacheCleanupInterval: 60000, // 1 minute
+      maxMemoryThreshold: 70, // Reduced from 85 to 70
+      criticalMemoryThreshold: 80, // Reduced from 95 to 80
+      gcInterval: 15000, // Reduced from 30s to 15s for more frequent monitoring
+      cacheCleanupInterval: 30000, // Reduced from 60s to 30s for more frequent cleanup
       ...config
     };
 

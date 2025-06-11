@@ -55,20 +55,20 @@ export class IntelligentTrainer {
 
   // Continuous Learning from Real Data
   private startContinuousLearning(): void {
-    // Real-time feedback collection
+    // Real-time feedback collection (reduced frequency for memory optimization)
     setInterval(async () => {
       await this.collectRealTimeData();
-    }, 15000); // Collect every 15 seconds
+    }, 45000); // Collect every 45 seconds (reduced from 15s)
 
     // Process learning queue
     setInterval(async () => {
       await this.processLearningQueue();
-    }, 60000); // Process every minute
+    }, 120000); // Process every 2 minutes (reduced from 1 minute)
 
     // Adaptive model updates
     setInterval(async () => {
       await this.updateMLEngineModels();
-    }, 300000); // Update every 5 minutes
+    }, 600000); // Update every 10 minutes (reduced from 5 minutes)
   }
 
   // Collect Real Performance Data with Memory Optimization
@@ -96,8 +96,8 @@ export class IntelligentTrainer {
       ];
 
       // Limit queue size for memory management
-      if (this.learningQueue.length > 500) {
-        this.learningQueue = this.learningQueue.slice(-250); // Keep only recent 250 items
+      if (this.learningQueue.length > 100) {
+        this.learningQueue = this.learningQueue.slice(-50); // Keep only recent 50 items
       }
 
       this.learningQueue.push(...optimizedData);

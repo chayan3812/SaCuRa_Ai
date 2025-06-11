@@ -1,479 +1,398 @@
-import { claudeAI } from './claudeAI';
-import { 
-  generateCustomerServiceResponse,
-  generateAdOptimizationSuggestions,
-  checkPolicyCompliance,
-  generateAdCopy,
-  analyzeSentiment,
-  generateFacebookPost,
-  analyzePostContent,
-  generateSEOOptimizedContent
-} from './openai';
+import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
-interface AIProvider {
-  name: 'openai' | 'claude';
-  available: boolean;
-  responseTime: number;
-  errorRate: number;
+// the newest Anthropic model is "claude-sonnet-4-20250514" which was released May 14, 2025. Use this by default unless user has already selected claude-3-7-sonnet-20250219
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export interface HybridAIResponse {
+  primary: {
+    content: string;
+    confidence: number;
+    model: string;
+    source: 'claude' | 'openai';
+  };
+  secondary?: {
+    content: string;
+    confidence: number;
+    model: string;
+    source: 'claude' | 'openai';
+  };
+  consensus?: {
+    content: string;
+    confidence: number;
+    agreement: number;
+  };
+  performance: {
+    responseTime: number;
+    tokensUsed: number;
+    cost: number;
+  };
 }
 
-interface HybridAIConfig {
-  primaryProvider: 'openai' | 'claude';
-  fallbackEnabled: boolean;
-  loadBalancing: boolean;
-  qualityThreshold: number;
+export interface AITaskOptimization {
+  taskType: 'content' | 'analysis' | 'strategy' | 'prediction' | 'creative';
+  complexity: 'simple' | 'medium' | 'complex' | 'expert';
+  preferredModel: 'claude' | 'openai' | 'hybrid';
+  reasoning: string;
 }
 
 export class HybridAIEngine {
-  private providers: Map<string, AIProvider> = new Map();
-  private config: HybridAIConfig;
-  
-  constructor(config: HybridAIConfig = {
-    primaryProvider: 'openai',
-    fallbackEnabled: true,
-    loadBalancing: true,
-    qualityThreshold: 0.8
-  }) {
-    this.config = config;
-    this.initializeProviders();
+  private performanceHistory: Map<string, any[]> = new Map();
+  private modelPreferences: Map<string, string> = new Map();
+
+  constructor() {
+    this.initializeModelPreferences();
   }
 
-  private initializeProviders() {
-    this.providers.set('openai', {
-      name: 'openai',
-      available: true,
-      responseTime: 0,
-      errorRate: 0
-    });
+  private initializeModelPreferences(): void {
+    // Claude excels at: Analysis, reasoning, creative writing, strategy
+    this.modelPreferences.set('content_analysis', 'claude');
+    this.modelPreferences.set('sentiment_analysis', 'claude');
+    this.modelPreferences.set('strategic_planning', 'claude');
+    this.modelPreferences.set('creative_writing', 'claude');
+    this.modelPreferences.set('competitive_analysis', 'claude');
     
-    this.providers.set('claude', {
-      name: 'claude',
-      available: true,
-      responseTime: 0,
-      errorRate: 0
-    });
+    // OpenAI excels at: Code generation, technical tasks, structured data
+    this.modelPreferences.set('data_processing', 'openai');
+    this.modelPreferences.set('json_generation', 'openai');
+    this.modelPreferences.set('technical_analysis', 'openai');
+    this.modelPreferences.set('structured_output', 'openai');
+    
+    // Hybrid for: Complex decision making, multi-perspective analysis
+    this.modelPreferences.set('campaign_optimization', 'hybrid');
+    this.modelPreferences.set('audience_targeting', 'hybrid');
+    this.modelPreferences.set('crisis_management', 'hybrid');
   }
 
-  // Enhanced content generation with AI provider selection
-  async generateEnhancedContent(
+  async generateContent(
     prompt: string,
-    contentType: 'post' | 'ad' | 'response' | 'story',
+    taskType: string,
     options: {
-      brand?: string;
-      audience?: string;
-      tone?: string;
-      length?: 'short' | 'medium' | 'long';
+      useHybrid?: boolean;
+      requireConsensus?: boolean;
+      maxTokens?: number;
+      temperature?: number;
     } = {}
-  ): Promise<{
-    content: string;
-    provider: string;
-    confidence: number;
-    alternatives?: string[];
-  }> {
-    const provider = this.selectOptimalProvider();
+  ): Promise<HybridAIResponse> {
+    const startTime = Date.now();
+    const preferredModel = this.modelPreferences.get(taskType) || 'claude';
+    const useHybrid = options.useHybrid || preferredModel === 'hybrid';
+
+    try {
+      if (useHybrid) {
+        return await this.generateHybridResponse(prompt, options);
+      } else if (preferredModel === 'claude') {
+        return await this.generateClaudeResponse(prompt, options);
+      } else {
+        return await this.generateOpenAIResponse(prompt, options);
+      }
+    } catch (error) {
+      console.error('Hybrid AI generation error:', error);
+      // Fallback to working model
+      return await this.generateFallbackResponse(prompt, options);
+    }
+  }
+
+  private async generateClaudeResponse(
+    prompt: string,
+    options: any
+  ): Promise<HybridAIResponse> {
+    const startTime = Date.now();
     
-    try {
-      if (provider === 'claude') {
-        const result = await claudeAI.generateContent(
-          prompt,
-          contentType === 'ad' ? 'ad_copy' : contentType,
-          options.brand,
-          options.audience
-        );
-        
-        // Get alternative from OpenAI if quality is high enough
-        let alternatives = [];
-        if (result.confidence > this.config.qualityThreshold && this.config.loadBalancing) {
-          try {
-            const openaiResult = await this.generateWithOpenAI(prompt, contentType, options);
-            alternatives.push(openaiResult);
-          } catch (error) {
-            console.log('OpenAI alternative generation failed:', error);
-          }
-        }
-        
-        return {
-          content: result.content,
-          provider: 'claude',
-          confidence: result.confidence,
-          alternatives
-        };
-      } else {
-        const openaiResult = await this.generateWithOpenAI(prompt, contentType, options);
-        
-        // Get alternative from Claude if enabled
-        let alternatives = [];
-        if (this.config.loadBalancing) {
-          try {
-            const claudeResult = await claudeAI.generateContent(
-              prompt,
-              contentType === 'ad' ? 'ad_copy' : contentType,
-              options.brand,
-              options.audience
-            );
-            alternatives.push(claudeResult.content);
-          } catch (error) {
-            console.log('Claude alternative generation failed:', error);
-          }
-        }
-        
-        return {
-          content: openaiResult,
-          provider: 'openai',
-          confidence: 0.9,
-          alternatives
-        };
-      }
-    } catch (error) {
-      console.error(`Primary provider ${provider} failed:`, error);
-      
-      if (this.config.fallbackEnabled) {
-        const fallbackProvider = provider === 'claude' ? 'openai' : 'claude';
-        console.log(`Falling back to ${fallbackProvider}`);
-        
-        try {
-          if (fallbackProvider === 'claude') {
-            const result = await claudeAI.generateContent(
-              prompt,
-              contentType === 'ad' ? 'ad_copy' : contentType,
-              options.brand,
-              options.audience
-            );
-            return {
-              content: result.content,
-              provider: 'claude',
-              confidence: result.confidence * 0.9, // Slight penalty for fallback
-              alternatives: []
-            };
-          } else {
-            const result = await this.generateWithOpenAI(prompt, contentType, options);
-            return {
-              content: result,
-              provider: 'openai',
-              confidence: 0.85,
-              alternatives: []
-            };
-          }
-        } catch (fallbackError) {
-          console.error('Fallback provider also failed:', fallbackError);
-          throw new Error('Both AI providers are currently unavailable');
-        }
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  // Enhanced customer service with dual AI processing
-  async generateCustomerServiceResponse(
-    message: string,
-    context: string,
-    tone: 'professional' | 'friendly' | 'helpful' | 'apologetic' = 'professional'
-  ): Promise<{
-    response: string;
-    sentiment: string;
-    urgency: 'low' | 'medium' | 'high';
-    confidence: number;
-    provider: string;
-    alternatives?: any[];
-  }> {
-    try {
-      // Get responses from both providers for comparison
-      const [claudeResult, openaiResult] = await Promise.allSettled([
-        claudeAI.generateCustomerResponse(message, context, tone),
-        generateCustomerServiceResponse(message, context, tone)
-      ]);
-
-      let primaryResult, alternatives = [];
-      
-      if (claudeResult.status === 'fulfilled' && openaiResult.status === 'fulfilled') {
-        // Both succeeded - use Claude as primary, OpenAI as alternative
-        primaryResult = {
-          ...claudeResult.value,
-          provider: 'claude',
-          confidence: 0.95
-        };
-        alternatives.push({
-          ...openaiResult.value,
-          provider: 'openai'
-        });
-      } else if (claudeResult.status === 'fulfilled') {
-        // Only Claude succeeded
-        primaryResult = {
-          ...claudeResult.value,
-          provider: 'claude',
-          confidence: 0.9
-        };
-      } else if (openaiResult.status === 'fulfilled') {
-        // Only OpenAI succeeded
-        primaryResult = {
-          ...openaiResult.value,
-          provider: 'openai',
-          confidence: 0.85
-        };
-      } else {
-        throw new Error('Both AI providers failed to generate customer response');
-      }
-
-      return {
-        ...primaryResult,
-        alternatives
-      };
-    } catch (error) {
-      console.error('Hybrid customer service response failed:', error);
-      throw error;
-    }
-  }
-
-  // Enhanced content analysis with cross-validation
-  async analyzeContentAdvanced(content: string): Promise<{
-    analysis: any;
-    crossValidation: any;
-    confidence: number;
-    recommendations: string[];
-  }> {
-    try {
-      const [claudeAnalysis, openaiAnalysis] = await Promise.allSettled([
-        claudeAI.analyzeContent(content),
-        analyzePostContent(content)
-      ]);
-
-      let primaryAnalysis, crossValidation;
-      
-      if (claudeAnalysis.status === 'fulfilled' && openaiAnalysis.status === 'fulfilled') {
-        primaryAnalysis = claudeAnalysis.value;
-        crossValidation = openaiAnalysis.value;
-        
-        // Generate consensus recommendations
-        const recommendations = this.generateConsensusRecommendations(
-          primaryAnalysis.improvementSuggestions,
-          crossValidation.improvementSuggestions
-        );
-        
-        return {
-          analysis: primaryAnalysis,
-          crossValidation,
-          confidence: 0.95,
-          recommendations
-        };
-      } else if (claudeAnalysis.status === 'fulfilled') {
-        return {
-          analysis: claudeAnalysis.value,
-          crossValidation: null,
-          confidence: 0.8,
-          recommendations: claudeAnalysis.value.improvementSuggestions
-        };
-      } else if (openaiAnalysis.status === 'fulfilled') {
-        return {
-          analysis: {
-            sentiment: openaiAnalysis.value.sentiment,
-            readabilityScore: openaiAnalysis.value.readabilityScore,
-            engagementPrediction: 75,
-            improvementSuggestions: openaiAnalysis.value.improvementSuggestions
-          },
-          crossValidation: null,
-          confidence: 0.8,
-          recommendations: openaiAnalysis.value.improvementSuggestions
-        };
-      } else {
-        throw new Error('Content analysis failed on both providers');
-      }
-    } catch (error) {
-      console.error('Hybrid content analysis failed:', error);
-      throw error;
-    }
-  }
-
-  // Enhanced ad optimization with dual AI insights
-  async optimizeAdCampaign(
-    adCopy: string,
-    objective: 'awareness' | 'engagement' | 'conversions' | 'traffic',
-    targetAudience?: string
-  ): Promise<{
-    optimizedCopy: string;
-    improvements: string[];
-    expectedPerformance: string;
-    alternatives: any[];
-    confidence: number;
-  }> {
-    try {
-      const [claudeOptimization, openaiSuggestions] = await Promise.allSettled([
-        claudeAI.optimizeAdCopy(adCopy, objective, targetAudience),
-        generateAdOptimizationSuggestions(adCopy, objective, { targetAudience })
-      ]);
-
-      if (claudeOptimization.status === 'fulfilled' && openaiSuggestions.status === 'fulfilled') {
-        return {
-          optimizedCopy: claudeOptimization.value.optimizedCopy,
-          improvements: claudeOptimization.value.improvements,
-          expectedPerformance: claudeOptimization.value.expectedPerformance,
-          alternatives: openaiSuggestions.value,
-          confidence: 0.95
-        };
-      } else if (claudeOptimization.status === 'fulfilled') {
-        return {
-          ...claudeOptimization.value,
-          alternatives: [],
-          confidence: 0.85
-        };
-      } else {
-        throw new Error('Ad optimization failed');
-      }
-    } catch (error) {
-      console.error('Hybrid ad optimization failed:', error);
-      throw error;
-    }
-  }
-
-  // Multi-language content generation with cultural adaptation
-  async generateMultiLanguageContent(
-    content: string,
-    targetLanguages: string[],
-    culturalAdaptation: boolean = true
-  ): Promise<{
-    translations: { [language: string]: any };
-    quality: { [language: string]: number };
-    provider: string;
-  }> {
-    const translations: { [language: string]: any } = {};
-    const quality: { [language: string]: number } = {};
-
-    for (const language of targetLanguages) {
-      try {
-        const result = await claudeAI.translateAndLocalizeContent(
-          content,
-          language,
-          culturalAdaptation ? 'Culturally adapted' : 'Direct translation'
-        );
-        
-        translations[language] = result;
-        quality[language] = culturalAdaptation ? 0.9 : 0.8;
-      } catch (error) {
-        console.error(`Translation failed for ${language}:`, error);
-        translations[language] = {
-          translatedContent: content,
-          culturalAdaptations: ['Translation unavailable'],
-          localizedHashtags: ['#global']
-        };
-        quality[language] = 0.3;
-      }
-    }
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: options.maxTokens || 1000,
+      messages: [{ role: 'user', content: prompt }]
+    });
 
     return {
-      translations,
-      quality,
-      provider: 'claude'
+      primary: {
+        content: response.content[0].type === 'text' ? response.content[0].text : '',
+        confidence: 0.95,
+        model: 'claude-sonnet-4-20250514',
+        source: 'claude'
+      },
+      performance: {
+        responseTime: Date.now() - startTime,
+        tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
+        cost: this.calculateCost('claude', response.usage.input_tokens, response.usage.output_tokens)
+      }
     };
   }
 
-  // Performance monitoring and provider selection
-  private selectOptimalProvider(): 'openai' | 'claude' {
-    if (!this.config.loadBalancing) {
-      return this.config.primaryProvider;
-    }
-
-    const openaiProvider = this.providers.get('openai')!;
-    const claudeProvider = this.providers.get('claude')!;
-
-    // Simple load balancing based on availability and performance
-    if (!openaiProvider.available) return 'claude';
-    if (!claudeProvider.available) return 'openai';
-
-    // Select based on performance metrics
-    const openaiScore = 1 / (openaiProvider.responseTime + 1) * (1 - openaiProvider.errorRate);
-    const claudeScore = 1 / (claudeProvider.responseTime + 1) * (1 - claudeProvider.errorRate);
-
-    return claudeScore > openaiScore ? 'claude' : 'openai';
-  }
-
-  private async generateWithOpenAI(
+  private async generateOpenAIResponse(
     prompt: string,
-    contentType: string,
     options: any
-  ): Promise<string> {
-    switch (contentType) {
-      case 'post':
-        const postResult = await generateFacebookPost(
-          prompt,
-          options.audience || 'general',
-          options.tone || 'professional'
-        );
-        return postResult.content;
+  ): Promise<HybridAIResponse> {
+    const startTime = Date.now();
+    
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      max_tokens: options.maxTokens || 1000,
+      temperature: options.temperature || 0.7,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    return {
+      primary: {
+        content: response.choices[0].message.content || '',
+        confidence: 0.90,
+        model: 'gpt-4o',
+        source: 'openai'
+      },
+      performance: {
+        responseTime: Date.now() - startTime,
+        tokensUsed: response.usage?.total_tokens || 0,
+        cost: this.calculateCost('openai', response.usage?.prompt_tokens || 0, response.usage?.completion_tokens || 0)
+      }
+    };
+  }
+
+  private async generateHybridResponse(
+    prompt: string,
+    options: any
+  ): Promise<HybridAIResponse> {
+    const startTime = Date.now();
+    
+    // Generate responses from both models in parallel
+    const [claudeResponse, openaiResponse] = await Promise.allSettled([
+      this.generateClaudeResponse(prompt, options),
+      this.generateOpenAIResponse(prompt, options)
+    ]);
+
+    const claudeResult = claudeResponse.status === 'fulfilled' ? claudeResponse.value : null;
+    const openaiResult = openaiResponse.status === 'fulfilled' ? openaiResponse.value : null;
+
+    if (!claudeResult && !openaiResult) {
+      throw new Error('Both AI models failed to respond');
+    }
+
+    if (!claudeResult) return openaiResult!;
+    if (!openaiResult) return claudeResult!;
+
+    // Generate consensus if both succeeded
+    const consensus = options.requireConsensus ? 
+      await this.generateConsensus(claudeResult.primary.content, openaiResult.primary.content) : 
+      undefined;
+
+    // Choose primary based on confidence and task optimization
+    const primary = claudeResult.primary.confidence >= openaiResult.primary.confidence ? 
+      claudeResult.primary : openaiResult.primary;
+    const secondary = claudeResult.primary.confidence >= openaiResult.primary.confidence ? 
+      openaiResult.primary : claudeResult.primary;
+
+    return {
+      primary,
+      secondary,
+      consensus,
+      performance: {
+        responseTime: Date.now() - startTime,
+        tokensUsed: (claudeResult.performance.tokensUsed || 0) + (openaiResult.performance.tokensUsed || 0),
+        cost: (claudeResult.performance.cost || 0) + (openaiResult.performance.cost || 0)
+      }
+    };
+  }
+
+  private async generateConsensus(claudeContent: string, openaiContent: string): Promise<any> {
+    try {
+      const consensusPrompt = `
+Analyze these two AI responses and create a consensus that combines the best elements of both:
+
+Response A (Claude): ${claudeContent}
+
+Response B (OpenAI): ${openaiContent}
+
+Create a unified response that:
+1. Incorporates the strongest points from both
+2. Resolves any contradictions
+3. Provides the most comprehensive and accurate answer
+4. Maintains consistency in tone and style
+
+Consensus Response:`;
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: consensusPrompt }]
+      });
+
+      const agreement = this.calculateAgreement(claudeContent, openaiContent);
       
-      case 'ad':
-        return await generateAdCopy(
-          prompt,
-          options.audience || 'general',
-          'awareness'
-        );
-      
-      default:
-        const seoResult = await generateSEOOptimizedContent(
-          prompt,
-          options.audience || 'general'
-        );
-        return seoResult.content;
+      return {
+        content: response.content[0].text,
+        confidence: 0.98,
+        agreement
+      };
+    } catch (error) {
+      return undefined;
     }
   }
 
-  private generateConsensusRecommendations(
-    claudeRecs: string[],
-    openaiRecs: string[]
-  ): string[] {
-    const allRecs = [...claudeRecs, ...openaiRecs];
-    const consensus = [];
-    
-    // Find common themes
-    for (const rec of claudeRecs) {
-      const similar = openaiRecs.find(openaiRec => 
-        this.calculateSimilarity(rec, openaiRec) > 0.6
-      );
-      
-      if (similar) {
-        consensus.push(`${rec} (Cross-validated)`);
-      } else {
-        consensus.push(rec);
+  private calculateAgreement(content1: string, content2: string): number {
+    // Simple similarity calculation based on common words and phrases
+    const words1 = content1.toLowerCase().split(/\s+/);
+    const words2 = content2.toLowerCase().split(/\s+/);
+    const commonWords = words1.filter(word => words2.includes(word));
+    return Math.round((commonWords.length / Math.max(words1.length, words2.length)) * 100) / 100;
+  }
+
+  private calculateCost(model: string, inputTokens: number, outputTokens: number): number {
+    // Approximate pricing (update with actual rates)
+    if (model === 'claude') {
+      return (inputTokens * 0.000003) + (outputTokens * 0.000015); // Claude Sonnet pricing
+    } else {
+      return (inputTokens * 0.000005) + (outputTokens * 0.000015); // GPT-4o pricing
+    }
+  }
+
+  private async generateFallbackResponse(prompt: string, options: any): Promise<HybridAIResponse> {
+    // Try OpenAI first as fallback, then Claude
+    try {
+      return await this.generateOpenAIResponse(prompt, options);
+    } catch (openaiError) {
+      try {
+        return await this.generateClaudeResponse(prompt, options);
+      } catch (claudeError) {
+        throw new Error('All AI models failed');
       }
     }
+  }
+
+  // Enhanced Content Generation
+  async generateMarketingContent(
+    contentType: 'ad_copy' | 'social_post' | 'email' | 'blog',
+    brand: string,
+    audience: string,
+    goals: string[]
+  ): Promise<HybridAIResponse> {
+    const prompt = `Create ${contentType} for ${brand} targeting ${audience} with goals: ${goals.join(', ')}. 
+    Make it engaging, conversion-focused, and platform-optimized.`;
     
-    // Add unique OpenAI recommendations
-    for (const rec of openaiRecs) {
-      const alreadyIncluded = claudeRecs.some(claudeRec => 
-        this.calculateSimilarity(rec, claudeRec) > 0.6
-      );
-      
-      if (!alreadyIncluded) {
-        consensus.push(rec);
+    return await this.generateContent(prompt, 'creative_writing', { 
+      useHybrid: true, 
+      requireConsensus: true 
+    });
+  }
+
+  // Advanced Sentiment Analysis
+  async analyzeSentimentAdvanced(text: string, context?: string): Promise<HybridAIResponse> {
+    const prompt = `Perform deep sentiment analysis on: "${text}"
+    ${context ? `Context: ${context}` : ''}
+    
+    Provide:
+    1. Overall sentiment (positive/negative/neutral) with confidence
+    2. Emotional breakdown (joy, anger, fear, sadness, surprise, disgust)
+    3. Intent analysis (complaint, praise, inquiry, request)
+    4. Urgency level (low/medium/high/critical)
+    5. Recommended response strategy
+    
+    Format as structured analysis.`;
+    
+    return await this.generateContent(prompt, 'sentiment_analysis', { useHybrid: true });
+  }
+
+  // Strategic Campaign Optimization
+  async optimizeCampaignStrategy(
+    campaignData: any,
+    performanceMetrics: any,
+    competitorData: any
+  ): Promise<HybridAIResponse> {
+    const prompt = `Analyze and optimize this campaign:
+    
+    Campaign: ${JSON.stringify(campaignData, null, 2)}
+    Performance: ${JSON.stringify(performanceMetrics, null, 2)}
+    Competitors: ${JSON.stringify(competitorData, null, 2)}
+    
+    Provide:
+    1. Performance analysis
+    2. Optimization recommendations
+    3. Budget reallocation suggestions
+    4. Targeting improvements
+    5. Creative suggestions
+    6. Expected ROI improvements
+    
+    Focus on actionable insights and measurable improvements.`;
+    
+    return await this.generateContent(prompt, 'campaign_optimization', { 
+      useHybrid: true, 
+      requireConsensus: true 
+    });
+  }
+
+  // Predictive Analytics
+  async generatePredictions(
+    historicalData: any,
+    marketTrends: any,
+    predictionType: 'performance' | 'budget' | 'audience' | 'content'
+  ): Promise<HybridAIResponse> {
+    const prompt = `Generate ${predictionType} predictions based on:
+    
+    Historical Data: ${JSON.stringify(historicalData, null, 2)}
+    Market Trends: ${JSON.stringify(marketTrends, null, 2)}
+    
+    Provide:
+    1. Key predictions with confidence levels
+    2. Supporting data analysis
+    3. Risk factors and mitigation strategies
+    4. Recommended actions
+    5. Timeline for expected changes
+    
+    Focus on actionable insights with quantifiable predictions.`;
+    
+    return await this.generateContent(prompt, 'prediction', { useHybrid: true });
+  }
+
+  // Performance Tracking
+  trackModelPerformance(taskType: string, response: HybridAIResponse, userFeedback?: number): void {
+    const history = this.performanceHistory.get(taskType) || [];
+    history.push({
+      timestamp: new Date(),
+      response,
+      userFeedback,
+      cost: response.performance.cost,
+      responseTime: response.performance.responseTime
+    });
+    this.performanceHistory.set(taskType, history.slice(-100)); // Keep last 100
+  }
+
+  // Get optimization recommendations
+  getModelOptimizations(): any {
+    const optimizations = [];
+    
+    this.performanceHistory.forEach((history, taskType) => {
+      if (history.length >= 5) {
+        const avgCost = history.reduce((sum, h) => sum + h.cost, 0) / history.length;
+        const avgTime = history.reduce((sum, h) => sum + h.response.performance.responseTime, 0) / history.length;
+        const avgFeedback = history.filter(h => h.userFeedback).reduce((sum, h) => sum + h.userFeedback, 0) / 
+                           history.filter(h => h.userFeedback).length || 0;
+        
+        optimizations.push({
+          taskType,
+          currentModel: this.modelPreferences.get(taskType),
+          avgCost,
+          avgTime,
+          avgFeedback,
+          recommendation: this.getOptimizationRecommendation(taskType, avgCost, avgTime, avgFeedback)
+        });
       }
-    }
+    });
     
-    return consensus.slice(0, 8); // Limit to top 8 recommendations
+    return optimizations;
   }
 
-  private calculateSimilarity(str1: string, str2: string): number {
-    const words1 = str1.toLowerCase().split(' ');
-    const words2 = str2.toLowerCase().split(' ');
-    
-    const intersection = words1.filter(word => words2.includes(word));
-    const union = [...new Set([...words1, ...words2])];
-    
-    return intersection.length / union.length;
-  }
-
-  // Health monitoring
-  public getProviderHealth(): { [provider: string]: AIProvider } {
-    return Object.fromEntries(this.providers);
-  }
-
-  public updateProviderMetrics(provider: string, responseTime: number, success: boolean) {
-    const providerData = this.providers.get(provider);
-    if (providerData) {
-      providerData.responseTime = (providerData.responseTime + responseTime) / 2;
-      providerData.errorRate = success 
-        ? Math.max(0, providerData.errorRate - 0.01)
-        : Math.min(1, providerData.errorRate + 0.05);
-      providerData.available = providerData.errorRate < 0.5;
-    }
+  private getOptimizationRecommendation(taskType: string, cost: number, time: number, feedback: number): string {
+    if (feedback < 3 && cost > 0.01) return `Consider switching to more cost-effective model for ${taskType}`;
+    if (time > 5000) return `Optimize response time for ${taskType} tasks`;
+    if (feedback > 4) return `Current model performing well for ${taskType}`;
+    return `Monitor performance for ${taskType}`;
   }
 }
 

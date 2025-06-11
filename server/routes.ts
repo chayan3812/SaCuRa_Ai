@@ -890,6 +890,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hybrid AI Enhanced Routes
+  app.post('/api/hybrid-ai/generate-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, taskType, options = {} } = req.body;
+      const result = await hybridAI.generateContent(prompt, taskType, options);
+      res.json(result);
+    } catch (error) {
+      console.error("Error with hybrid AI generation:", error);
+      res.status(500).json({ message: "Failed to generate content with hybrid AI" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/marketing-content', isAuthenticated, async (req: any, res) => {
+    try {
+      const { contentType, brand, audience, goals } = req.body;
+      const result = await hybridAI.generateMarketingContent(contentType, brand, audience, goals);
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating marketing content:", error);
+      res.status(500).json({ message: "Failed to generate marketing content" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/sentiment-analysis', isAuthenticated, async (req: any, res) => {
+    try {
+      const { text, context } = req.body;
+      const result = await hybridAI.analyzeSentimentAdvanced(text, context);
+      res.json(result);
+    } catch (error) {
+      console.error("Error with advanced sentiment analysis:", error);
+      res.status(500).json({ message: "Failed to analyze sentiment" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/optimize-campaign', isAuthenticated, async (req: any, res) => {
+    try {
+      const { campaignData, performanceMetrics, competitorData } = req.body;
+      const result = await hybridAI.optimizeCampaignStrategy(campaignData, performanceMetrics, competitorData);
+      res.json(result);
+    } catch (error) {
+      console.error("Error optimizing campaign:", error);
+      res.status(500).json({ message: "Failed to optimize campaign strategy" });
+    }
+  });
+
+  app.post('/api/hybrid-ai/predictions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { historicalData, marketTrends, predictionType } = req.body;
+      const result = await hybridAI.generatePredictions(historicalData, marketTrends, predictionType);
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating predictions:", error);
+      res.status(500).json({ message: "Failed to generate predictions" });
+    }
+  });
+
+  app.get('/api/hybrid-ai/optimizations', isAuthenticated, async (req: any, res) => {
+    try {
+      const optimizations = hybridAI.getModelOptimizations();
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Error getting AI optimizations:", error);
+      res.status(500).json({ message: "Failed to get optimization recommendations" });
+    }
+  });
+
   // Advanced ML Intelligence API Routes
   app.get('/api/ml/status', isAuthenticated, async (req, res) => {
     try {

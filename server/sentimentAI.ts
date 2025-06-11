@@ -1,4 +1,5 @@
 import { claudeAI } from "./claudeAI";
+import { hybridAI } from "./hybridAI";
 import { websocketService } from "./websocket";
 
 interface SentimentAnalysis {

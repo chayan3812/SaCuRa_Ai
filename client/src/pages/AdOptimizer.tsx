@@ -273,13 +273,7 @@ export default function AdOptimizer() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <main className="flex-1 overflow-y-auto">
-        <TopBar />
-        
-        <div className="p-6 space-y-6">
+    <div className="space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -964,7 +958,6 @@ export default function AdOptimizer() {
             </CardContent>
           </Card>
         </div>
-      </main>
     </div>
   );
 }

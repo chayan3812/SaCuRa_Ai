@@ -347,85 +347,94 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-r from-sacura-primary via-purple-600 to-indigo-700 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+      <section className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+        {/* Enhanced Background Pattern */}
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%)] bg-[length:60px_60px]"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15),transparent_70%)]"></div>
         
-        <div className="relative container mx-auto px-4 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
-            <Zap className="w-4 h-4 mr-2" />
-            Limited Time Offer
+        <div className="relative container mx-auto px-6 text-center">
+          {/* Enhanced Badge */}
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur-md rounded-full border border-yellow-400/30 text-yellow-300 text-base font-bold mb-8 shadow-lg">
+            <Zap className="w-5 h-5 mr-3 text-yellow-400" />
+            🔥 LIMITED TIME OFFER
           </div>
           
-          {/* Main Heading */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-            Ready to Transform Your<br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-              Facebook Marketing?
+          {/* Enhanced Main Heading */}
+          <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-8 leading-tight tracking-tight">
+            Ready to Transform Your
+            <br className="hidden sm:block" />
+            <span className="relative">
+              <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+                Facebook Marketing?
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"></div>
             </span>
           </h2>
           
-          {/* Description */}
-          <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Join thousands of businesses using SaCuRa AI to automate their Facebook marketing, 
-            reduce costs by 40%, and drive 3x better results with intelligent automation.
+          {/* Enhanced Description */}
+          <p className="text-xl sm:text-2xl text-gray-100 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
+            Join <span className="text-yellow-400 font-bold">5,000+</span> businesses using SaCuRa AI to automate Facebook marketing, 
+            <br className="hidden sm:block" />
+            reduce costs by <span className="text-green-400 font-bold">40%</span>, and drive <span className="text-blue-400 font-bold">3x better results</span> with intelligent automation.
           </p>
           
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">3x</div>
-              <div className="text-sm text-white/80">Better ROI</div>
+          {/* Enhanced Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto mb-12">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="text-4xl sm:text-5xl font-black text-green-400 mb-2">3x</div>
+              <div className="text-lg text-gray-200 font-semibold">Better ROI</div>
+              <div className="text-sm text-gray-400 mt-1">Average improvement</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">40%</div>
-              <div className="text-sm text-white/80">Cost Reduction</div>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="text-4xl sm:text-5xl font-black text-blue-400 mb-2">40%</div>
+              <div className="text-lg text-gray-200 font-semibold">Cost Reduction</div>
+              <div className="text-sm text-gray-400 mt-1">Marketing spend saved</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">24/7</div>
-              <div className="text-sm text-white/80">AI Support</div>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="text-4xl sm:text-5xl font-black text-purple-400 mb-2">24/7</div>
+              <div className="text-lg text-gray-200 font-semibold">AI Support</div>
+              <div className="text-sm text-gray-400 mt-1">Always monitoring</div>
             </div>
           </div>
           
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8">
+          {/* Enhanced CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10">
             <Button 
               onClick={handleLogin}
               size="lg" 
-              className="bg-white text-sacura-primary hover:bg-gray-100 hover:scale-105 transition-all duration-200 text-lg px-8 py-4 shadow-xl font-semibold group"
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-300 hover:to-orange-400 hover:scale-110 transition-all duration-300 text-xl px-12 py-6 shadow-2xl font-black group border-0 rounded-full"
             >
-              Start Your Free Trial
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              🚀 START FREE TRIAL NOW
+              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform duration-300" />
             </Button>
             
             <Button 
               variant="outline"
               size="lg"
-              className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-8 py-4"
+              className="border-3 border-white/40 text-white hover:bg-white/20 hover:border-white/60 backdrop-blur-md text-xl px-12 py-6 rounded-full font-bold transition-all duration-300"
               onClick={() => {
                 document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <Play className="w-5 h-5 mr-2" />
+              <Play className="w-6 h-6 mr-3" />
               Watch Demo
             </Button>
           </div>
           
-          {/* Trust Indicators */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-white/80 text-sm">
-            <div className="flex items-center">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              No credit card required
+          {/* Enhanced Trust Indicators */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+              <CheckCircle className="w-5 h-5 mr-3 text-green-400" />
+              <span className="text-gray-200 font-medium">No Credit Card Required</span>
             </div>
-            <div className="flex items-center">
-              <Shield className="w-4 h-4 mr-2" />
-              Enterprise-grade security
+            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+              <Shield className="w-5 h-5 mr-3 text-blue-400" />
+              <span className="text-gray-200 font-medium">Enterprise Security</span>
             </div>
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-2" />
-              Setup in under 5 minutes
+            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+              <Clock className="w-5 h-5 mr-3 text-purple-400" />
+              <span className="text-gray-200 font-medium">5-Minute Setup</span>
             </div>
           </div>
         </div>

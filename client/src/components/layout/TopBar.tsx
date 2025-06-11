@@ -5,10 +5,12 @@ import { Bell, Moon, Sun, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 
 export default function TopBar() {
   const [isDark, setIsDark] = useState(false);
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Fetch notifications
   const { data: notifications = [] } = useQuery({
@@ -23,6 +25,10 @@ export default function TopBar() {
 
   const handleLogout = () => {
     window.location.href = '/api/logout';
+  };
+
+  const handleSettingsClick = () => {
+    setLocation('/system-health');
   };
 
   const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.read)?.length || 0 : 0;
@@ -100,7 +106,7 @@ export default function TopBar() {
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettingsClick}>
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </DropdownMenuItem>

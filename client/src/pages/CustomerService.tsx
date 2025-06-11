@@ -121,13 +121,7 @@ export default function CustomerService() {
   const resolvedInteractions = interactions.filter(i => i.status === 'responded');
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <main className="flex-1 overflow-y-auto">
-        <TopBar />
-        
-        <div className="p-6 space-y-6">
+    <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>

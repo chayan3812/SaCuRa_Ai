@@ -124,7 +124,7 @@ export class WebSocketService {
 
       socket.on('disconnect', () => {
         // Remove user from tracking when they disconnect
-        for (const [userId, socketId] of this.userSockets.entries()) {
+        for (const [userId, socketId] of Array.from(this.userSockets.entries())) {
           if (socketId === socket.id) {
             this.userSockets.delete(userId);
             break;

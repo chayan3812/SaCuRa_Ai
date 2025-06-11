@@ -141,7 +141,7 @@ export class CompetitorAIEngine {
     try {
       console.log('🔍 Performing competitive intelligence analysis...');
       
-      for (const [competitorId, competitor] of this.competitors) {
+      for (const [competitorId, competitor] of Array.from(this.competitors.entries())) {
         await this.analyzeCompetitor(competitor);
         await this.generateCompetitorInsights(competitor);
       }
@@ -628,7 +628,7 @@ Focus on actionable intelligence for competitive advantage.`;
 
     // Guard against websocketService.broadcast not being a function
     if (websocketService && typeof websocketService.broadcast === 'function') {
-      websocketService.broadcast({
+      websocketService.broadcast('competitor-intelligence', {
         type: 'info',
         title: 'Competitive Intelligence Updated',
         message: `Analyzed ${totalCompetitors} competitors with ${totalInsights} strategic insights`,

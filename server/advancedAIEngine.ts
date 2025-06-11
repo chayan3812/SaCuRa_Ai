@@ -431,7 +431,7 @@ export class AdvancedAIEngine {
     
     // Guard against websocketService.broadcast not being a function
     if (websocketService && typeof websocketService.broadcast === 'function') {
-      websocketService.broadcast({
+      websocketService.broadcast('ai-insights', {
         type: 'info',
         title: 'AI Insights Updated',
         message: `Generated ${insightsSummary.length} page analysis reports`,

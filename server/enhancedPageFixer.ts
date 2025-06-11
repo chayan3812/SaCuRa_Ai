@@ -574,7 +574,7 @@ export class EnhancedPageFixer {
     
     // Guard against websocketService.broadcast not being a function
     if (websocketService && typeof websocketService.broadcast === 'function') {
-      websocketService.broadcast({
+      websocketService.broadcast('page-health', {
         type: 'info',
         title: 'Page Health Update',
         message: `Analyzed ${healthSummary.length} pages`,

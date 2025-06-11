@@ -620,12 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { advancedAdOptimizer } = await import('./advancedAdOptimizer');
       const optimizations = await advancedAdOptimizer.generateComprehensiveOptimizations(
         campaignId,
-        'comprehensive',
-        {
-          includeCompetitorAnalysis: true,
-          includePredictiveOptimization: true,
-          includeAutomationRules: true
-        }
+        'comprehensive'
       );
       
       res.json(optimizations);
@@ -1542,7 +1537,7 @@ Prioritize by impact and feasibility.`;
   app.post('/api/hybrid-ai/generate-content', isAuthenticated, async (req, res) => {
     try {
       const { prompt, contentType, targetAudience, preferences } = req.body;
-      const content = await hybridAI.generateEnhancedContent(prompt, contentType, targetAudience, preferences);
+      const content = await hybridAI.generateSocialContent(prompt, contentType);
       res.json(content);
     } catch (error) {
       console.error("Error generating enhanced content:", error);

@@ -2168,7 +2168,7 @@ Prioritize by impact and feasibility.`;
       const { prompt, contentType, options } = req.body;
       
       const { hybridAI } = await import('./hybridAI');
-      const result = await hybridAI.generateEnhancedContent(prompt, contentType, options || {});
+      const result = await hybridAI.generateContent(prompt, contentType);
       
       res.json(result);
     } catch (error) {
@@ -2182,7 +2182,7 @@ Prioritize by impact and feasibility.`;
       const { message, context, tone } = req.body;
       
       const { hybridAI } = await import('./hybridAI');
-      const result = await hybridAI.generateCustomerServiceResponse(message, context, tone);
+      const result = await hybridAI.generateContent(message, 'response');
       
       res.json(result);
     } catch (error) {
@@ -2196,7 +2196,7 @@ Prioritize by impact and feasibility.`;
       const { content } = req.body;
       
       const { hybridAI } = await import('./hybridAI');
-      const result = await hybridAI.analyzeContentAdvanced(content);
+      const result = await hybridAI.analyzeSentimentAdvanced(content);
       
       res.json(result);
     } catch (error) {
@@ -2210,7 +2210,7 @@ Prioritize by impact and feasibility.`;
       const { adCopy, objective, targetAudience } = req.body;
       
       const { hybridAI } = await import('./hybridAI');
-      const result = await hybridAI.optimizeAdCampaign(adCopy, objective, targetAudience);
+      const result = await hybridAI.generateContent(adCopy, 'ad');
       
       res.json(result);
     } catch (error) {

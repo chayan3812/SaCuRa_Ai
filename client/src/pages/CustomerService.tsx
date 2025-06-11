@@ -122,8 +122,8 @@ export default function CustomerService() {
 
   return (
     <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Customer Service</h1>
               <p className="text-muted-foreground">AI-powered customer service automation and monitoring</p>
@@ -336,7 +336,7 @@ export default function CustomerService() {
             </Card>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

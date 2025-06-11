@@ -109,8 +109,8 @@ export default function EmployeeMonitor() {
 
   return (
     <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Employee Monitor</h1>
               <p className="text-muted-foreground">Track team performance and response times</p>
@@ -377,7 +377,7 @@ export default function EmployeeMonitor() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

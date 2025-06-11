@@ -1,0 +1,160 @@
+{
+  "startTime": "2025-06-11T17:13:35.078Z",
+  "tests": [
+    {
+      "name": "Server Health Check",
+      "status": "PASSED",
+      "duration": "19ms",
+      "details": {
+        "status": "healthy",
+        "memoryUsage": 97.02125848058854
+      },
+      "timestamp": "2025-06-11T17:13:35.103Z"
+    },
+    {
+      "name": "Authentication Flow",
+      "status": "PASSED",
+      "duration": "4ms",
+      "details": {
+        "unauthenticated": "Properly blocked",
+        "protectedRoutes": "Secured"
+      },
+      "timestamp": "2025-06-11T17:13:35.108Z"
+    },
+    {
+      "name": "Dashboard Metrics",
+      "status": "PASSED",
+      "duration": "1ms",
+      "details": {
+        "status": "Authentication required (expected)",
+        "endpoint": "Available"
+      },
+      "timestamp": "2025-06-11T17:13:35.109Z"
+    },
+    {
+      "name": "Ad Optimizer Features",
+      "status": "PASSED",
+      "duration": "1ms",
+      "details": {
+        "performanceMetrics": "Authentication required (expected)",
+        "endpoint": "Available"
+      },
+      "timestamp": "2025-06-11T17:13:35.111Z"
+    },
+    {
+      "name": "AI Features",
+      "status": "PASSED",
+      "duration": "1ms",
+      "details": {
+        "aiInsights": "Authentication required (expected)",
+        "endpoint": "Available"
+      },
+      "timestamp": "2025-06-11T17:13:35.113Z"
+    },
+    {
+      "name": "Page Health Monitoring",
+      "status": "PASSED",
+      "duration": "2ms",
+      "details": {
+        "pageHealth": "Authentication required (expected)",
+        "endpoint": "Available"
+      },
+      "timestamp": "2025-06-11T17:13:35.116Z"
+    },
+    {
+      "name": "WebSocket Connectivity",
+      "status": "PASSED",
+      "duration": "1ms",
+      "details": {
+        "status": "WebSocket endpoint responsive",
+        "statusCode": 400
+      },
+      "timestamp": "2025-06-11T17:13:35.117Z"
+    },
+    {
+      "name": "Database Connectivity",
+      "status": "PASSED",
+      "duration": "8ms",
+      "details": {
+        "database": "Connected",
+        "pagesEndpoint": "Working"
+      },
+      "timestamp": "2025-06-11T17:13:35.126Z"
+    },
+    {
+      "name": "API Endpoints Coverage",
+      "status": "PASSED",
+      "duration": "14ms",
+      "details": {
+        "/api/notifications": {
+          "status": 401,
+          "available": true
+        },
+        "/api/employees": {
+          "status": 401,
+          "available": true
+        },
+        "/api/templates": {
+          "status": 401,
+          "available": true
+        },
+        "/api/page-watcher/status": {
+          "status": 401,
+          "available": true
+        },
+        "/api/ml/status": {
+          "status": 401,
+          "available": true
+        },
+        "/api/system/health": {
+          "status": 200,
+          "available": true
+        }
+      },
+      "timestamp": "2025-06-11T17:13:35.140Z"
+    },
+    {
+      "name": "Hybrid AI Integration",
+      "status": "PASSED",
+      "duration": "3ms",
+      "details": {
+        "/api/hybrid-ai/optimizations": {
+          "status": 401,
+          "available": true
+        },
+        "/api/ai/sentiment-analysis": {
+          "status": 401,
+          "available": true
+        }
+      },
+      "timestamp": "2025-06-11T17:13:35.144Z"
+    },
+    {
+      "name": "Auto-Analyze Feature",
+      "status": "PASSED",
+      "duration": "2ms",
+      "details": {
+        "autoAnalyze": "Authentication required (expected)",
+        "endpoint": "Available"
+      },
+      "timestamp": "2025-06-11T17:13:35.146Z"
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "warnings": 0
+  },
+  "endTime": "2025-06-11T17:13:35.147Z",
+  "platform": {
+    "name": "PagePilot AI",
+    "version": "1.0.0",
+    "environment": "Development"
+  },
+  "testEnvironment": {
+    "baseUrl": "http://localhost:5000",
+    "userAgent": "PagePilot-Tester/1.0",
+    "timestamp": "2025-06-11T17:13:35.147Z"
+  }
+}

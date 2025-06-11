@@ -42,6 +42,12 @@ export class FacebookAPIService {
 
   // Get User's Facebook Pages
   async getUserPages(): Promise<FacebookPageInfo[]> {
+    // Skip API calls for demo/invalid tokens
+    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
+      console.log('Skipping Facebook API call - demo/invalid token detected');
+      return [];
+    }
+
     try {
       const response = await axios.get(`${FB_BASE_URL}/me/accounts`, {
         params: {
@@ -50,15 +56,21 @@ export class FacebookAPIService {
         }
       });
 
-      return response.data.data;
+      return response.data.data || [];
     } catch (error) {
       console.error('Error fetching Facebook pages:', error);
-      throw new Error('Failed to fetch Facebook pages');
+      throw new Error('Failed to fetch Facebook pages - check access token validity');
     }
   }
 
   // Get User's Ad Accounts
   async getUserAdAccounts(): Promise<FacebookAdAccount[]> {
+    // Skip API calls for demo/invalid tokens
+    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
+      console.log('Skipping Facebook Ad Accounts API call - demo/invalid token detected');
+      return [];
+    }
+
     try {
       const response = await axios.get(`${FB_BASE_URL}/me/adaccounts`, {
         params: {
@@ -67,10 +79,10 @@ export class FacebookAPIService {
         }
       });
 
-      return response.data.data;
+      return response.data.data || [];
     } catch (error) {
       console.error('Error fetching ad accounts:', error);
-      throw new Error('Failed to fetch ad accounts');
+      throw new Error('Failed to fetch ad accounts - check access token validity');
     }
   }
 
@@ -79,6 +91,12 @@ export class FacebookAPIService {
     adAccountId: string,
     dateRange: { since: string; until: string }
   ): Promise<FacebookAdMetrics[]> {
+    // Skip API calls for demo/invalid tokens
+    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
+      console.log('Skipping Facebook Ad Insights API call - demo/invalid token detected');
+      return [];
+    }
+
     try {
       const response = await axios.get(`${FB_BASE_URL}/${adAccountId}/insights`, {
         params: {
@@ -90,15 +108,21 @@ export class FacebookAPIService {
         }
       });
 
-      return response.data.data;
+      return response.data.data || [];
     } catch (error) {
       console.error('Error fetching ad insights:', error);
-      throw new Error('Failed to fetch ad insights');
+      throw new Error('Failed to fetch ad insights - check access token validity');
     }
   }
 
   // Get Page Posts
   async getPagePosts(pageId: string, pageAccessToken: string, limit: number = 25) {
+    // Skip API calls for demo/invalid tokens or page IDs
+    if (pageAccessToken === 'demo_token_123' || pageId === 'demo_page_123' || !pageAccessToken || pageAccessToken.length < 10) {
+      console.log('Skipping Facebook Page Posts API call - demo/invalid token detected');
+      return [];
+    }
+
     try {
       const response = await axios.get(`${FB_BASE_URL}/${pageId}/posts`, {
         params: {
@@ -108,10 +132,10 @@ export class FacebookAPIService {
         }
       });
 
-      return response.data.data;
+      return response.data.data || [];
     } catch (error) {
       console.error('Error fetching page posts:', error);
-      throw new Error('Failed to fetch page posts');
+      throw new Error('Failed to fetch page posts - check access token validity');
     }
   }
 

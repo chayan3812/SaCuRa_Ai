@@ -531,16 +531,19 @@ Response should be concise but complete.`;
     if (recentCritical.length > 2) {
       console.log('🚨 Multiple critical sentiment issues detected in last 30 minutes');
       
-      websocketService.broadcast({
-        type: 'error',
-        title: 'Urgent: Multiple Critical Issues',
-        message: `${recentCritical.length} critical customer sentiment issues detected. Immediate action required.`,
-        data: {
-          count: recentCritical.length,
-          timeframe: '30 minutes',
-          recommendation: 'Escalate to senior customer service team'
-        }
-      });
+      // Guard against websocketService.broadcast not being a function
+      if (websocketService && typeof websocketService.broadcast === 'function') {
+        websocketService.broadcast({
+          type: 'error',
+          title: 'Urgent: Multiple Critical Issues',
+          message: `${recentCritical.length} critical customer sentiment issues detected. Immediate action required.`,
+          data: {
+            count: recentCritical.length,
+            timeframe: '30 minutes',
+            recommendation: 'Escalate to senior customer service team'
+          }
+        });
+      }
     }
   }
 

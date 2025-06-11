@@ -572,12 +572,15 @@ export class EnhancedPageFixer {
       lastAnalyzed: health.lastAnalyzed
     }));
     
-    websocketService.broadcast({
-      type: 'info',
-      title: 'Page Health Update',
-      message: `Analyzed ${healthSummary.length} pages`,
-      data: healthSummary
-    });
+    // Guard against websocketService.broadcast not being a function
+    if (websocketService && typeof websocketService.broadcast === 'function') {
+      websocketService.broadcast({
+        type: 'info',
+        title: 'Page Health Update',
+        message: `Analyzed ${healthSummary.length} pages`,
+        data: healthSummary
+      });
+    }
   }
 
   // Public API methods

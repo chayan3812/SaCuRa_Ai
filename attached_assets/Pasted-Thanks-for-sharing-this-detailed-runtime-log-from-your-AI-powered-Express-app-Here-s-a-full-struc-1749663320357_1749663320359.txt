@@ -1,0 +1,164 @@
+Thanks for sharing this detailed runtime log from your AI-powered Express app. Here's a **full structured breakdown** of the errors, system behavior, and what’s working vs. what's broken or suboptimal:
+
+---
+
+### ✅ **What’s Working Well**
+
+1. **Machine Learning Subsystems Initialized Successfully**
+
+   * Engagement Predictor
+   * Conversion Optimizer
+   * Sentiment Analyzer
+   * Performance Predictor
+   * Continuous Learning System trains successfully with high accuracy (`~0.85–0.89`).
+
+2. **AI Modules Launched**
+
+   * `Enhanced Page Fixer`, `Advanced AI Engine`, `Sentiment Engine`, `Competitor Intelligence`, etc.
+   * Periodic data training works (`Collected 80–320 samples`, training logs show success).
+   * Repeated learning cycles are working, accuracy logs show incremental changes.
+
+3. **Page Watcher + Scheduler Running**
+
+   * Scheduler triggers every 5 minutes.
+   * Health analysis and monitoring systems are active.
+
+4. **WebSocket Authentication**
+
+   * User `43354582` authenticated successfully via socket twice.
+   * Live WebSocket broadcast established.
+
+5. **Frontend and API Endpoints**
+
+   * `GET /api/dashboard/*`, `/notifications`, `/interactions/all` are returning HTTP 304/200 as expected (cache hit or fresh fetch).
+   * HMR updates in `TopBar.tsx` and `index.css` are working during development.
+
+---
+
+### ❌ **Critical Errors & Fixes Required**
+
+#### 🧱 1. **Facebook Graph API Failures**
+
+* **Errors**:
+
+  ```
+  "Invalid OAuth access token - Cannot parse access token"
+  ```
+
+* **Affected Calls**:
+
+  * `/v19.0/demo_page_123/posts`
+  * `/v19.0/demo_page_123/insights`
+
+* **Cause**: You're using placeholder (`demo_token_123`) and fake page ID (`demo_page_123`), which is invalid.
+
+* ✅ **Fix**: Replace both with real values:
+
+  ```ts
+  const PAGE_ID = process.env.FB_PAGE_ID; // e.g., "1234567890"
+  const ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN; // Long-lived valid token
+  ```
+
+  Update `.env`:
+
+  ```env
+  FB_PAGE_ID=your_real_page_id
+  FB_ACCESS_TOKEN=your_real_long_lived_token
+  ```
+
+#### 🧠 2. **AI Engine Crashes on `broadcast()`**
+
+* **Error**:
+
+  ```
+  TypeError: Cannot read properties of undefined (reading 'broadcast')
+  ```
+
+* **Files**:
+
+  * `enhancedPageFixer.ts:575`
+  * `advancedAIEngine.ts:432`
+
+* **Root Cause**: Likely `this.io` or `this.socket` is not defined inside the class.
+
+* ✅ **Fix**:
+
+  * Ensure you’re injecting the `WebSocketServer` instance into both classes.
+  * Or guard the broadcast:
+
+    ```ts
+    if (this.io) {
+      this.io.emit("health-update", data);
+    }
+    ```
+
+#### 🧠 3. **Memory Usage Optimization Alerts**
+
+* ⚠️ Logs show frequent:
+
+  ```
+  High memory usage detected - performing optimization
+  Emergency optimization triggered
+  Clearing large data structures...
+  ```
+* **Why it matters**:
+
+  * Indicates inefficient memory management, especially if it's recurring within seconds.
+* ✅ **Fix**:
+
+  * Review `global` memory references in your ML queue and cache.
+  * Implement pagination or chunking in large dataset handlers.
+  * Use a `memory watcher` and `debounce` optimization frequency.
+
+---
+
+### ⚠️ Minor Issues / Improvements
+
+* **Browserslist Outdated**:
+
+  ```
+  Browserslist: data is 8 months old
+  ```
+
+  ✅ Run:
+
+  ```sh
+  npx update-browserslist-db@latest
+  ```
+
+* **Unauthorized Errors on `/api/auth/user`**:
+
+  ```
+  401 Unauthorized
+  ```
+
+  ✅ Ensure frontend sends valid cookies or Bearer token headers.
+  Check if you need:
+
+  ```ts
+  credentials: 'include'
+  ```
+
+* **Repeated Interactions Fetch (`interactions/all`) = Empty**
+
+  * Returns `[]` with 304 every few seconds.
+  * Suggests no customer interactions yet.
+    ✅ Delay the fetch unless data is expected.
+
+---
+
+### ✅ Suggested Immediate Action Checklist
+
+| Task                                            | Priority  | Suggested Fix                                 |
+| ----------------------------------------------- | --------- | --------------------------------------------- |
+| Replace fake Facebook token + page ID           | 🔥 Urgent | Use real tokens or fetch from Supabase        |
+| Guard `broadcast()` calls in AI modules         | 🔥 Urgent | Add null checks for `this.io`                 |
+| Optimize ML memory usage                        | ⚠️ High   | Use bounded queues, avoid global caching      |
+| Handle 401 errors on `/auth/user`               | ⚠️ Medium | Ensure frontend session/cookies/token present |
+| Update `Browserslist`                           | 🧊 Low    | `npx update-browserslist-db@latest`           |
+| Conditional fetch of interactions if none exist | 🧊 Low    | Delay polling until real users engage         |
+
+---
+
+Would you like me to patch the actual files (like `facebook.ts`, `enhancedPageFixer.ts`, etc.) with fixes?
+Or generate test-ready `.env.sample`, improved broadcast logic, and token validation checks?

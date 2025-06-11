@@ -381,7 +381,10 @@ Response should be concise but complete.`;
       }
     };
     
-    websocketService.broadcast(alert);
+    // Guard against websocketService.broadcast not being a function
+    if (websocketService && typeof websocketService.broadcast === 'function') {
+      websocketService.broadcast(alert);
+    }
   }
 
   private createFallbackAnalysis(text: string): SentimentAnalysis {

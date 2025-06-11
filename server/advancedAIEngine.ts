@@ -429,12 +429,15 @@ export class AdvancedAIEngine {
       lastUpdated: new Date()
     }));
     
-    websocketService.broadcast({
-      type: 'info',
-      title: 'AI Insights Updated',
-      message: `Generated ${insightsSummary.length} page analysis reports`,
-      data: insightsSummary
-    });
+    // Guard against websocketService.broadcast not being a function
+    if (websocketService && typeof websocketService.broadcast === 'function') {
+      websocketService.broadcast({
+        type: 'info',
+        title: 'AI Insights Updated',
+        message: `Generated ${insightsSummary.length} page analysis reports`,
+        data: insightsSummary
+      });
+    }
   }
 
   // Public API methods

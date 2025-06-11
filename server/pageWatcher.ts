@@ -145,9 +145,14 @@ export class PageWatcherEngine {
     healthCheck: PageHealthCheck
   ): Promise<void> {
     try {
-      // Try to fetch basic page info
+      // Try to fetch basic page info - use real tokens or skip if demo
+      if (page.accessToken === 'demo_token_123' || page.pageId === 'demo_page_123') {
+        // Skip API calls for demo data
+        return;
+      }
+      
       const response = await fetch(
-        `https://graph.facebook.com/v18.0/${page.pageId}?fields=id,name,category,is_published&access_token=${page.accessToken}`
+        `https://graph.facebook.com/v19.0/${page.pageId}?fields=id,name,category,is_published&access_token=${page.accessToken}`
       );
       
       if (!response.ok) {

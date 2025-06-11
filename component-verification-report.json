@@ -1,0 +1,580 @@
+{
+  "timestamp": "2025-06-11T18:20:37.063Z",
+  "successRate": 100,
+  "summary": {
+    "passed": 32,
+    "failed": 0,
+    "warnings": 0
+  },
+  "components": {
+    "ui/button.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 1901,
+      "lines": 57,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": true,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/card.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 1858,
+      "lines": 80,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/input.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 791,
+      "lines": 23,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/label.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 710,
+      "lines": 25,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/form.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 4120,
+      "lines": 179,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/dropdown-menu.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 7609,
+      "lines": 199,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/dialog.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 3848,
+      "lines": 123,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/toast.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 4845,
+      "lines": 128,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/badge.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 1128,
+      "lines": 37,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": true,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/tabs.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 1883,
+      "lines": 54,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/table.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 2765,
+      "lines": 118,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/select.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 5742,
+      "lines": 161,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "ui/checkbox.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 1056,
+      "lines": 29,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "TopBar.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 8069,
+      "lines": 196,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "Sidebar.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 4420,
+      "lines": 118,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "MetricsCards.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 3806,
+      "lines": 105,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": true,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "AdPerformanceChart.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 3207,
+      "lines": 127,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "AIRecommendations.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 4227,
+      "lines": 109,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "CustomerServiceMonitor.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 8622,
+      "lines": 181,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "Dashboard.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 9642,
+      "lines": 219,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": false,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "AdOptimizer.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 44735,
+      "lines": 956,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "AIInsights.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 26314,
+      "lines": 606,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "CompetitorAnalysis.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 22031,
+      "lines": 470,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "PageStatus.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 14760,
+      "lines": 435,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "CustomerService.tsx": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 14174,
+      "lines": 349,
+      "patterns": {
+        "hasStateManagement": true,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "routes.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": true,
+      "size": 105291,
+      "lines": 2921,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "db.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": false,
+      "size": 482,
+      "lines": 15,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": false
+      },
+      "status": "PASSED"
+    },
+    "storage.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": false,
+      "size": 18936,
+      "lines": 566,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "aiEngine.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": true,
+      "size": 17570,
+      "lines": 501,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "facebook.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": false,
+      "hasErrorHandling": true,
+      "size": 9663,
+      "lines": 316,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": false,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    },
+    "hybridAI.ts": {
+      "exists": true,
+      "hasImports": true,
+      "hasExports": true,
+      "usesTypeScript": true,
+      "hasReactHooks": true,
+      "hasErrorHandling": true,
+      "size": 13702,
+      "lines": 399,
+      "patterns": {
+        "hasStateManagement": false,
+        "hasEventHandlers": true,
+        "hasConditionalRendering": true,
+        "hasPropsInterface": false,
+        "hasAsyncOperations": true
+      },
+      "status": "PASSED"
+    }
+  },
+  "routes": {
+    "configuration": {
+      "hasRouter": true,
+      "hasAuthentication": true,
+      "hasLoadingStates": true,
+      "routeCount": 14,
+      "hasNotFound": true,
+      "status": "PASSED"
+    }
+  },
+  "endpoints": {}
+}

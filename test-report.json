@@ -1,65 +1,65 @@
 {
-  "startTime": "2025-06-11T17:13:35.078Z",
+  "startTime": "2025-06-11T18:19:44.979Z",
   "tests": [
     {
       "name": "Server Health Check",
       "status": "PASSED",
-      "duration": "19ms",
+      "duration": "26ms",
       "details": {
         "status": "healthy",
-        "memoryUsage": 97.02125848058854
+        "memoryUsage": 86.59495118648205
       },
-      "timestamp": "2025-06-11T17:13:35.103Z"
+      "timestamp": "2025-06-11T18:19:45.010Z"
     },
     {
       "name": "Authentication Flow",
       "status": "PASSED",
-      "duration": "4ms",
+      "duration": "3ms",
       "details": {
         "unauthenticated": "Properly blocked",
         "protectedRoutes": "Secured"
       },
-      "timestamp": "2025-06-11T17:13:35.108Z"
+      "timestamp": "2025-06-11T18:19:45.014Z"
     },
     {
       "name": "Dashboard Metrics",
       "status": "PASSED",
-      "duration": "1ms",
+      "duration": "2ms",
       "details": {
         "status": "Authentication required (expected)",
         "endpoint": "Available"
       },
-      "timestamp": "2025-06-11T17:13:35.109Z"
+      "timestamp": "2025-06-11T18:19:45.016Z"
     },
     {
       "name": "Ad Optimizer Features",
       "status": "PASSED",
-      "duration": "1ms",
+      "duration": "2ms",
       "details": {
         "performanceMetrics": "Authentication required (expected)",
         "endpoint": "Available"
       },
-      "timestamp": "2025-06-11T17:13:35.111Z"
+      "timestamp": "2025-06-11T18:19:45.018Z"
     },
     {
       "name": "AI Features",
       "status": "PASSED",
-      "duration": "1ms",
+      "duration": "2ms",
       "details": {
         "aiInsights": "Authentication required (expected)",
         "endpoint": "Available"
       },
-      "timestamp": "2025-06-11T17:13:35.113Z"
+      "timestamp": "2025-06-11T18:19:45.021Z"
     },
     {
       "name": "Page Health Monitoring",
       "status": "PASSED",
-      "duration": "2ms",
+      "duration": "3ms",
       "details": {
         "pageHealth": "Authentication required (expected)",
         "endpoint": "Available"
       },
-      "timestamp": "2025-06-11T17:13:35.116Z"
+      "timestamp": "2025-06-11T18:19:45.024Z"
     },
     {
       "name": "WebSocket Connectivity",
@@ -69,22 +69,22 @@
         "status": "WebSocket endpoint responsive",
         "statusCode": 400
       },
-      "timestamp": "2025-06-11T17:13:35.117Z"
+      "timestamp": "2025-06-11T18:19:45.025Z"
     },
     {
       "name": "Database Connectivity",
       "status": "PASSED",
-      "duration": "8ms",
+      "duration": "7ms",
       "details": {
         "database": "Connected",
         "pagesEndpoint": "Working"
       },
-      "timestamp": "2025-06-11T17:13:35.126Z"
+      "timestamp": "2025-06-11T18:19:45.033Z"
     },
     {
       "name": "API Endpoints Coverage",
       "status": "PASSED",
-      "duration": "14ms",
+      "duration": "18ms",
       "details": {
         "/api/notifications": {
           "status": 401,
@@ -111,12 +111,12 @@
           "available": true
         }
       },
-      "timestamp": "2025-06-11T17:13:35.140Z"
+      "timestamp": "2025-06-11T18:19:45.052Z"
     },
     {
       "name": "Hybrid AI Integration",
       "status": "PASSED",
-      "duration": "3ms",
+      "duration": "2ms",
       "details": {
         "/api/hybrid-ai/optimizations": {
           "status": 401,
@@ -127,17 +127,17 @@
           "available": true
         }
       },
-      "timestamp": "2025-06-11T17:13:35.144Z"
+      "timestamp": "2025-06-11T18:19:45.054Z"
     },
     {
       "name": "Auto-Analyze Feature",
       "status": "PASSED",
-      "duration": "2ms",
+      "duration": "3ms",
       "details": {
         "autoAnalyze": "Authentication required (expected)",
         "endpoint": "Available"
       },
-      "timestamp": "2025-06-11T17:13:35.146Z"
+      "timestamp": "2025-06-11T18:19:45.057Z"
     }
   ],
   "summary": {
@@ -146,7 +146,7 @@
     "failed": 0,
     "warnings": 0
   },
-  "endTime": "2025-06-11T17:13:35.147Z",
+  "endTime": "2025-06-11T18:19:45.057Z",
   "platform": {
     "name": "PagePilot AI",
     "version": "1.0.0",
@@ -155,6 +155,6 @@
   "testEnvironment": {
     "baseUrl": "http://localhost:5000",
     "userAgent": "PagePilot-Tester/1.0",
-    "timestamp": "2025-06-11T17:13:35.147Z"
+    "timestamp": "2025-06-11T18:19:45.057Z"
   }
 }

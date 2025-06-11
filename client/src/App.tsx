@@ -22,6 +22,7 @@ import PageStatus from "@/pages/PageStatus";
 import ContentQueue from "@/pages/ContentQueue";
 import Analytics from "@/pages/Analytics";
 import Settings from "@/pages/Settings";
+import SystemHealth from "@/pages/SystemHealth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -53,6 +54,7 @@ function Router() {
           <Route path="/insights" component={AIInsights} />
           <Route path="/hybrid-ai" component={HybridAI} />
           <Route path="/ml-intelligence" component={MLIntelligence} />
+          <Route path="/system-health" component={SystemHealth} />
           <Route path="/settings" component={Settings} />
         </>
       )}

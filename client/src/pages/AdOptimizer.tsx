@@ -125,8 +125,11 @@ export default function AdOptimizer() {
   const handleAdvancedOptimize = async () => {
     setIsAdvancedOptimizing(true);
     try {
-      const response = await apiRequest('POST', '/api/ads/advanced-optimize', {
-        campaignId: selectedCampaignId
+      const response = await apiRequest('/api/ads/advanced-optimize', {
+        method: 'POST',
+        body: JSON.stringify({
+          campaignId: selectedCampaignId
+        })
       });
       
       const data = await response.json();
@@ -149,9 +152,12 @@ export default function AdOptimizer() {
 
   const handleAutoImplement = async (optimizationId: string) => {
     try {
-      const response = await apiRequest('POST', '/api/ads/auto-implement', {
-        campaignId: selectedCampaignId,
-        optimizationId
+      const response = await apiRequest('/api/ads/auto-implement', {
+        method: 'POST',
+        body: JSON.stringify({
+          campaignId: selectedCampaignId,
+          optimizationId
+        })
       });
       
       const data = await response.json();
@@ -182,8 +188,11 @@ export default function AdOptimizer() {
   const handleAutoFixPageIssues = async () => {
     setIsAutoFixing(true);
     try {
-      const response = await apiRequest('POST', '/api/ads/auto-fix', {
-        pageId: 'demo_page_123'
+      const response = await apiRequest('/api/ads/auto-fix', {
+        method: 'POST',
+        body: JSON.stringify({
+          pageId: 'demo_page_123'
+        })
       });
       
       const data = await response.json();

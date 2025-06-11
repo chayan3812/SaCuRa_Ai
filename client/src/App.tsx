@@ -24,6 +24,7 @@ import Analytics from "@/pages/Analytics";
 import Settings from "@/pages/Settings";
 import SystemHealth from "@/pages/SystemHealth";
 import NotFound from "@/pages/not-found";
+import AppLayout from "@/components/layout/AppLayout";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -57,24 +58,26 @@ function Router() {
           <Route component={() => <Landing />} />
         </>
       ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/ads" component={AdOptimizer} />
-          <Route path="/auto-poster" component={AutoPoster} />
-          <Route path="/content-queue" component={ContentQueue} />
-          <Route path="/analytics" component={Analytics} />
-          <Route path="/page-status" component={PageStatus} />
-          <Route path="/customer-service" component={CustomerService} />
-          <Route path="/restrictions" component={RestrictionMonitor} />
-          <Route path="/employees" component={EmployeeMonitor} />
-          <Route path="/competitors" component={CompetitorAnalysis} />
-          <Route path="/insights" component={AIInsights} />
-          <Route path="/hybrid-ai" component={HybridAI} />
-          <Route path="/ml-intelligence" component={MLIntelligence} />
-          <Route path="/system-health" component={SystemHealth} />
-          <Route path="/settings" component={Settings} />
-          <Route component={() => <Dashboard />} />
-        </>
+        <AppLayout>
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/ads" component={AdOptimizer} />
+            <Route path="/auto-poster" component={AutoPoster} />
+            <Route path="/content-queue" component={ContentQueue} />
+            <Route path="/analytics" component={Analytics} />
+            <Route path="/page-status" component={PageStatus} />
+            <Route path="/customer-service" component={CustomerService} />
+            <Route path="/restrictions" component={RestrictionMonitor} />
+            <Route path="/employees" component={EmployeeMonitor} />
+            <Route path="/competitors" component={CompetitorAnalysis} />
+            <Route path="/insights" component={AIInsights} />
+            <Route path="/hybrid-ai" component={HybridAI} />
+            <Route path="/ml-intelligence" component={MLIntelligence} />
+            <Route path="/system-health" component={SystemHealth} />
+            <Route path="/settings" component={Settings} />
+            <Route component={() => <Dashboard />} />
+          </Switch>
+        </AppLayout>
       )}
     </Switch>
   );

@@ -1,5 +1,3 @@
-import Sidebar from "@/components/layout/Sidebar";
-import TopBar from "@/components/layout/TopBar";
 import MetricsCards from "@/components/dashboard/MetricsCards";
 import AdPerformanceChart from "@/components/dashboard/AdPerformanceChart";
 import AIRecommendations from "@/components/dashboard/AIRecommendations";
@@ -8,8 +6,6 @@ import EmployeeMonitor from "@/components/dashboard/EmployeeMonitor";
 import ConnectedAccounts from "@/components/dashboard/ConnectedAccounts";
 import AILearningProgress from "@/components/dashboard/AILearningProgress";
 import QuickActions from "@/components/dashboard/QuickActions";
-import FloatingAIAssistant from "@/components/FloatingAIAssistant";
-import RealTimeAlerts from "@/components/RealTimeAlerts";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,13 +27,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <main className="flex-1 overflow-y-auto">
-        <TopBar />
-        
-        <div className="p-4 md:p-6 space-y-6">
+    <>
           {/* Dashboard Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -208,12 +198,6 @@ export default function Dashboard() {
             <CustomerServiceMonitor />
             <EmployeeMonitor />
           </div>
-        </div>
-
-        {/* Floating Assistant */}
-        <FloatingAIAssistant />
-        <RealTimeAlerts />
-      </main>
-    </div>
+    </>
   );
 }

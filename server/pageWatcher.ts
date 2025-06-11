@@ -132,7 +132,7 @@ export class PageWatcherEngine {
       
     } catch (error) {
       healthCheck.status = 'error';
-      healthCheck.issues.push(`API Error: ${error.message}`);
+      healthCheck.issues.push(`API Error: ${(error as Error).message}`);
       console.error(`Error checking page ${page.pageName}:`, error);
     }
 
@@ -179,7 +179,7 @@ export class PageWatcherEngine {
       }
     } catch (error) {
       healthCheck.status = 'error';
-      healthCheck.issues.push(`Failed to check page accessibility: ${error.message}`);
+      healthCheck.issues.push(`Failed to check page accessibility: ${(error as Error).message}`);
     }
   }
 
@@ -214,7 +214,7 @@ export class PageWatcherEngine {
         }
       }
     } catch (error) {
-      healthCheck.issues.push(`Failed to analyze recent posts: ${error.message}`);
+      healthCheck.issues.push(`Failed to analyze recent posts: ${(error as Error).message}`);
     }
   }
 
@@ -259,7 +259,7 @@ export class PageWatcherEngine {
       
       // Analyze trends (simplified)
       if (insights.data && insights.data.length > 0) {
-        const reachData = insights.data.find(metric => metric.name === 'page_reach');
+        const reachData = insights.data.find((metric: any) => metric.name === 'page_reach');
         if (reachData && reachData.values) {
           const latestReach = reachData.values[reachData.values.length - 1]?.value || 0;
           const previousReach = reachData.values[reachData.values.length - 2]?.value || 0;
@@ -271,7 +271,7 @@ export class PageWatcherEngine {
         }
       }
     } catch (error) {
-      healthCheck.issues.push(`Failed to analyze page insights: ${error.message}`);
+      healthCheck.issues.push(`Failed to analyze page insights: ${(error as Error).message}`);
     }
   }
 
@@ -345,7 +345,7 @@ export class PageWatcherEngine {
   private sendRealtimeUpdate(userId: string, healthCheck: PageHealthCheck): void {
     if (websocketService) {
       websocketService.sendAlert(userId, {
-        type: 'page_health_update',
+        type: 'info' as const,
         pageId: healthCheck.pageId,
         pageName: healthCheck.pageName,
         status: healthCheck.status,

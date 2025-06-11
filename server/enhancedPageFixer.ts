@@ -466,7 +466,7 @@ export class EnhancedPageFixer {
 
   private async getRecentPosts(fbService: FacebookAPIService, pageId: string): Promise<any[]> {
     try {
-      return await fbService.getPagePosts(pageId, 20);
+      return await fbService.getPagePosts(pageId, 20, 'posts');
     } catch (error) {
       return [];
     }
@@ -509,7 +509,7 @@ export class EnhancedPageFixer {
     
     try {
       const response = await claudeAI.generateContent(prompt, 'post');
-      return response.split('\n').filter(line => line.trim()).slice(0, 5);
+      return String(response).split('\n').filter((line: string) => line.trim()).slice(0, 5);
     } catch (error) {
       return [
         'Share behind-the-scenes content',

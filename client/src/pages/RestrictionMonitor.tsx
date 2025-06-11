@@ -95,15 +95,9 @@ export default function RestrictionMonitor() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <main className="flex-1 overflow-y-auto">
-        <TopBar />
-        
-        <div className="p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Restriction Monitor</h1>
               <p className="text-muted-foreground">AI-powered Facebook policy compliance and restriction prevention</p>
@@ -333,7 +327,6 @@ export default function RestrictionMonitor() {
             </CardContent>
           </Card>
         </div>
-      </main>
     </div>
   );
 }

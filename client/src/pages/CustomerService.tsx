@@ -71,10 +71,13 @@ export default function CustomerService() {
     if (!selectedInteraction || !responseText.trim()) return;
 
     try {
-      await apiRequest('POST', '/api/customer-service/respond', {
-        interactionId: selectedInteraction,
-        response: responseText,
-        responseTime: 30 // Mock response time
+      await apiRequest('/api/customer-service/respond', {
+        method: 'POST',
+        body: JSON.stringify({
+          interactionId: selectedInteraction,
+          response: responseText,
+          responseTime: 30
+        })
       });
 
       setResponseText("");

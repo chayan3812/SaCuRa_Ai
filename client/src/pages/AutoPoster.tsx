@@ -222,11 +222,11 @@ export default function AutoPoster() {
       return;
     }
 
-    const template = templates.find((t: PostTemplate) => t.id === selectedTemplate);
+    const template = (templates as PostTemplate[]).find((t: PostTemplate) => t.id === selectedTemplate);
     if (!template) return;
 
     // Check if all required variables are filled
-    const missingVars = template.variables.filter(variable => !templateVariables[variable]);
+    const missingVars = template.variables.filter((variable: string) => !templateVariables[variable]);
     if (missingVars.length > 0) {
       toast({
         title: "Error",
@@ -648,7 +648,7 @@ export default function AutoPoster() {
                       <SelectValue placeholder="Select a template" />
                     </SelectTrigger>
                     <SelectContent>
-                      {templates.map((template: PostTemplate) => (
+                      {(templates as PostTemplate[]).map((template: PostTemplate) => (
                         <SelectItem key={template.id} value={template.id}>
                           {template.name} - {template.category}
                         </SelectItem>

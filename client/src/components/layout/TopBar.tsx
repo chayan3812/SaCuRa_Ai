@@ -4,18 +4,33 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Bell, Moon, Sun, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function TopBar() {
   const [isDark, setIsDark] = useState(false);
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   // Fetch notifications
   const { data: notifications = [] } = useQuery({
     queryKey: ['/api/notifications'],
     refetchInterval: 30000 // Refresh every 30 seconds
+  });
+
+  // Mark notification as read mutation
+  const markAsReadMutation = useMutation({
+    mutationFn: async (notificationId: string) => {
+      await apiRequest(`/api/notifications/${notificationId}/mark-read`, {
+        method: 'POST'
+      });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch notifications
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+    }
   });
 
   const toggleTheme = () => {
@@ -29,6 +44,42 @@ export default function TopBar() {
 
   const handleSettingsClick = () => {
     setLocation('/system-health');
+  };
+
+  const getNotificationRoute = (notification: any) => {
+    switch (notification.type) {
+      case 'success':
+        return '/ad-optimizer'; // Campaign performance alerts
+      case 'warning':
+        if (notification.message.includes('budget')) {
+          return '/ad-optimizer'; // Budget warnings
+        }
+        if (notification.message.includes('policy') || notification.message.includes('Page')) {
+          return '/page-status'; // Page health issues
+        }
+        return '/analytics';
+      case 'info':
+        if (notification.message.includes('optimization')) {
+          return '/ai-insights'; // AI optimization results
+        }
+        if (notification.message.includes('competitor')) {
+          return '/competitor-analysis'; // Competitor alerts
+        }
+        return '/analytics';
+      default:
+        return '/dashboard';
+    }
+  };
+
+  const handleNotificationClick = (notification: any) => {
+    // Mark as read if unread
+    if (!notification.read) {
+      markAsReadMutation.mutate(notification.id);
+    }
+
+    // Navigate to appropriate page
+    const route = getNotificationRoute(notification);
+    setLocation(route);
   };
 
   const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.read)?.length || 0 : 0;
@@ -69,18 +120,33 @@ export default function TopBar() {
               <div className="max-h-96 overflow-y-auto">
                 {Array.isArray(notifications) && notifications.length > 0 ? (
                   (notifications as any[]).slice(0, 10).map((notification: any) => (
-                    <DropdownMenuItem key={notification.id} className="p-4 cursor-pointer">
-                      <div className="space-y-1">
+                    <DropdownMenuItem 
+                      key={notification.id} 
+                      className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      <div className="space-y-1 w-full">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-sm">{notification.title}</p>
+                          <p className={`font-medium text-sm ${!notification.read ? 'font-semibold' : ''}`}>
+                            {notification.title}
+                          </p>
                           <span className="text-xs text-muted-foreground">
                             {new Date(notification.createdAt).toLocaleTimeString()}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground">{notification.message}</p>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        )}
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            notification.type === 'success' ? 'bg-green-100 text-green-800' :
+                            notification.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {notification.type}
+                          </span>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
                       </div>
                     </DropdownMenuItem>
                   ))

@@ -71,13 +71,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Notifications API
-  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      
-      // Return demo notifications for now
-      const notifications = [
+  // In-memory notification store for demo purposes
+  const notificationStore = new Map<string, any[]>();
+
+  // Initialize demo notifications for users
+  const initializeUserNotifications = (userId: string) => {
+    if (!notificationStore.has(userId)) {
+      notificationStore.set(userId, [
         {
           id: 'notif_1',
           title: 'Campaign Performance Alert',
@@ -118,8 +118,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           read: true,
           createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
         }
-      ];
+      ]);
+    }
+  };
+
+  // Notifications API
+  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      initializeUserNotifications(userId);
       
+      const notifications = notificationStore.get(userId) || [];
       res.json(notifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -132,8 +141,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const userId = req.user.claims.sub;
       
-      // In a real implementation, this would update the notification in the database
-      res.json({ message: 'Notification marked as read' });
+      initializeUserNotifications(userId);
+      const notifications = notificationStore.get(userId) || [];
+      
+      // Find and mark the notification as read
+      const notification = notifications.find(n => n.id === id);
+      if (notification) {
+        notification.read = true;
+        notificationStore.set(userId, notifications);
+        res.json({ message: 'Notification marked as read', notification });
+      } else {
+        res.status(404).json({ message: 'Notification not found' });
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
       res.status(500).json({ message: "Failed to mark notification as read" });

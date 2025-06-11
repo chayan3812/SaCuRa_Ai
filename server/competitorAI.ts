@@ -626,17 +626,20 @@ Focus on actionable intelligence for competitive advantage.`;
     const totalInsights = Array.from(this.insights.values()).reduce((sum, insights) => sum + insights.length, 0);
     const criticalThreats = Array.from(this.competitors.values()).filter(c => this.calculateThreatLevel(c) === 'critical').length;
 
-    websocketService.broadcast({
-      type: 'info',
-      title: 'Competitive Intelligence Updated',
-      message: `Analyzed ${totalCompetitors} competitors with ${totalInsights} strategic insights`,
-      data: {
-        competitors: totalCompetitors,
-        insights: totalInsights,
-        criticalThreats,
-        lastUpdated: new Date()
-      }
-    });
+    // Guard against websocketService.broadcast not being a function
+    if (websocketService && typeof websocketService.broadcast === 'function') {
+      websocketService.broadcast({
+        type: 'info',
+        title: 'Competitive Intelligence Updated',
+        message: `Analyzed ${totalCompetitors} competitors with ${totalInsights} strategic insights`,
+        data: {
+          competitors: totalCompetitors,
+          insights: totalInsights,
+          criticalThreats,
+          lastUpdated: new Date()
+        }
+      });
+    }
   }
 
   public getMonitoringStatus(): { active: boolean, competitorCount: number, insightCount: number } {

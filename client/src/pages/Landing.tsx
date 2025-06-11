@@ -347,27 +347,85 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-sacura-primary to-purple-600">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Facebook Marketing?
+      <section className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-r from-sacura-primary via-purple-600 to-indigo-700 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+        
+        <div className="relative container mx-auto px-4 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
+            <Zap className="w-4 h-4 mr-2" />
+            Limited Time Offer
+          </div>
+          
+          {/* Main Heading */}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+            Ready to Transform Your<br className="hidden sm:block" />
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+              Facebook Marketing?
+            </span>
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses using SaCuRa AI to automate their Facebook marketing and drive better results.
+          
+          {/* Description */}
+          <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Join thousands of businesses using SaCuRa AI to automate their Facebook marketing, 
+            reduce costs by 40%, and drive 3x better results with intelligent automation.
           </p>
-          <div className="flex items-center justify-center space-x-4">
+          
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">3x</div>
+              <div className="text-sm text-white/80">Better ROI</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">40%</div>
+              <div className="text-sm text-white/80">Cost Reduction</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">24/7</div>
+              <div className="text-sm text-white/80">AI Support</div>
+            </div>
+          </div>
+          
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8">
             <Button 
               onClick={handleLogin}
               size="lg" 
-              variant="secondary"
-              className="bg-white text-sacura-primary hover:bg-gray-100 text-lg px-8 py-3"
+              className="bg-white text-sacura-primary hover:bg-gray-100 hover:scale-105 transition-all duration-200 text-lg px-8 py-4 shadow-xl font-semibold group"
             >
               Start Your Free Trial
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <div className="text-white/80 text-sm">
-              <CheckCircle className="w-4 h-4 inline mr-1" />
+            
+            <Button 
+              variant="outline"
+              size="lg"
+              className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-8 py-4"
+              onClick={() => {
+                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Watch Demo
+            </Button>
+          </div>
+          
+          {/* Trust Indicators */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-white/80 text-sm">
+            <div className="flex items-center">
+              <CheckCircle className="w-4 h-4 mr-2" />
               No credit card required
+            </div>
+            <div className="flex items-center">
+              <Shield className="w-4 h-4 mr-2" />
+              Enterprise-grade security
+            </div>
+            <div className="flex items-center">
+              <Clock className="w-4 h-4 mr-2" />
+              Setup in under 5 minutes
             </div>
           </div>
         </div>

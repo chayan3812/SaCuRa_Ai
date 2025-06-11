@@ -42,13 +42,13 @@ export default function AdOptimizer() {
   const { toast } = useToast();
 
   // Fetch real-time performance metrics
-  const { data: performanceMetrics, isLoading: metricsLoading } = useQuery({
+  const { data: performanceMetrics = { metrics: {}, trends: {}, alerts: [] }, isLoading: metricsLoading } = useQuery({
     queryKey: ['/api/ads/performance-metrics', selectedCampaignId],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Fetch page health data
-  const { data: pageHealth, isLoading: healthLoading } = useQuery({
+  const { data: pageHealth = { overallScore: 0, metrics: {}, trends: {}, issues: [] }, isLoading: healthLoading } = useQuery({
     queryKey: ['/api/page-health', 'demo_page_123'],
     refetchInterval: 60000, // Refresh every minute
   });
@@ -56,11 +56,14 @@ export default function AdOptimizer() {
   const handleGenerateAdCopy = async () => {
     setIsGenerating(true);
     try {
-      const response = await apiRequest('POST', '/api/ads/generate-copy', {
-        productDescription: "Facebook marketing automation platform",
-        targetAudience: "Small business owners and marketers",
-        campaignObjective: "Lead generation",
-        tone: "professional"
+      const response = await apiRequest('/api/ads/generate-copy', {
+        method: 'POST',
+        body: JSON.stringify({
+          productDescription: "Facebook marketing automation platform",
+          targetAudience: "Small business owners and marketers",
+          campaignObjective: "Lead generation",
+          tone: "professional"
+        })
       });
       
       const data = await response.json();
@@ -84,18 +87,21 @@ export default function AdOptimizer() {
   const handleOptimizeAds = async () => {
     setIsOptimizing(true);
     try {
-      const response = await apiRequest('POST', '/api/ads/optimize', {
-        adData: {
-          spend: 2847,
-          impressions: 85430,
-          clicks: 1247,
-          conversions: 89,
-          ctr: 1.46,
-          cpm: 3.33,
-          cpc: 2.28
-        },
-        campaignObjective: "Lead generation",
-        targetAudience: "Small business owners"
+      const response = await apiRequest('/api/ads/optimize', {
+        method: 'POST',
+        body: JSON.stringify({
+          adData: {
+            spend: 2847,
+            impressions: 85430,
+            clicks: 1247,
+            conversions: 89,
+            ctr: 1.46,
+            cpm: 3.33,
+            cpc: 2.28
+          },
+          campaignObjective: "Lead generation",
+          targetAudience: "Small business owners"
+        })
       });
       
       const data = await response.json();

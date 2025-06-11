@@ -458,7 +458,7 @@ export class EnhancedPageFixer {
 
   private async getPageInsights(fbService: FacebookAPIService, pageId: string): Promise<any> {
     try {
-      return await fbService.getPageInsights(pageId, 'page_impressions,page_reach,page_engagement', 'day');
+      return await fbService.getPageInsights(pageId, ['page_impressions', 'page_reach', 'page_engagement'], 'day');
     } catch (error) {
       return {};
     }

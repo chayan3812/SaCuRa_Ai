@@ -24,8 +24,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import Sidebar from "@/components/layout/Sidebar";
-import TopBar from "@/components/layout/TopBar";
+
 
 export default function Settings() {
   const { user } = useAuth();

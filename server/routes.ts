@@ -617,12 +617,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { campaignId } = req.body;
       
       // Use advanced ad optimizer for comprehensive optimization
-      const optimizations = await import('./advancedAdOptimizer').then(module => 
-        module.advancedAdOptimizer.generateComprehensiveOptimizations(campaignId, {
+      const { advancedAdOptimizer } = await import('./advancedAdOptimizer');
+      const optimizations = await advancedAdOptimizer.generateComprehensiveOptimizations(
+        campaignId,
+        'comprehensive',
+        {
           includeCompetitorAnalysis: true,
           includePredictiveOptimization: true,
           includeAutomationRules: true
-        })
+        }
       );
       
       res.json(optimizations);

@@ -421,3 +421,50 @@ export async function generateImage(prompt: string): Promise<{ url: string; prom
     throw new Error("Failed to generate image: " + (error as Error).message);
   }
 }
+
+// Add missing function stubs for compatibility
+export async function generateContentIdeas(): Promise<any[]> {
+  return [];
+}
+
+export async function optimizeAdCopy(): Promise<any> {
+  return {};
+}
+
+export async function analyzeAudience(): Promise<any> {
+  return {};
+}
+
+export async function generateSocialMediaContent(): Promise<any> {
+  return {};
+}
+
+export async function generateMarketingStrategy(): Promise<any> {
+  return {};
+}
+
+export async function analyzeCompetitors(): Promise<any> {
+  return {};
+}
+
+export async function generateContentCalendar(): Promise<any> {
+  return {};
+}
+
+// Export openaiService object for compatibility with other modules
+export const openaiService = {
+  generateCustomerServiceResponse,
+  generateAdOptimizationSuggestions,
+  checkPolicyCompliance,
+  generateContentIdeas,
+  optimizeAdCopy,
+  analyzeAudience,
+  generateSocialMediaContent,
+  analyzeSentiment,
+  generateMarketingStrategy,
+  analyzeCompetitors,
+  generateContentCalendar,
+  analyzePostContent,
+  generateSEOOptimizedContent,
+  generateImage
+};

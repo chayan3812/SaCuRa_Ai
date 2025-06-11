@@ -226,8 +226,9 @@ Consensus Response:`;
 
       const agreement = this.calculateAgreement(claudeContent, openaiContent);
       
+      const textContent = response.content.find(block => block.type === 'text')?.text || '';
       return {
-        content: response.content[0].text,
+        content: textContent,
         confidence: 0.98,
         agreement
       };

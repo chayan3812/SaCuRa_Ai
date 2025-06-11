@@ -202,26 +202,19 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <Sidebar />
-      
-      <div className="flex-1">
-        <TopBar />
-        
-        <main className="p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Settings</h1>
                 <p className="text-muted-foreground">Manage your account settings and preferences</p>
-              </div>
-              <Badge variant="outline" className="bg-sacura-primary/10 text-sacura-primary border-sacura-primary/20">
-                Pro Plan
-              </Badge>
-            </div>
+        </div>
+        <Badge variant="outline" className="bg-sacura-primary/10 text-sacura-primary border-sacura-primary/20">
+          Pro Plan
+        </Badge>
+      </div>
 
-            <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="w-4 h-4" />
@@ -670,10 +663,7 @@ export default function Settings() {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
-          </div>
-        </main>
-      </div>
+      </Tabs>
     </div>
   );
 }

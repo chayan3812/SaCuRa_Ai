@@ -40,6 +40,7 @@ export interface CustomerInteraction {
   sentiment?: 'positive' | 'negative' | 'neutral';
   status: 'pending' | 'responded' | 'escalated';
   isAutoResponse: boolean;
+  context?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }

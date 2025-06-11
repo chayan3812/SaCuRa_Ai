@@ -1,160 +1,263 @@
 {
-  "startTime": "2025-06-11T18:19:44.979Z",
+  "timestamp": "2025-06-11T18:35:58.702Z",
   "tests": [
     {
       "name": "Server Health Check",
-      "status": "PASSED",
-      "duration": "26ms",
-      "details": {
+      "passed": true,
+      "duration": "24ms",
+      "result": {
         "status": "healthy",
-        "memoryUsage": 86.59495118648205
+        "memory": 96.80583274211241,
+        "connections": 5
       },
-      "timestamp": "2025-06-11T18:19:45.010Z"
+      "timestamp": "2025-06-11T18:35:58.733Z"
     },
     {
       "name": "Authentication Flow",
-      "status": "PASSED",
-      "duration": "3ms",
-      "details": {
-        "unauthenticated": "Properly blocked",
-        "protectedRoutes": "Secured"
+      "passed": true,
+      "duration": "10ms",
+      "result": {
+        "protectedEndpoints": 3,
+        "allSecured": true
       },
-      "timestamp": "2025-06-11T18:19:45.014Z"
+      "timestamp": "2025-06-11T18:35:58.743Z"
     },
     {
       "name": "Dashboard Metrics",
-      "status": "PASSED",
+      "passed": true,
       "duration": "2ms",
-      "details": {
-        "status": "Authentication required (expected)",
-        "endpoint": "Available"
+      "result": {
+        "authRequired": true,
+        "endpointWorking": true
       },
-      "timestamp": "2025-06-11T18:19:45.016Z"
+      "timestamp": "2025-06-11T18:35:58.745Z"
     },
     {
       "name": "Ad Optimizer Features",
-      "status": "PASSED",
-      "duration": "2ms",
-      "details": {
-        "performanceMetrics": "Authentication required (expected)",
-        "endpoint": "Available"
+      "passed": true,
+      "duration": "30ms",
+      "result": {
+        "endpointsTested": 3,
+        "results": [
+          {
+            "endpoint": "/api/ads/performance-metrics",
+            "status": 401,
+            "working": true
+          },
+          {
+            "endpoint": "/api/ads/campaigns",
+            "status": 200,
+            "working": true
+          },
+          {
+            "endpoint": "/api/ads/optimization-suggestions",
+            "status": 200,
+            "working": true
+          }
+        ]
       },
-      "timestamp": "2025-06-11T18:19:45.018Z"
+      "timestamp": "2025-06-11T18:35:58.775Z"
     },
     {
       "name": "AI Features",
-      "status": "PASSED",
-      "duration": "2ms",
-      "details": {
-        "aiInsights": "Authentication required (expected)",
-        "endpoint": "Available"
+      "passed": true,
+      "duration": "13ms",
+      "result": {
+        "aiEndpointsTested": 3,
+        "results": [
+          {
+            "endpoint": "/api/ai/insights",
+            "status": 401,
+            "working": true
+          },
+          {
+            "endpoint": "/api/hybrid-ai/optimizations",
+            "status": 401,
+            "working": true
+          },
+          {
+            "endpoint": "/api/ml/status",
+            "status": 401,
+            "working": true
+          }
+        ]
       },
-      "timestamp": "2025-06-11T18:19:45.021Z"
+      "timestamp": "2025-06-11T18:35:58.789Z"
     },
     {
       "name": "Page Health Monitoring",
-      "status": "PASSED",
-      "duration": "3ms",
-      "details": {
-        "pageHealth": "Authentication required (expected)",
-        "endpoint": "Available"
+      "passed": true,
+      "duration": "2ms",
+      "result": {
+        "status": 401,
+        "working": true,
+        "data": {
+          "message": "Unauthorized"
+        }
       },
-      "timestamp": "2025-06-11T18:19:45.024Z"
+      "timestamp": "2025-06-11T18:35:58.792Z"
     },
     {
       "name": "WebSocket Connectivity",
-      "status": "PASSED",
+      "passed": true,
       "duration": "1ms",
-      "details": {
-        "status": "WebSocket endpoint responsive",
-        "statusCode": 400
+      "result": {
+        "status": 400,
+        "webSocketEndpointResponsive": true,
+        "body": "{\"code\":0,\"message\":\"Transport unknown\"}"
       },
-      "timestamp": "2025-06-11T18:19:45.025Z"
+      "timestamp": "2025-06-11T18:35:58.793Z"
     },
     {
       "name": "Database Connectivity",
-      "status": "PASSED",
-      "duration": "7ms",
-      "details": {
-        "database": "Connected",
-        "pagesEndpoint": "Working"
+      "passed": true,
+      "duration": "16ms",
+      "result": {
+        "databaseConnected": true,
+        "endpointsTested": 3,
+        "results": [
+          {
+            "endpoint": "/api/facebook/pages",
+            "status": 200,
+            "connected": true
+          },
+          {
+            "endpoint": "/api/employees",
+            "status": 401,
+            "connected": true
+          },
+          {
+            "endpoint": "/api/templates",
+            "status": 401,
+            "connected": true
+          }
+        ]
       },
-      "timestamp": "2025-06-11T18:19:45.033Z"
+      "timestamp": "2025-06-11T18:35:58.810Z"
     },
     {
       "name": "API Endpoints Coverage",
-      "status": "PASSED",
-      "duration": "18ms",
-      "details": {
-        "/api/notifications": {
-          "status": 401,
-          "available": true
-        },
-        "/api/employees": {
-          "status": 401,
-          "available": true
-        },
-        "/api/templates": {
-          "status": 401,
-          "available": true
-        },
-        "/api/page-watcher/status": {
-          "status": 401,
-          "available": true
-        },
-        "/api/ml/status": {
-          "status": 401,
-          "available": true
-        },
-        "/api/system/health": {
-          "status": 200,
-          "available": true
-        }
+      "passed": true,
+      "duration": "49ms",
+      "result": {
+        "totalEndpoints": 16,
+        "workingEndpoints": 16,
+        "coverage": "100.0%",
+        "results": [
+          {
+            "endpoint": "/api/system/health",
+            "status": 200,
+            "working": true,
+            "responseTime": 1749666958814
+          },
+          {
+            "endpoint": "/api/auth/user",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958817
+          },
+          {
+            "endpoint": "/api/notifications",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958819
+          },
+          {
+            "endpoint": "/api/dashboard/metrics",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958820
+          },
+          {
+            "endpoint": "/api/dashboard/pages",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958822
+          },
+          {
+            "endpoint": "/api/dashboard/recommendations",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958823
+          },
+          {
+            "endpoint": "/api/ads/performance-metrics",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958824
+          },
+          {
+            "endpoint": "/api/ads/campaigns",
+            "status": 200,
+            "working": true,
+            "responseTime": 1749666958831
+          },
+          {
+            "endpoint": "/api/ai/insights",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958833
+          },
+          {
+            "endpoint": "/api/page-health/demo_page_123",
+            "status": 401,
+            "working": true,
+            "responseTime": 1749666958839
+          }
+        ]
       },
-      "timestamp": "2025-06-11T18:19:45.052Z"
+      "timestamp": "2025-06-11T18:35:58.860Z"
     },
     {
       "name": "Hybrid AI Integration",
-      "status": "PASSED",
-      "duration": "2ms",
-      "details": {
-        "/api/hybrid-ai/optimizations": {
-          "status": 401,
-          "available": true
-        },
-        "/api/ai/sentiment-analysis": {
-          "status": 401,
-          "available": true
-        }
+      "passed": true,
+      "duration": "29ms",
+      "result": {
+        "hybridAIEndpoints": 4,
+        "results": [
+          {
+            "endpoint": "/api/hybrid-ai/optimizations",
+            "status": 401,
+            "aiEngineResponsive": true
+          },
+          {
+            "endpoint": "/api/hybrid-ai/analyze",
+            "status": 200,
+            "aiEngineResponsive": true
+          },
+          {
+            "endpoint": "/api/hybrid-ai/sentiment",
+            "status": 200,
+            "aiEngineResponsive": true
+          },
+          {
+            "endpoint": "/api/ai/insights",
+            "status": 401,
+            "aiEngineResponsive": true
+          }
+        ]
       },
-      "timestamp": "2025-06-11T18:19:45.054Z"
+      "timestamp": "2025-06-11T18:35:58.889Z"
     },
     {
-      "name": "Auto-Analyze Feature",
-      "status": "PASSED",
-      "duration": "3ms",
-      "details": {
-        "autoAnalyze": "Authentication required (expected)",
-        "endpoint": "Available"
+      "name": "Auto Analyze Feature",
+      "passed": true,
+      "duration": "9ms",
+      "result": {
+        "status": 200,
+        "autoAnalyzeWorking": true,
+        "data": null
       },
-      "timestamp": "2025-06-11T18:19:45.057Z"
+      "timestamp": "2025-06-11T18:35:58.899Z"
     }
   ],
+  "passed": 11,
+  "failed": 0,
   "summary": {
-    "total": 11,
+    "totalTests": 11,
     "passed": 11,
     "failed": 0,
-    "warnings": 0
-  },
-  "endTime": "2025-06-11T18:19:45.057Z",
-  "platform": {
-    "name": "PagePilot AI",
-    "version": "1.0.0",
-    "environment": "Development"
-  },
-  "testEnvironment": {
-    "baseUrl": "http://localhost:5000",
-    "userAgent": "PagePilot-Tester/1.0",
-    "timestamp": "2025-06-11T18:19:45.057Z"
+    "successRate": 100,
+    "timestamp": "2025-06-11T18:35:58.899Z"
   }
 }

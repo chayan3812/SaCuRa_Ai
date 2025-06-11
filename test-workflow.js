@@ -5,9 +5,9 @@
  * Tests all major platform features like a real user
  */
 
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
 
 const BASE_URL = 'http://localhost:5000';
 
@@ -420,8 +420,4 @@ async function main() {
   }
 }
 
-if (require.main === module) {
-  main();
-}
-
-module.exports = PagePilotTester;
+main();

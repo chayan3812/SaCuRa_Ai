@@ -1,5 +1,3 @@
-import Sidebar from "@/components/layout/Sidebar";
-import TopBar from "@/components/layout/TopBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,28 +28,26 @@ export default function CustomerService() {
   const [interactions, setInteractions] = useState<CustomerInteraction[]>([]);
   const { toast } = useToast();
 
-  const { data: initialInteractions = [] } = useQuery<CustomerInteraction[]>({
+  const { data: allInteractions = [], isLoading } = useQuery<CustomerInteraction[]>({
     queryKey: ['/api/customer-service/interactions/all'],
-    refetchInterval: 30000,
+    refetchInterval: 5000,
   });
 
   useEffect(() => {
-    setInteractions(initialInteractions);
-  }, [initialInteractions]);
+    setInteractions(allInteractions);
+  }, [allInteractions]);
 
   useEffect(() => {
     const ws = getWebSocket();
     
-    const handleNewMessage = (data: CustomerInteraction) => {
+    const handleNewMessage = (data: any) => {
       setInteractions(prev => [data, ...prev]);
     };
 
     const handleResponseUpdate = (data: any) => {
       setInteractions(prev => 
         prev.map(interaction => 
-          interaction.id === data.id 
-            ? { ...interaction, ...data }
-            : interaction
+          interaction.id === data.id ? { ...interaction, ...data } : interaction
         )
       );
     };
@@ -84,7 +80,7 @@ export default function CustomerService() {
       setSelectedInteraction(null);
       
       toast({
-        title: "Response Sent",
+        title: "Response sent",
         description: "Your response has been sent to the customer.",
       });
     } catch (error) {
@@ -96,25 +92,31 @@ export default function CustomerService() {
     }
   };
 
-  const formatTimeAgo = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
-  };
+  const generateAIResponse = async (interactionId: string) => {
+    try {
+      const interaction = interactions.find(i => i.id === interactionId);
+      if (!interaction) return;
 
-  const getStatusBadge = (interaction: CustomerInteraction) => {
-    if (interaction.status === 'pending') {
-      return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Pending</Badge>;
+      await apiRequest('/api/customer-service/ai-response', {
+        method: 'POST',
+        body: JSON.stringify({
+          interactionId,
+          message: interaction.message,
+          context: interaction.context || {}
+        })
+      });
+
+      toast({
+        title: "AI Response Generated",
+        description: "AI has generated a response for this interaction.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate AI response. Please try again.",
+        variant: "destructive",
+      });
     }
-    if (interaction.isAutoResponse) {
-      return <Badge variant="secondary" className="text-green-600 border-green-200 bg-green-50">AI Response</Badge>;
-    }
-    return <Badge variant="default" className="text-blue-600 border-blue-200 bg-blue-50">Human Response</Badge>;
   };
 
   const pendingInteractions = interactions.filter(i => i.status === 'pending');
@@ -124,218 +126,229 @@ export default function CustomerService() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Customer Service</h1>
-              <p className="text-muted-foreground">AI-powered customer service automation and monitoring</p>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Customer Service</h1>
+          <p className="text-muted-foreground">AI-powered customer service automation and monitoring</p>
+        </div>
+        <Badge variant="secondary" className="bg-sacura-secondary/10 text-sacura-secondary">
+          <div className="w-2 h-2 bg-sacura-secondary rounded-full notification-dot mr-2"></div>
+          Live Monitoring
+        </Badge>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Interactions</p>
+                <p className="text-2xl font-bold text-foreground">{interactions.length}</p>
+                <p className="text-sm text-sacura-secondary">Today</p>
+              </div>
+              <MessageSquare className="w-8 h-8 text-muted-foreground" />
             </div>
-            <Badge variant="secondary" className="bg-sacura-secondary/10 text-sacura-secondary">
-              <div className="w-2 h-2 bg-sacura-secondary rounded-full notification-dot mr-2"></div>
-              Live Monitoring
-            </Badge>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Interactions</p>
-                    <p className="text-2xl font-bold text-foreground">{interactions.length}</p>
-                    <p className="text-sm text-sacura-secondary">Today</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <MessageSquare className="text-blue-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-foreground">{pendingInteractions.length}</p>
+                <p className="text-sm text-orange-600">Needs attention</p>
+              </div>
+              <AlertCircle className="w-8 h-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">AI Responses</p>
-                    <p className="text-2xl font-bold text-foreground">
-                      {interactions.filter(i => i.isAutoResponse).length}
-                    </p>
-                    <p className="text-sm text-sacura-secondary">89% of total</p>
-                  </div>
-                  <div className="w-12 h-12 bg-sacura-secondary/10 rounded-lg flex items-center justify-center">
-                    <Bot className="text-sacura-secondary w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Resolved</p>
+                <p className="text-2xl font-bold text-foreground">{resolvedInteractions.length}</p>
+                <p className="text-sm text-green-600">Completed</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                    <p className="text-2xl font-bold text-foreground">{pendingInteractions.length}</p>
-                    <p className="text-sm text-amber-600">Needs attention</p>
-                  </div>
-                  <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                    <AlertCircle className="text-amber-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Avg Response</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {interactions.length > 0 
+                    ? `${(interactions.reduce((sum, i) => sum + (i.responseTime || 0), 0) / interactions.length).toFixed(1)}s`
+                    : '0s'
+                  }
+                </p>
+                <p className="text-sm text-sacura-secondary">Response time</p>
+              </div>
+              <Clock className="w-8 h-8 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Avg Response Time</p>
-                    <p className="text-2xl font-bold text-foreground">0.8s</p>
-                    <p className="text-sm text-sacura-secondary">AI average</p>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Live Interactions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Headphones className="w-5 h-5 text-sacura-primary" />
+              <span>Live Customer Interactions</span>
+              {pendingInteractions.length > 0 && (
+                <Badge variant="destructive">{pendingInteractions.length}</Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="flex items-start space-x-3 p-4 border rounded-lg">
+                      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Clock className="text-green-600 w-6 h-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Interactions List */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Customer Interactions</CardTitle>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant={activeTab === 'live' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveTab('live')}
-                    >
-                      Live ({pendingInteractions.length})
-                    </Button>
-                    <Button
-                      variant={activeTab === 'history' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveTab('history')}
-                    >
-                      History
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {(activeTab === 'live' ? pendingInteractions : resolvedInteractions).map((interaction) => (
-                    <div
-                      key={interaction.id}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedInteraction === interaction.id 
-                          ? 'border-sacura-primary bg-sacura-primary/5' 
-                          : 'hover:bg-muted'
-                      }`}
-                      onClick={() => setSelectedInteraction(interaction.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <p className="font-medium text-foreground">{interaction.customerName}</p>
-                            {getStatusBadge(interaction)}
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            "{interaction.message}"
-                          </p>
-                          {interaction.response && (
-                            <p className="text-sm text-sacura-primary bg-sacura-primary/10 p-2 rounded">
-                              Response: "{interaction.response}"
-                            </p>
-                          )}
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {formatTimeAgo(interaction.createdAt)}
+                ))}
+              </div>
+            ) : pendingInteractions.length > 0 ? (
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {pendingInteractions.map((interaction) => (
+                  <div 
+                    key={interaction.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                      selectedInteraction === interaction.id 
+                        ? 'border-sacura-primary bg-sacura-primary/5' 
+                        : 'border-border hover:border-sacura-primary/50'
+                    }`}
+                    onClick={() => setSelectedInteraction(interaction.id)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-3">
+                        <User className="w-8 h-8 text-muted-foreground mt-1" />
+                        <div>
+                          <h4 className="font-medium">{interaction.customerName}</h4>
+                          <p className="text-sm text-muted-foreground">{interaction.message}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(interaction.createdAt).toLocaleTimeString()}
                           </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  
-                  {(activeTab === 'live' ? pendingInteractions : resolvedInteractions).length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No {activeTab === 'live' ? 'pending' : 'resolved'} interactions</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Response Panel */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Send className="w-5 h-5" />
-                  <span>Quick Response</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedInteraction ? (
-                  <>
-                    <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm font-medium">Selected Interaction</p>
-                      <p className="text-sm text-muted-foreground">
-                        {interactions.find(i => i.id === selectedInteraction)?.customerName}
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Your Response</label>
-                      <Textarea
-                        placeholder="Type your response here..."
-                        value={responseText}
-                        onChange={(e) => setResponseText(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-                    
-                    <Button 
-                      onClick={handleSendResponse}
-                      className="w-full"
-                      disabled={!responseText.trim()}
-                    >
-                      Send Response
-                    </Button>
-                  </>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Send className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Select an interaction to respond</p>
-                  </div>
-                )}
-
-                {/* Quick Response Templates */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Quick Templates</label>
-                  <div className="space-y-2">
-                    {[
-                      "Thank you for reaching out! How can I help you today?",
-                      "I understand your concern. Let me look into this for you.",
-                      "Thanks for your patience. I'll get back to you shortly.",
-                    ].map((template, index) => (
                       <Button
-                        key={index}
-                        variant="outline"
                         size="sm"
-                        className="w-full text-left justify-start text-xs"
-                        onClick={() => setResponseText(template)}
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          generateAIResponse(interaction.id);
+                        }}
                       >
-                        {template}
+                        <Bot className="w-4 h-4 mr-1" />
+                        AI
                       </Button>
-                    ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No pending interactions</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Response Panel */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Send className="w-5 h-5 text-sacura-primary" />
+              <span>Quick Response</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {selectedInteraction ? (
+                <>
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm">
+                      Responding to: {interactions.find(i => i.id === selectedInteraction)?.customerName}
+                    </p>
+                  </div>
+                  <Textarea
+                    placeholder="Type your response here..."
+                    value={responseText}
+                    onChange={(e) => setResponseText(e.target.value)}
+                    className="min-h-32"
+                  />
+                  <Button 
+                    onClick={handleSendResponse} 
+                    disabled={!responseText.trim()}
+                    className="w-full"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Response
+                  </Button>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Select an interaction to respond</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Response Templates */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Bot className="w-5 h-5 text-sacura-primary" />
+              <span>AI Response Templates</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                Quick AI-generated responses for common customer inquiries
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[
+                  'Thank you for contacting us',
+                  'I understand your concern',
+                  'Let me help you with that',
+                  'This issue will be resolved',
+                  'Thank you for your patience',
+                  'We appreciate your feedback'
+                ].map((template) => (
+                  <Button
+                    key={template}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setResponseText(template)}
+                    className="justify-start text-left h-auto p-3 whitespace-normal"
+                  >
+                    {template}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

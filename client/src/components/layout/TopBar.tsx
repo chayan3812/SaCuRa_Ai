@@ -43,7 +43,7 @@ export default function TopBar() {
   };
 
   const handleSettingsClick = () => {
-    setLocation('/system-health');
+    setLocation('/settings');
   };
 
   const getNotificationRoute = (notification: any) => {

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Bot, 
   ChartLine, 
@@ -33,6 +34,14 @@ const navigation = [
 
 export default function Sidebar() {
   const [location] = useLocation();
+  const { user } = useAuth();
+
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    return user?.email?.[0]?.toUpperCase() || 'U';
+  };
 
   return (
     <aside className="w-64 bg-sidebar-background border-r border-sidebar-border flex flex-col">
@@ -88,19 +97,31 @@ export default function Sidebar() {
       {/* User Profile */}
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center space-x-3">
-          <img 
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" 
-            alt="User Profile" 
-            className="w-10 h-10 rounded-full object-cover"
-          />
+          {user?.profileImageUrl ? (
+            <img 
+              src={user.profileImageUrl} 
+              alt="User Profile" 
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-sacura-primary flex items-center justify-center text-white font-medium">
+              {getUserInitials()}
+            </div>
+          )}
           <div className="flex-1">
-            <p className="text-sm font-medium text-sidebar-foreground">John Martinez</p>
+            <p className="text-sm font-medium text-sidebar-foreground">
+              {user?.firstName && user?.lastName 
+                ? `${user.firstName} ${user.lastName}` 
+                : user?.email || 'User'}
+            </p>
             <p className="text-xs text-muted-foreground">Pro Plan</p>
           </div>
           <div className="flex space-x-1">
-            <Button variant="ghost" size="icon" className="w-8 h-8">
-              <Settings className="w-4 h-4" />
-            </Button>
+            <Link href="/settings">
+              <Button variant="ghost" size="icon" className="w-8 h-8">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </Link>
             <Button 
               variant="ghost" 
               size="icon" 

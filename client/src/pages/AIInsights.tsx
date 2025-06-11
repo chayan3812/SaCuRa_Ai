@@ -154,7 +154,7 @@ export default function AIInsights() {
 
         <TabsContent value="insights" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {insights?.map((insight: any, index: number) => (
+            {Array.isArray(insights) ? insights.map((insight: any, index: number) => (
               <Card key={index} className="border-l-4 border-l-blue-500">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export default function AIInsights() {
                   </div>
                 </CardContent>
               </Card>
-            )) || []}
+            )) : null}
           </div>
         </TabsContent>
 
@@ -303,12 +303,12 @@ export default function AIInsights() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-3xl font-bold mb-2">
-                        {sentimentData.overall > 0 ? '+' : ''}{(sentimentData.overall * 100).toFixed(1)}%
+                        {(sentimentData as any)?.overall > 0 ? '+' : ''}{((sentimentData as any)?.overall * 100).toFixed(1)}%
                       </div>
                       <div className="flex items-center justify-center space-x-2">
                         <span className="text-sm text-gray-500">Overall Sentiment</span>
-                        <Badge variant={sentimentData.trend === 'improving' ? 'default' : 'secondary'}>
-                          {sentimentData.trend}
+                        <Badge variant={(sentimentData as any)?.trend === 'improving' ? 'default' : 'secondary'}>
+                          {(sentimentData as any)?.trend}
                         </Badge>
                       </div>
                     </div>
@@ -379,24 +379,24 @@ export default function AIInsights() {
                     <div>
                       <h4 className="font-semibold text-sm mb-2">Opportunities:</h4>
                       <ul className="space-y-1">
-                        {trend.opportunities?.map((opportunity: string, oppIndex: number) => (
+                        {Array.isArray(trend.opportunities) ? trend.opportunities.map((opportunity: string, oppIndex: number) => (
                           <li key={oppIndex} className="flex items-start space-x-2 text-sm">
                             <TrendingUp className="h-3 w-3 text-green-500 mt-1" />
                             <span>{opportunity}</span>
                           </li>
-                        ))}
+                        )) : []}
                       </ul>
                     </div>
                     
                     <div>
                       <h4 className="font-semibold text-sm mb-2">Recommended Actions:</h4>
                       <ul className="space-y-1">
-                        {trend.recommendedActions?.map((action: string, actionIndex: number) => (
+                        {Array.isArray(trend.recommendedActions) ? trend.recommendedActions.map((action: string, actionIndex: number) => (
                           <li key={actionIndex} className="flex items-start space-x-2 text-sm">
                             <Target className="h-3 w-3 text-blue-500 mt-1" />
                             <span>{action}</span>
                           </li>
-                        ))}
+                        )) : []}
                       </ul>
                     </div>
                   </div>

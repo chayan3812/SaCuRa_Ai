@@ -631,10 +631,7 @@ Please analyze and provide:
 
 Focus on actionable insights and specific recommendations.`;
 
-      const analysis = await hybridAI.generateContent(analysisPrompt, 'analysis', {
-        includeMetrics: true,
-        detailLevel: 'comprehensive'
-      });
+      const analysis = await hybridAI.generateContent(analysisPrompt, 'analysis');
 
       // Generate structured analysis data
       const pageAnalysisData = {
@@ -724,10 +721,7 @@ Implementation Level: ${implementationLevel}
 Create detailed implementation steps for each suggestion and determine which can be automated vs manual.
 Prioritize by impact and feasibility.`;
 
-      const improvementPlan = await hybridAI.generateContent(improvementPrompt, 'strategy', {
-        includeActionPlan: true,
-        implementationFocus: true
-      });
+      const improvementPlan = await hybridAI.generateContent(improvementPrompt, 'strategy');
 
       // Simulate implementation results
       const implementationResults = {

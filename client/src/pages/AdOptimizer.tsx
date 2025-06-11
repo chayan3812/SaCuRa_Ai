@@ -173,7 +173,7 @@ export default function AdOptimizer() {
   const handleAutoFixPageIssues = async () => {
     setIsAutoFixing(true);
     try {
-      const response = await apiRequest('POST', '/api/page-health/auto-fix', {
+      const response = await apiRequest('POST', '/api/ads/auto-fix', {
         pageId: 'demo_page_123'
       });
       
@@ -181,7 +181,7 @@ export default function AdOptimizer() {
       
       toast({
         title: "Auto-Fix Complete",
-        description: `Fixed ${data.fixed} issues, ${data.failed} failed attempts.`,
+        description: data.message || "Page issues have been automatically resolved.",
       });
     } catch (error) {
       toast({

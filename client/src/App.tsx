@@ -35,10 +35,27 @@ function Router() {
     }
   }, [isAuthenticated, user?.id]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">
+            <div className="w-12 h-12 bg-blue-500 rounded-full mx-auto mb-4"></div>
+            <p className="text-white text-lg">Loading PagePilot AI...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+      {!isAuthenticated ? (
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/login" component={() => { window.location.href = '/api/login'; return null; }} />
+          <Route component={() => <Landing />} />
+        </>
       ) : (
         <>
           <Route path="/" component={Dashboard} />
@@ -56,9 +73,9 @@ function Router() {
           <Route path="/ml-intelligence" component={MLIntelligence} />
           <Route path="/system-health" component={SystemHealth} />
           <Route path="/settings" component={Settings} />
+          <Route component={NotFound} />
         </>
       )}
-      <Route component={NotFound} />
     </Switch>
   );
 }

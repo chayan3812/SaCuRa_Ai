@@ -27,11 +27,11 @@ function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user?.id) {
       // Initialize WebSocket connection when user is authenticated
       initializeWebSocket(user.id);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user?.id]);
 
   return (
     <Switch>

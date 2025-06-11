@@ -8,11 +8,10 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function TopBar() {
   const [isDark, setIsDark] = useState(false);
-  const [notificationOpen, setNotificationOpen] = useState(false);
   const { user } = useAuth();
 
   // Fetch notifications
-  const { data: notifications } = useQuery({
+  const { data: notifications = [] } = useQuery({
     queryKey: ['/api/notifications'],
     refetchInterval: 30000 // Refresh every 30 seconds
   });
@@ -26,7 +25,7 @@ export default function TopBar() {
     window.location.href = '/api/logout';
   };
 
-  const unreadCount = notifications?.filter((n: any) => !n.read)?.length || 0;
+  const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.read)?.length || 0 : 0;
 
   return (
     <header className="bg-background border-b border-border px-6 py-4">
@@ -43,7 +42,7 @@ export default function TopBar() {
           </Badge>
           
           {/* Notifications Dropdown */}
-          <DropdownMenu open={notificationOpen} onOpenChange={setNotificationOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
@@ -62,8 +61,8 @@ export default function TopBar() {
                 </p>
               </div>
               <div className="max-h-96 overflow-y-auto">
-                {notifications && notifications.length > 0 ? (
-                  notifications.slice(0, 10).map((notification: any) => (
+                {Array.isArray(notifications) && notifications.length > 0 ? (
+                  (notifications as any[]).slice(0, 10).map((notification: any) => (
                     <DropdownMenuItem key={notification.id} className="p-4 cursor-pointer">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">

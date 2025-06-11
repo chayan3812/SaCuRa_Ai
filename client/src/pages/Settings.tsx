@@ -29,6 +29,8 @@ import TopBar from "@/components/layout/TopBar";
 
 export default function Settings() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
@@ -48,14 +50,149 @@ export default function Settings() {
     timezone: 'UTC-05:00'
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [apiKeys, setApiKeys] = useState({
+    facebookAccessToken: '',
+    openaiApiKey: '',
+    claudeApiKey: ''
+  });
+
+  // Fetch user settings
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ['/api/user/settings'],
+    retry: false,
+  });
+
+  // Update profile mutation
+  const profileMutation = useMutation({
+    mutationFn: async (profileData: any) => {
+      return await apiRequest('/api/user/profile', 'PUT', profileData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update notifications mutation
+  const notificationsMutation = useMutation({
+    mutationFn: async (notificationPrefs: any) => {
+      return await apiRequest('/api/user/notifications', 'PUT', notificationPrefs);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Notifications Updated",
+        description: "Your notification preferences have been saved.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update notifications",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update password mutation
+  const passwordMutation = useMutation({
+    mutationFn: async (passwordUpdateData: any) => {
+      return await apiRequest('/api/user/password', 'PUT', passwordUpdateData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
+      });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update password",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update API keys mutation
+  const apiKeysMutation = useMutation({
+    mutationFn: async (apiKeyData: any) => {
+      return await apiRequest('/api/user/api-keys', 'PUT', apiKeyData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "API Keys Updated",
+        description: "Your API keys have been saved securely.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update API keys",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize settings when data is loaded
+  useEffect(() => {
+    if (settings) {
+      setProfile(prev => ({
+        ...prev,
+        ...settings.profile
+      }));
+      setNotifications(settings.notifications || notifications);
+    }
+  }, [settings]);
+
   const handleSaveProfile = () => {
-    // Save profile logic would go here
-    console.log('Saving profile:', profile);
+    profileMutation.mutate(profile);
   };
 
   const handleSaveNotifications = () => {
-    // Save notification preferences
-    console.log('Saving notifications:', notifications);
+    notificationsMutation.mutate(notifications);
+  };
+
+  const handleSavePassword = () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (passwordData.newPassword.length < 8) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    passwordMutation.mutate(passwordData);
+  };
+
+  const handleSaveApiKeys = () => {
+    apiKeysMutation.mutate(apiKeys);
   };
 
   const getUserInitials = () => {
@@ -336,6 +473,8 @@ export default function Settings() {
                             id="currentPassword"
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter current password"
+                            value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                           />
                           <Button
                             type="button"
@@ -355,6 +494,8 @@ export default function Settings() {
                           id="newPassword"
                           type="password"
                           placeholder="Enter new password"
+                          value={passwordData.newPassword}
+                          onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                         />
                       </div>
 
@@ -364,6 +505,8 @@ export default function Settings() {
                           id="confirmPassword"
                           type="password"
                           placeholder="Confirm new password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                         />
                       </div>
                     </div>
@@ -393,9 +536,12 @@ export default function Settings() {
                     </div>
 
                     <div className="flex justify-end">
-                      <Button>
+                      <Button 
+                        onClick={handleSavePassword}
+                        disabled={passwordMutation.isPending}
+                      >
                         <Save className="w-4 h-4 mr-2" />
-                        Update Password
+                        {passwordMutation.isPending ? 'Updating...' : 'Update Password'}
                       </Button>
                     </div>
                   </CardContent>

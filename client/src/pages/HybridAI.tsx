@@ -156,7 +156,8 @@ export default function HybridAI() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {providerHealth && Object.entries(providerHealth).map(([name, provider]: [string, any]) => (
+            {providerHealth && Object.entries(providerHealth).map(([name, provider]: [string, any]) => {
+              return (
               <div key={name} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className={`w-3 h-3 rounded-full ${getProviderStatusColor(provider)}`}></div>
@@ -171,7 +172,8 @@ export default function HybridAI() {
                   {getProviderStatusText(provider)}
                 </Badge>
               </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>

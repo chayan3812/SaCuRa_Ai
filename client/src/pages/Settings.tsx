@@ -205,9 +205,9 @@ export default function Settings() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-                <p className="text-muted-foreground">Manage your account settings and preferences</p>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground">Manage your account settings and preferences</p>
         </div>
         <Badge variant="outline" className="bg-sacura-primary/10 text-sacura-primary border-sacura-primary/20">
           Pro Plan
@@ -215,31 +215,31 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="profile" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Profile
-                </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex items-center gap-2">
-                  <Bell className="w-4 h-4" />
-                  Notifications
-                </TabsTrigger>
-                <TabsTrigger value="security" className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  Security
-                </TabsTrigger>
-                <TabsTrigger value="api" className="flex items-center gap-2">
-                  <Key className="w-4 h-4" />
-                  API Keys
-                </TabsTrigger>
-                <TabsTrigger value="appearance" className="flex items-center gap-2">
-                  <Palette className="w-4 h-4" />
-                  Appearance
-                </TabsTrigger>
-              </TabsList>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User className="w-4 h-4" />
+            Profile
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <Bell className="w-4 h-4" />
+            Notifications
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="api" className="flex items-center gap-2">
+            <Key className="w-4 h-4" />
+            API Keys
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            Appearance
+          </TabsTrigger>
+        </TabsList>
 
-              {/* Profile Tab */}
-              <TabsContent value="profile" className="space-y-6">
+        {/* Profile Tab */}
+        <TabsContent value="profile" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Profile Information</CardTitle>

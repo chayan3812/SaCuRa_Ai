@@ -73,7 +73,7 @@ function Router() {
           <Route path="/ml-intelligence" component={MLIntelligence} />
           <Route path="/system-health" component={SystemHealth} />
           <Route path="/settings" component={Settings} />
-          <Route component={NotFound} />
+          <Route component={() => <Dashboard />} />
         </>
       )}
     </Switch>

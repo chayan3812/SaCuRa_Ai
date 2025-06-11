@@ -347,7 +347,7 @@ export class EnhancedPageFixer {
       const fbService = new FacebookAPIService(page.accessToken);
       
       // Analyze recent content
-      const posts = await fbService.getPagePosts(String(page.pageId), 10);
+      const posts = await fbService.getPagePosts(String(page.pageId), 10, 'posts');
       fixResult.actionsPerformed.push('Analyzed recent post performance');
       
       // Generate content improvements
@@ -474,7 +474,7 @@ export class EnhancedPageFixer {
 
   private async getAudienceData(fbService: FacebookAPIService, pageId: string): Promise<any> {
     try {
-      return await fbService.getPageInsights(pageId, ['page_fans', 'page_fan_adds', 'page_fan_removes']);
+      return await fbService.getPageInsights(pageId, ['page_fans', 'page_fan_adds', 'page_fan_removes'], 'day');
     } catch (error) {
       return {};
     }

@@ -198,7 +198,7 @@ export class PageWatcherEngine {
           const compliance = { isCompliant: true, riskLevel: 'low', violations: [] };
           
           if (!compliance.isCompliant) {
-            const severity = compliance.riskLevel;
+            const severity = compliance.riskLevel as 'low' | 'medium' | 'high' | 'critical';
             healthCheck.restrictions.push({
               type: 'policy_violation',
               severity,
@@ -347,12 +347,8 @@ export class PageWatcherEngine {
     if (websocketService) {
       websocketService.sendAlert(userId, {
         type: 'info' as const,
-        pageId: healthCheck.pageId,
-        pageName: healthCheck.pageName,
-        status: healthCheck.status,
-        timestamp: healthCheck.lastCheck,
-        issues: healthCheck.issues,
-        restrictionCount: healthCheck.restrictions.length
+        title: `Page Health Update: ${healthCheck.pageName}`,
+        message: `Status: ${healthCheck.status}. Issues found: ${healthCheck.issues.length}`
       });
     }
   }

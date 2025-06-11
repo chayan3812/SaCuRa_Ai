@@ -331,7 +331,7 @@ export async function generateFacebookPost(
     const result = JSON.parse(response.choices[0].message.content || '{}');
     return result;
   } catch (error) {
-    throw new Error("Failed to generate Facebook post: " + error.message);
+    throw new Error("Failed to generate Facebook post: " + (error as Error).message);
   }
 }
 

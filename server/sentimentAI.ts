@@ -264,7 +264,7 @@ Generate a professional, empathetic response that:
 
 Response should be concise but complete.`;
 
-      const response = await claudeAI.generateContent(prompt, 'response');
+      const response = await claudeAI.generateContent(prompt, 'post');
       return typeof response === 'string' ? response : 'Thank you for your feedback. We appreciate you taking the time to share your thoughts with us.';
 
     } catch (error) {
@@ -354,7 +354,7 @@ Response should be concise but complete.`;
     const sentimentScores = insight.sentimentHistory.map(s => 
       s.sentiment === 'positive' ? 1 : s.sentiment === 'negative' ? -1 : 0
     );
-    insight.averageSentiment = sentimentScores.reduce((a, b) => a + b, 0) / sentimentScores.length;
+    insight.averageSentiment = sentimentScores.reduce((a: number, b: number) => a + b, 0) / Math.max(sentimentScores.length, 1);
     
     // Update risk level
     const recentNegative = insight.sentimentHistory.slice(-3).filter(s => s.sentiment === 'negative').length;
@@ -383,7 +383,7 @@ Response should be concise but complete.`;
     
     // Guard against websocketService.broadcast not being a function
     if (websocketService && typeof websocketService.broadcast === 'function') {
-      websocketService.broadcast(alert);
+      websocketService.broadcast('critical-sentiment', alert);
     }
   }
 
@@ -413,8 +413,8 @@ Response should be concise but complete.`;
     const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
     const allAnalyses: SentimentAnalysis[] = [];
     
-    for (const analyses of this.analysisHistory.values()) {
-      allAnalyses.push(...analyses.filter(a => a.analyzedAt > cutoffTime));
+    for (const analyses of Array.from(this.analysisHistory.values())) {
+      allAnalyses.push(...analyses.filter((a: SentimentAnalysis) => a.analyzedAt > cutoffTime));
     }
     
     return allAnalyses;
@@ -505,7 +505,7 @@ Response should be concise but complete.`;
     const sentimentScores = recentAnalyses.map(a => 
       a.sentiment === 'positive' ? 1 : a.sentiment === 'negative' ? -1 : 0
     );
-    const averageSentiment = sentimentScores.reduce((a, b) => a + b, 0) / sentimentScores.length;
+    const averageSentiment = sentimentScores.reduce((a: number, b: number) => a + b, 0) / Math.max(sentimentScores.length, 1);
     
     const emotionalTrend: EmotionalTrend = {
       timeframe: new Date().toISOString(),
@@ -533,7 +533,7 @@ Response should be concise but complete.`;
       
       // Guard against websocketService.broadcast not being a function
       if (websocketService && typeof websocketService.broadcast === 'function') {
-        websocketService.broadcast({
+        websocketService.broadcast('urgent-alert', {
           type: 'error',
           title: 'Urgent: Multiple Critical Issues',
           message: `${recentCritical.length} critical customer sentiment issues detected. Immediate action required.`,

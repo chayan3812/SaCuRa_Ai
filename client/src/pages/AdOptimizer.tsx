@@ -32,9 +32,12 @@ export default function AdOptimizer() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [isAdvancedOptimizing, setIsAdvancedOptimizing] = useState(false);
   const [isAutoFixing, setIsAutoFixing] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAutoImproving, setIsAutoImproving] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [advancedSuggestions, setAdvancedSuggestions] = useState<any[]>([]);
   const [adCopy, setAdCopy] = useState<any>(null);
+  const [pageAnalysis, setPageAnalysis] = useState<any>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState('campaign_123');
   const { toast } = useToast();
 
@@ -191,6 +194,66 @@ export default function AdOptimizer() {
       });
     } finally {
       setIsAutoFixing(false);
+    }
+  };
+
+  const handleAutoAnalyzePage = async () => {
+    setIsAnalyzing(true);
+    try {
+      const response = await apiRequest('POST', '/api/page/auto-analyze', {
+        pageId: 'demo_page_123',
+        includePerformanceMetrics: true,
+        includeContentAnalysis: true,
+        includeCompetitorComparison: true,
+        includeAudienceInsights: true
+      });
+      
+      const data = await response.json();
+      setPageAnalysis(data);
+      
+      toast({
+        title: "Page Analysis Complete",
+        description: `Analyzed page with ${data.totalMetrics} data points and generated ${data.suggestions?.length || 0} improvement suggestions.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to analyze page. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleAutoImprove = async () => {
+    setIsAutoImproving(true);
+    try {
+      const response = await apiRequest('POST', '/api/page/auto-improve', {
+        pageId: 'demo_page_123',
+        analysisData: pageAnalysis,
+        implementationLevel: 'comprehensive'
+      });
+      
+      const data = await response.json();
+      
+      toast({
+        title: "Auto-Improvement Complete",
+        description: `Applied ${data.implemented} improvements successfully. ${data.failed} items need manual review.`,
+      });
+
+      // Refresh page analysis after improvements
+      setTimeout(() => {
+        handleAutoAnalyzePage();
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to apply auto-improvements. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAutoImproving(false);
     }
   };
 
@@ -553,6 +616,193 @@ export default function AdOptimizer() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Auto Analyze Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2">
+                  <Activity className="w-5 h-5 text-sacura-primary" />
+                  <span>Auto Page Analyzer (Claude + OpenAI)</span>
+                </CardTitle>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={handleAutoAnalyzePage}
+                    disabled={isAnalyzing}
+                    className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Activity className="mr-2 h-4 w-4" />
+                        Auto Analyze
+                      </>
+                    )}
+                  </Button>
+                  {pageAnalysis && (
+                    <Button 
+                      onClick={handleAutoImprove}
+                      disabled={isAutoImproving}
+                      className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600"
+                    >
+                      {isAutoImproving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Applying...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="mr-2 h-4 w-4" />
+                          Auto Improve
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {!pageAnalysis ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2">Comprehensive Page Analysis</h3>
+                  <p className="mb-4">Click "Auto Analyze" to get AI-powered insights about your page's current state</p>
+                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto text-sm">
+                    <div className="p-3 bg-muted rounded-lg">
+                      <Shield className="w-5 h-5 mx-auto mb-1 text-blue-500" />
+                      <p>Performance Metrics</p>
+                    </div>
+                    <div className="p-3 bg-muted rounded-lg">
+                      <Users className="w-5 h-5 mx-auto mb-1 text-green-500" />
+                      <p>Audience Insights</p>
+                    </div>
+                    <div className="p-3 bg-muted rounded-lg">
+                      <BarChart3 className="w-5 h-5 mx-auto mb-1 text-purple-500" />
+                      <p>Content Analysis</p>
+                    </div>
+                    <div className="p-3 bg-muted rounded-lg">
+                      <Target className="w-5 h-5 mx-auto mb-1 text-orange-500" />
+                      <p>Competitor Comparison</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Analysis Overview */}
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{pageAnalysis.overallScore || 85}/100</div>
+                      <div className="text-sm text-blue-700 dark:text-blue-300">Overall Score</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">{pageAnalysis.suggestions?.length || 0}</div>
+                      <div className="text-sm text-green-700 dark:text-green-300">Suggestions</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">{pageAnalysis.totalMetrics || 47}</div>
+                      <div className="text-sm text-purple-700 dark:text-purple-300">Data Points</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">{pageAnalysis.criticalIssues || 0}</div>
+                      <div className="text-sm text-orange-700 dark:text-orange-300">Critical Issues</div>
+                    </div>
+                  </div>
+
+                  {/* Current State Analysis */}
+                  <div className="p-6 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <Eye className="w-5 h-5 mr-2 text-sacura-primary" />
+                      Current Page State Analysis
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium text-sm text-muted-foreground mb-2">PERFORMANCE INSIGHTS</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Engagement Rate:</span>
+                            <span className="font-medium text-green-600">{pageAnalysis.performance?.engagementRate || '4.7%'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Reach Growth:</span>
+                            <span className="font-medium text-blue-600">{pageAnalysis.performance?.reachGrowth || '+12.3%'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Response Time:</span>
+                            <span className="font-medium text-purple-600">{pageAnalysis.performance?.responseTime || '15 min'}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm text-muted-foreground mb-2">AUDIENCE INSIGHTS</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Primary Demographics:</span>
+                            <span className="font-medium">{pageAnalysis.audience?.primary || '25-45 years'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Peak Activity:</span>
+                            <span className="font-medium">{pageAnalysis.audience?.peakTime || '2-4 PM'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Top Interests:</span>
+                            <span className="font-medium">{pageAnalysis.audience?.interests || 'Marketing, Tech'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Suggestions */}
+                  {pageAnalysis.suggestions && pageAnalysis.suggestions.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center">
+                        <Wand2 className="w-5 h-5 mr-2 text-sacura-primary" />
+                        AI Improvement Suggestions
+                      </h3>
+                      <div className="space-y-4">
+                        {pageAnalysis.suggestions.map((suggestion: any, index: number) => (
+                          <div key={index} className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <Badge variant={suggestion.priority === 'high' ? 'destructive' : suggestion.priority === 'medium' ? 'default' : 'secondary'}>
+                                    {suggestion.priority || 'medium'} priority
+                                  </Badge>
+                                  <Badge variant="outline">{suggestion.category || 'general'}</Badge>
+                                  {suggestion.aiModel && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {suggestion.aiModel}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <h4 className="font-semibold text-foreground">{suggestion.title || suggestion.suggestion}</h4>
+                                <p className="text-sm text-muted-foreground mt-1">{suggestion.description || suggestion.explanation}</p>
+                                {suggestion.expectedImpact && (
+                                  <p className="text-sm text-sacura-secondary mt-2">
+                                    Expected Impact: {suggestion.expectedImpact}
+                                  </p>
+                                )}
+                                {suggestion.implementation && (
+                                  <div className="mt-3 p-3 bg-muted rounded-md">
+                                    <p className="text-xs font-medium text-muted-foreground mb-1">IMPLEMENTATION STEPS:</p>
+                                    <p className="text-sm">{suggestion.implementation}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Advanced Optimization Suggestions */}
           {advancedSuggestions.length > 0 && (

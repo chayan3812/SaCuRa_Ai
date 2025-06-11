@@ -180,9 +180,9 @@ Format as detailed analysis focusing on emotional intelligence.`;
 
       // Calculate emotional metrics
       const sentimentScores = recentAnalyses.map(a => 
-        a.sentiment === 'positive' ? 1 : a.sentiment === 'negative' ? -1 : 0
+        a.sentiment === 'positive' ? 1 as const : a.sentiment === 'negative' ? -1 as const : 0 as const
       );
-      const averageSentiment = sentimentScores.reduce((a, b) => a + b, 0) / sentimentScores.length;
+      const averageSentiment = sentimentScores.reduce((a: number, b: number) => a + b, 0) / Math.max(sentimentScores.length, 1);
 
       // Emotion distribution
       const emotionTotals = recentAnalyses.reduce((acc, analysis) => {

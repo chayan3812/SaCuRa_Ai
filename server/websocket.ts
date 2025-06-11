@@ -239,6 +239,11 @@ export class WebSocketService {
       this.io.to(socketId).emit('ai-recommendation', recommendation);
     }
   }
+
+  // Broadcast method for compatibility with other modules
+  public broadcast(event: string, data: any) {
+    this.io.emit(event, data);
+  }
 }
 
 export let websocketService: WebSocketService;

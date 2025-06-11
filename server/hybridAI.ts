@@ -365,15 +365,15 @@ Consensus Response:`;
   }
 
   // Get optimization recommendations
-  getModelOptimizations(): any {
-    const optimizations = [];
+  getModelOptimizations(): any[] {
+    const optimizations: any[] = [];
     
     this.performanceHistory.forEach((history, taskType) => {
       if (history.length >= 5) {
         const avgCost = history.reduce((sum, h) => sum + h.cost, 0) / history.length;
-        const avgTime = history.reduce((sum, h) => sum + h.response.performance.responseTime, 0) / history.length;
-        const avgFeedback = history.filter(h => h.userFeedback).reduce((sum, h) => sum + h.userFeedback, 0) / 
-                           history.filter(h => h.userFeedback).length || 0;
+        const avgTime = history.reduce((sum, h) => sum + h.responseTime, 0) / history.length;
+        const avgFeedback = history.filter(h => h.userFeedback).reduce((sum, h) => sum + (h.userFeedback || 0), 0) / 
+                           Math.max(history.filter(h => h.userFeedback).length, 1);
         
         optimizations.push({
           taskType,

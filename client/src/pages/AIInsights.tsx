@@ -588,7 +588,7 @@ export default function AIInsights() {
         </TabsContent>
       </Tabs>
 
-      {(!insights || insights.length === 0) && !insightsLoading && (
+      {(!insights || (Array.isArray(insights) && insights.length === 0)) && !insightsLoading && (
         <Card>
           <CardContent className="text-center py-12">
             <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />

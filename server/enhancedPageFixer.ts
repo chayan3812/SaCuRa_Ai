@@ -347,7 +347,7 @@ export class EnhancedPageFixer {
       const fbService = new FacebookAPIService(page.accessToken);
       
       // Analyze recent content
-      const posts = await fbService.getPagePosts(page.pageId, 10);
+      const posts = await fbService.getPagePosts(String(page.pageId), 10);
       fixResult.actionsPerformed.push('Analyzed recent post performance');
       
       // Generate content improvements

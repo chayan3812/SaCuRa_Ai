@@ -92,11 +92,14 @@ export default function ContentQueue() {
       const hashtags = data.hashtags?.split(',').map(tag => tag.trim()).filter(Boolean) || [];
       const targetAudience = data.targetAudience ? JSON.parse(data.targetAudience) : null;
       
-      return apiRequest("/api/content-queue", "POST", {
-        ...data,
-        hashtags,
-        targetAudience,
-        scheduledFor: new Date(data.scheduledFor),
+      return apiRequest("/api/content-queue", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          hashtags,
+          targetAudience,
+          scheduledFor: new Date(data.scheduledFor),
+        })
       });
     },
     onSuccess: () => {
@@ -110,10 +113,13 @@ export default function ContentQueue() {
       const hashtags = data.hashtags?.split(',').map(tag => tag.trim()).filter(Boolean) || [];
       const variables = data.variables?.split(',').map(v => v.trim()).filter(Boolean) || [];
       
-      return apiRequest("/api/content-templates", "POST", {
-        ...data,
-        hashtags,
-        variables,
+      return apiRequest("/api/content-templates", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          hashtags,
+          variables,
+        })
       });
     },
     onSuccess: () => {
@@ -126,9 +132,12 @@ export default function ContentQueue() {
     mutationFn: async (data: z.infer<typeof scheduleSchema>) => {
       const timeSlots = JSON.parse(data.timeSlots);
       
-      return apiRequest("/api/posting-schedules", "POST", {
-        ...data,
-        timeSlots,
+      return apiRequest("/api/posting-schedules", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          timeSlots,
+        })
       });
     },
     onSuccess: () => {
@@ -138,7 +147,10 @@ export default function ContentQueue() {
   });
 
   const deletePostMutation = useMutation({
-    mutationFn: (postId: string) => apiRequest(`/api/content-queue/${postId}`, "DELETE"),
+    mutationFn: (postId: string) => apiRequest(`/api/content-queue/${postId}`, {
+      method: "DELETE",
+      body: undefined
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/content-queue"] });
     },
@@ -439,11 +451,11 @@ export default function ContentQueue() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {pages.map((page: any) => (
+                          {Array.isArray(pages) ? pages.map((page: any) => (
                             <SelectItem key={page.id} value={page.id}>
                               {page.name}
                             </SelectItem>
-                          ))}
+                          )) : []}
                         </SelectContent>
                       </Select>
                       <FormMessage />

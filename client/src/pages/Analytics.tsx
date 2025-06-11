@@ -111,7 +111,7 @@ export default function Analytics() {
   });
 
   // Safe access to real-time data
-  const alerts = realtimeData?.alerts || [];
+  const alerts = Array.isArray(realtimeData?.alerts) ? realtimeData.alerts : [];
   const hasAlerts = alerts.length > 0;
 
   const formatCurrency = (value: number) => {

@@ -15,9 +15,11 @@ export default function MetricsCards({ metrics, isLoading }: MetricsCardsProps) 
     }).format(amount);
   };
 
-  const formatTime = (seconds: number) => {
-    if (seconds < 60) return `${seconds.toFixed(1)}s`;
-    return `${(seconds / 60).toFixed(1)}m`;
+  const formatTime = (seconds: number | string) => {
+    const numSeconds = typeof seconds === 'string' ? parseFloat(seconds) : seconds;
+    if (isNaN(numSeconds)) return '0s';
+    if (numSeconds < 60) return `${numSeconds.toFixed(1)}s`;
+    return `${(numSeconds / 60).toFixed(1)}m`;
   };
 
   const cards = [

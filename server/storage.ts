@@ -546,7 +546,7 @@ export class DatabaseStorage implements IStorage {
     const avgResponseResult = await db
       .select({ avgResponseTime: sql<number>`COALESCE(AVG(${customerInteractions.responseTime}), 0)` })
       .from(customerInteractions)
-      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.pageId))
+      .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.id))
       .where(and(
         eq(facebookPages.userId, userId),
         eq(customerInteractions.isAutoResponse, true),

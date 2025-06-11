@@ -661,11 +661,11 @@ export default function AutoPoster() {
                   <div className="space-y-3">
                     <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        {templates.find((t: PostTemplate) => t.id === selectedTemplate)?.description}
+                        {(templates as PostTemplate[]).find((t: PostTemplate) => t.id === selectedTemplate)?.description}
                       </p>
                     </div>
                     
-                    {templates.find((t: PostTemplate) => t.id === selectedTemplate)?.variables.map((variable: string) => (
+                    {(templates as PostTemplate[]).find((t: PostTemplate) => t.id === selectedTemplate)?.variables.map((variable: string) => (
                       <div key={variable}>
                         <Label htmlFor={variable} className="capitalize">
                           {variable.replace(/([A-Z])/g, ' $1').trim()}
@@ -709,15 +709,15 @@ export default function AutoPoster() {
                     <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
                       <h4 className="font-semibold mb-2">Template Structure:</h4>
                       <p className="text-sm whitespace-pre-wrap text-gray-600 dark:text-gray-400">
-                        {templates.find((t: PostTemplate) => t.id === selectedTemplate)?.structure}
+                        {(templates as PostTemplate[]).find((t: PostTemplate) => t.id === selectedTemplate)?.structure}
                       </p>
                     </div>
                     
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-semibold mb-2">Preview with Your Content:</h4>
                       <p className="text-sm whitespace-pre-wrap">
-                        {templates.find((t: PostTemplate) => t.id === selectedTemplate)?.structure
-                          .replace(/{(\w+)}/g, (match, variable) => 
+                        {(templates as PostTemplate[]).find((t: PostTemplate) => t.id === selectedTemplate)?.structure
+                          ?.replace(/{(\w+)}/g, (match: string, variable: string) => 
                             templateVariables[variable] || `{${variable}}`
                           )}
                       </p>
@@ -773,7 +773,7 @@ export default function AutoPoster() {
               </CardContent>
             </Card>
 
-            {pagesQuery.data && pagesQuery.data.length > 0 ? (
+            {pagesQuery.data && Array.isArray(pagesQuery.data) && pagesQuery.data.length > 0 ? (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

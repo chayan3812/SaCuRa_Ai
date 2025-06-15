@@ -4346,7 +4346,7 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/marketing/campaigns/:adAccountId', isAuthenticated, async (req, res) => {
+  app.get('/api/marketing/campaigns/:adAccountId', async (req, res) => {
     try {
       const { adAccountId } = req.params;
       const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
@@ -4367,7 +4367,7 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/marketing/campaign-report/:adAccountId', isAuthenticated, async (req, res) => {
+  app.get('/api/marketing/campaign-report/:adAccountId', async (req, res) => {
     try {
       const { adAccountId } = req.params;
       const { since, until } = req.query;
@@ -4475,7 +4475,7 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/marketing/interest-suggestions', isAuthenticated, async (req, res) => {
+  app.get('/api/marketing/interest-suggestions', async (req, res) => {
     try {
       const { query, limit } = req.query;
       const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
@@ -4507,7 +4507,7 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/marketing/validate-token', isAuthenticated, async (req, res) => {
+  app.get('/api/marketing/validate-token', async (req, res) => {
     try {
       const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
       const validation = await facebookMarketingAPI.validateMarketingAPIToken();

@@ -456,12 +456,21 @@ export class FacebookMarketingAPIService {
     expiresAt?: number;
   }> {
     try {
+      // First test basic user info endpoint
       const endpoint = '/me?fields=id,name';
       const response = await this.makeMarketingAPIRequest(endpoint);
       
-      // Get token info
-      const tokenEndpoint = `/debug_token?input_token=${this.marketingToken}`;
-      const tokenInfo = await this.makeMarketingAPIRequest(tokenEndpoint);
+      // Get token info using app access token for debug_token
+      const appAccessToken = `${this.appId}|${this.appSecret}`;
+      const appSecretProof = facebookAppAuth.generateAppSecretProof(appAccessToken);
+      
+      const debugUrl = `${this.baseUrl}/debug_token?input_token=${this.marketingToken}&access_token=${appAccessToken}&appsecret_proof=${appSecretProof}`;
+      const debugResponse = await fetch(debugUrl);
+      const tokenInfo = await debugResponse.json();
+      
+      if (tokenInfo.error) {
+        throw new Error(`Token debug failed: ${tokenInfo.error.message}`);
+      }
       
       return {
         isValid: true,

@@ -51,6 +51,15 @@ import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for deployment verification
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      service: 'SaCuRa AI Platform'
+    });
+  });
+
   // Facebook webhook routes (must be before auth middleware)
   const facebookWebhookRouter = await import('./webhooks/facebook');
   app.use('/webhook/facebook', facebookWebhookRouter.default);

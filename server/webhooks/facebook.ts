@@ -11,7 +11,8 @@ const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || "sacura_ai_webhook_token_202
 
 // Facebook webhook verification (GET request)
 router.get("/", (req, res) => {
-  console.log("Facebook webhook verification request received");
+  console.log("Facebook webhook verification request received from:", req.ip);
+  console.log("Request headers:", req.headers);
   
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -19,6 +20,12 @@ router.get("/", (req, res) => {
 
   console.log("Facebook webhook verification:", { mode, token, challenge });
   console.log("Expected token:", VERIFY_TOKEN);
+
+  // Set proper headers for Facebook
+  res.set({
+    'Content-Type': 'text/plain',
+    'Cache-Control': 'no-cache'
+  });
 
   if (mode === "subscribe" && token === VERIFY_TOKEN) {
     console.log("Webhook verification successful");
@@ -30,7 +37,7 @@ router.get("/", (req, res) => {
       receivedToken: token,
       expectedToken: VERIFY_TOKEN
     });
-    return res.sendStatus(403);
+    return res.status(403).send("Verification failed");
   }
 });
 

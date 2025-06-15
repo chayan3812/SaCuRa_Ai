@@ -799,3 +799,128 @@ Return as a JSON array of content theme strings.`;
     return [];
   }
 }
+
+// SmartInboxAI Functions
+export async function classifyCustomerMessage(message: string): Promise<string> {
+  if (!message || message.trim() === '') {
+    return 'Unknown';
+  }
+
+  const prompt = `Classify this customer message into one of these categories: Question, Complaint, Urgent Issue, Positive Feedback, Product Inquiry, Support Request, Billing Issue, Feature Request, Bug Report, or General.
+
+Message: "${message}"
+
+Return only the classification category.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a customer service classification expert. Analyze messages and categorize them accurately based on customer intent and urgency." 
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 50,
+    });
+
+    const classification = response.choices[0].message.content?.trim() || 'General';
+    return classification;
+  } catch (error) {
+    console.error('Error classifying customer message:', error);
+    return 'General';
+  }
+}
+
+export async function calculateUrgencyScore(message: string, classification: string): Promise<number> {
+  if (!message || message.trim() === '') {
+    return 0;
+  }
+
+  const prompt = `Rate the urgency of this customer message on a scale of 0-100, where:
+- 0-25: Low urgency (general inquiries, positive feedback)
+- 26-50: Medium urgency (product questions, feature requests)
+- 51-75: High urgency (complaints, billing issues)
+- 76-100: Critical urgency (urgent issues, angry customers, system problems)
+
+Message: "${message}"
+Classification: ${classification}
+
+Return only the urgency score as a number.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { 
+          role: "system", 
+          content: "You are an expert at assessing customer service urgency. Analyze messages and provide accurate urgency scores." 
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 10,
+    });
+
+    const scoreText = response.choices[0].message.content?.trim() || '0';
+    const score = parseInt(scoreText, 10);
+    return Math.max(0, Math.min(100, isNaN(score) ? 0 : score));
+  } catch (error) {
+    console.error('Error calculating urgency score:', error);
+    return 0;
+  }
+}
+
+export async function suggestReply(message: string, classification: string): Promise<string[]> {
+  if (!message || message.trim() === '') {
+    return [];
+  }
+
+  const prompt = `Generate 2-3 professional, helpful reply suggestions for this customer message. Make them contextually appropriate for the classification type.
+
+Message: "${message}"
+Classification: ${classification}
+
+Requirements:
+- Be helpful and professional
+- Address the customer's specific concern
+- Vary the tone (formal, friendly, empathetic)
+- Keep responses concise but complete
+
+Return as a JSON array of reply strings.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a customer service expert. Generate professional, helpful reply suggestions that address customer concerns effectively." 
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.6,
+    });
+
+    const content = response.choices[0].message.content || '{"replies": []}';
+    const parsed = JSON.parse(content);
+    const replies = parsed.replies || parsed || [];
+    
+    return Array.isArray(replies) ? replies.slice(0, 3) : [];
+  } catch (error) {
+    console.error('Error generating reply suggestions:', error);
+    return [];
+  }
+}

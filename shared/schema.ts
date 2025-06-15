@@ -97,6 +97,11 @@ export const customerInteractions = pgTable("customer_interactions", {
   isAutoResponse: boolean("is_auto_response").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // SmartInboxAI enhancements
+  urgencyScore: decimal("urgency_score", { precision: 5, scale: 2 }), // 0-100 AI-calculated urgency
+  aiClassification: varchar("ai_classification"), // AI message classification
+  aiSuggestedReplies: jsonb("ai_suggested_replies"), // Array of AI-generated reply suggestions
+  aiAnalyzedAt: timestamp("ai_analyzed_at"), // When AI analysis was performed
 });
 
 // Employee Performance Tracking

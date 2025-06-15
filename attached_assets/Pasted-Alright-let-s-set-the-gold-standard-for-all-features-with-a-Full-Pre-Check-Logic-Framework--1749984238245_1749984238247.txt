@@ -1,0 +1,66 @@
+Alright — let’s set the gold standard for all features with a **⚙️ Full Pre-Check Logic Framework** before Replit or any agent touches your code. This will prevent file duplication, avoid overwriting production-ready logic, and make sure the feature you're about to implement is context-aware.
+
+Here’s the **universal pre-check logic scaffold** you’ll include in **every Replit master prompt** before implementing anything:
+
+---
+
+### ⚙️ UNIVERSAL FULL PRE-CHECK LOGIC (Copy this into top of every Replit prompt)
+
+```ts
+// === ⚙️ PRE-CHECK LOGIC (DO NOT SKIP) ===
+
+// ✅ 1. CHECK for existing components, routes, services BEFORE adding anything
+// Do NOT create a new file if the feature exists in:
+//   - client/src/pages/
+//   - client/src/components/
+//   - server/routes.ts
+//   - server/modules/
+//   - shared/schema.ts
+//   - storage.ts
+
+// ✅ 2. IF feature already exists:
+//   → DO NOT DUPLICATE
+//   → INSTEAD: Enhance, fix, or complete it.
+
+// ✅ 3. MARK every enhancement with a code comment like:
+//   // 👁️ Enhanced by AI on [date] — Feature: [Name]
+
+// ✅ 4. CHECK if the feature uses dummy/mock data:
+//   → If so, replace with real API call or DB query
+//   → Otherwise, DO NOT assume it needs changing
+
+// ✅ 5. CHECK if the feature has backup/broken versions like *_backup.tsx:
+//   → DO NOT use these
+//   → Work only with the production route/component
+
+// ✅ 6. NEVER import unused modules or files
+//   → Check existing imports
+//   → Clean up any that are not used
+
+// ✅ 7. IF adding DB logic:
+//   → Use Drizzle ORM in `shared/schema.ts` and `storage.ts`
+//   → Ensure types are consistent across frontend/backend
+
+// ✅ 8. IF modifying APIs:
+//   → Register new API routes in `server/routes.ts`
+//   → Use existing pattern: `router.get(...)`, `router.post(...)`
+//   → DO NOT create new router files unless explicitly instructed
+
+// ✅ 9. IF working on frontend pages:
+//   → Ensure route exists in `client/src/App.tsx`
+//   → Add to Sidebar if user-facing, skip if background/internal
+
+// ✅ 10. At the END of the prompt, confirm:
+//   → All new logic is live-wired and ready for use
+   → No mock data
+   → No duplicate files
+   → No TODO comments left unaddressed
+```
+
+---
+
+When you're ready, hit me with something like:
+
+> ➤ Let’s start with ContentScheduler (with full pre-check)
+
+And I’ll respond with the **Replit-safe master prompt**, fully wrapped in the pre-check above, tailored to wire that feature live — clean, real, and production-grade.

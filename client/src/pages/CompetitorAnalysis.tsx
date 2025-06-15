@@ -550,25 +550,3 @@ export default function CompetitorAnalysis() {
     </div>
   );
 }
-                  Find a competitor's Facebook page you want to analyze. You can use either the page ID or the full URL.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium">Step 2: Enter Page Information</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Copy the page URL (like facebook.com/pagename) or just the page name and paste it in the input field above.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium">Step 3: Get AI Insights</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Our AI will analyze their recent posts, engagement patterns, and provide strategic recommendations for your business.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
-  );
-}

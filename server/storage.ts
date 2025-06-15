@@ -741,13 +741,57 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllActiveCompetitorPages(): Promise<{ pageId: string; pageName: string }[]> {
-    return await db
+    const competitors = await db
       .select({
         pageId: watchedCompetitors.pageId,
         pageName: watchedCompetitors.pageName
       })
       .from(watchedCompetitors)
       .where(eq(watchedCompetitors.isActive, true));
+    
+    return competitors.map(c => ({
+      pageId: c.pageId,
+      pageName: c.pageName || ''
+    }));
+  }
+
+  // ContentScheduler storage methods
+  async getPostsDueForPublishing(now: Date = new Date()): Promise<any[]> {
+    const posts = await db
+      .select()
+      .from(contentQueue)
+      .where(
+        and(
+          eq(contentQueue.status, 'scheduled'),
+          lte(contentQueue.scheduledFor, now)
+        )
+      );
+    return posts;
+  }
+
+  async markPostAsPublished(id: string, facebookPostId?: string): Promise<void> {
+    await db
+      .update(contentQueue)
+      .set({
+        status: 'published',
+        publishedAt: new Date(),
+        ...(facebookPostId && { externalPostId: facebookPostId })
+      })
+      .where(eq(contentQueue.id, id));
+  }
+
+  async createScheduledPost(postData: any): Promise<any> {
+    const [post] = await db
+      .insert(contentQueue)
+      .values(postData)
+      .returning();
+    return post;
+  }
+
+  async deleteScheduledPost(id: string): Promise<void> {
+    await db
+      .delete(contentQueue)
+      .where(eq(contentQueue.id, id));
   }
 }
 

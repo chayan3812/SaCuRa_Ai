@@ -302,6 +302,90 @@ export default function AdOptimizer() {
         </CardContent>
       </Card>
 
+      {/* Competitor Keywords Integration */}
+      {competitorKeywords.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-purple-600" />
+              AI-Enhanced Targeting from Competitor Analysis
+            </CardTitle>
+            <CardDescription>
+              Keywords extracted from competitor analysis - use these high-performing terms to enhance your ad targeting
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {competitorKeywords.slice(0, 10).map((keyword, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors"
+                    onClick={() => {
+                      navigator.clipboard.writeText(keyword);
+                      toast({
+                        title: "Keyword Copied",
+                        description: `"${keyword}" copied for ad targeting`,
+                      });
+                    }}
+                  >
+                    {keyword}
+                  </Badge>
+                ))}
+                {competitorKeywords.length > 10 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{competitorKeywords.length - 10} more
+                  </Badge>
+                )}
+              </div>
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                <h4 className="font-medium text-sm text-purple-900 dark:text-purple-100 mb-2">
+                  AI Targeting Suggestions:
+                </h4>
+                <ul className="text-sm text-purple-800 dark:text-purple-200 space-y-1">
+                  <li>• Use these keywords in your ad copy for better relevance</li>
+                  <li>• Target audiences interested in: {competitorKeywords.slice(0, 3).join(', ')}</li>
+                  <li>• Create lookalike audiences based on competitor engagement</li>
+                  <li>• Optimize bid strategies for high-frequency competitor terms</li>
+                </ul>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const keywordText = competitorKeywords.join(', ');
+                    navigator.clipboard.writeText(keywordText);
+                    toast({
+                      title: "All Keywords Copied",
+                      description: "Competitor keywords copied for campaign targeting",
+                    });
+                  }}
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy All Keywords
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.removeItem('competitorKeywords');
+                    setCompetitorKeywords([]);
+                    toast({
+                      title: "Keywords Cleared",
+                      description: "Competitor keywords removed from targeting",
+                    });
+                  }}
+                >
+                  Clear Keywords
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* AI-Generated Ad Copy */}
       {adCopy && (
         <Card>

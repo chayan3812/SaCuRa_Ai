@@ -73,7 +73,7 @@ async function handleMessage(event: any) {
     if (!facebookPage) {
       // Create a default Facebook page entry for webhook messages
       facebookPage = await storage.createFacebookPage({
-        userId: 'system', // System user for webhook messages
+        userId: 'system-webhook-user', // System user for webhook messages
         pageId: recipientId,
         pageName: 'Facebook Messenger',
         accessToken: 'webhook_token',

@@ -87,20 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               console.log(`Message from ${senderId}: ${messageText}`);
               
-              // Store the interaction in database
-              try {
-                await storage.createCustomerInteraction({
-                  pageId: 'facebook_messenger',
-                  customerId: senderId,
-                  customerName: 'Facebook User',
-                  message: messageText,
-                  sentiment: 'neutral',
-                  priority: 'medium',
-                  status: 'new'
-                });
-              } catch (error) {
-                console.error("Error storing message:", error);
-              }
+              // Message processing is handled by the webhook module
             }
           });
         });

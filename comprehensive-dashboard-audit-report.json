@@ -1,0 +1,1168 @@
+{
+  "timestamp": "2025-06-15T20:12:39.621Z",
+  "summary": {
+    "totalTests": 63,
+    "totalPassed": 34,
+    "totalFailed": 29,
+    "overallHealth": 53.96825396825397
+  },
+  "categories": {
+    "database": {
+      "passed": 5,
+      "failed": 7,
+      "total": 12,
+      "healthScore": 41.66666666666667,
+      "issues": [
+        {
+          "test": "Schema Structure Incomplete",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Missing tables: aiTrainingData, campaignPerformance, notifications",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.276Z"
+        },
+        {
+          "test": "Database Relations",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Missing table relations",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.277Z"
+        },
+        {
+          "test": "Data Integrity Check",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Data validation failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.392Z"
+        },
+        {
+          "test": "Performance - /api/dashboard/metrics",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Performance test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.395Z"
+        },
+        {
+          "test": "Performance - /api/customer-service/interactions/all",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Performance test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.397Z"
+        },
+        {
+          "test": "Performance - /api/ai/learning-metrics",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Performance test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.401Z"
+        },
+        {
+          "test": "Performance - /api/notifications",
+          "category": "database",
+          "status": "FAIL",
+          "details": "Performance test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.408Z"
+        }
+      ]
+    },
+    "backend": {
+      "passed": 17,
+      "failed": 2,
+      "total": 19,
+      "healthScore": 89.47368421052632,
+      "issues": [
+        {
+          "test": "Server File - server/index.ts",
+          "category": "backend",
+          "status": "FAIL",
+          "details": "File missing or invalid",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.409Z"
+        },
+        {
+          "test": "CORS Middleware",
+          "category": "backend",
+          "status": "FAIL",
+          "details": "CORS not configured",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.442Z"
+        }
+      ]
+    },
+    "frontend": {
+      "passed": 8,
+      "failed": 4,
+      "total": 12,
+      "healthScore": 66.66666666666666,
+      "issues": [
+        {
+          "test": "Component - client/src/components/dashboard/LiveSystemStatus.tsx",
+          "category": "frontend",
+          "status": "FAIL",
+          "details": "Component structure issues",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.450Z"
+        },
+        {
+          "test": "Component - client/src/components/dashboard/AIRecommendations.tsx",
+          "category": "frontend",
+          "status": "FAIL",
+          "details": "Component structure issues",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.451Z"
+        },
+        {
+          "test": "Component - client/src/lib/queryClient.ts",
+          "category": "frontend",
+          "status": "FAIL",
+          "details": "Component structure issues",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.451Z"
+        },
+        {
+          "test": "Error Handling UI",
+          "category": "frontend",
+          "status": "FAIL",
+          "details": "Missing error handling",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.454Z"
+        }
+      ]
+    },
+    "integration": {
+      "passed": 0,
+      "failed": 8,
+      "total": 8,
+      "healthScore": 0,
+      "issues": [
+        {
+          "test": "Dashboard Metrics Flow",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Integration test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.457Z"
+        },
+        {
+          "test": "AI Learning Metrics Flow",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Integration test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.459Z"
+        },
+        {
+          "test": "Customer Interactions Flow",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Integration test failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.460Z"
+        },
+        {
+          "test": "Response Format - /api/dashboard/metrics",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Format validation failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.463Z"
+        },
+        {
+          "test": "Response Format - /api/notifications",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Format validation failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.464Z"
+        },
+        {
+          "test": "Response Format - /api/ai/learning-metrics",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Format validation failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.466Z"
+        },
+        {
+          "test": "404 Error Handling",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "404 endpoint returned 200",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.471Z"
+        },
+        {
+          "test": "Data Consistency",
+          "category": "integration",
+          "status": "FAIL",
+          "details": "Consistency check failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.491Z"
+        }
+      ]
+    },
+    "performance": {
+      "passed": 1,
+      "failed": 2,
+      "total": 3,
+      "healthScore": 33.33333333333333,
+      "issues": [
+        {
+          "test": "Concurrent Request Handling",
+          "category": "performance",
+          "status": "FAIL",
+          "details": "0% success rate, 13ms total time",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.568Z"
+        },
+        {
+          "test": "Caching Validation",
+          "category": "performance",
+          "status": "FAIL",
+          "details": "Caching check failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.572Z"
+        }
+      ]
+    },
+    "security": {
+      "passed": 3,
+      "failed": 6,
+      "total": 9,
+      "healthScore": 33.33333333333333,
+      "issues": [
+        {
+          "test": "Input Validation - XSS Script",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Server returned 200 for malicious input",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.578Z"
+        },
+        {
+          "test": "Input Validation - SQL Injection",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Server returned 200 for malicious input",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.588Z"
+        },
+        {
+          "test": "Input Validation - Large Payload",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Server returned 200 for malicious input",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.597Z"
+        },
+        {
+          "test": "Authentication - /api/admin",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Protected endpoint returned 200",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.603Z"
+        },
+        {
+          "test": "Authentication - /api/protected",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Protected endpoint returned 200",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.609Z"
+        },
+        {
+          "test": "Security Headers",
+          "category": "security",
+          "status": "FAIL",
+          "details": "Security headers check failed: Request failed with status code 401",
+          "evidence": null,
+          "timestamp": "2025-06-15T20:12:39.621Z"
+        }
+      ]
+    }
+  },
+  "criticalIssues": [
+    {
+      "category": "database",
+      "test": "Schema Structure Incomplete",
+      "details": "Missing tables: aiTrainingData, campaignPerformance, notifications",
+      "timestamp": "2025-06-15T20:12:39.276Z"
+    },
+    {
+      "category": "database",
+      "test": "Database Relations",
+      "details": "Missing table relations",
+      "timestamp": "2025-06-15T20:12:39.277Z"
+    },
+    {
+      "category": "database",
+      "test": "Data Integrity Check",
+      "details": "Data validation failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.392Z"
+    },
+    {
+      "category": "database",
+      "test": "Performance - /api/dashboard/metrics",
+      "details": "Performance test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.395Z"
+    },
+    {
+      "category": "database",
+      "test": "Performance - /api/customer-service/interactions/all",
+      "details": "Performance test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.397Z"
+    },
+    {
+      "category": "database",
+      "test": "Performance - /api/ai/learning-metrics",
+      "details": "Performance test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.401Z"
+    },
+    {
+      "category": "database",
+      "test": "Performance - /api/notifications",
+      "details": "Performance test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.408Z"
+    },
+    {
+      "category": "backend",
+      "test": "Server File - server/index.ts",
+      "details": "File missing or invalid",
+      "timestamp": "2025-06-15T20:12:39.409Z"
+    },
+    {
+      "category": "backend",
+      "test": "CORS Middleware",
+      "details": "CORS not configured",
+      "timestamp": "2025-06-15T20:12:39.442Z"
+    },
+    {
+      "category": "frontend",
+      "test": "Component - client/src/components/dashboard/LiveSystemStatus.tsx",
+      "details": "Component structure issues",
+      "timestamp": "2025-06-15T20:12:39.450Z"
+    },
+    {
+      "category": "frontend",
+      "test": "Component - client/src/components/dashboard/AIRecommendations.tsx",
+      "details": "Component structure issues",
+      "timestamp": "2025-06-15T20:12:39.451Z"
+    },
+    {
+      "category": "frontend",
+      "test": "Component - client/src/lib/queryClient.ts",
+      "details": "Component structure issues",
+      "timestamp": "2025-06-15T20:12:39.451Z"
+    },
+    {
+      "category": "frontend",
+      "test": "Error Handling UI",
+      "details": "Missing error handling",
+      "timestamp": "2025-06-15T20:12:39.454Z"
+    },
+    {
+      "category": "integration",
+      "test": "Dashboard Metrics Flow",
+      "details": "Integration test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.457Z"
+    },
+    {
+      "category": "integration",
+      "test": "AI Learning Metrics Flow",
+      "details": "Integration test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.459Z"
+    },
+    {
+      "category": "integration",
+      "test": "Customer Interactions Flow",
+      "details": "Integration test failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.460Z"
+    },
+    {
+      "category": "integration",
+      "test": "Response Format - /api/dashboard/metrics",
+      "details": "Format validation failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.463Z"
+    },
+    {
+      "category": "integration",
+      "test": "Response Format - /api/notifications",
+      "details": "Format validation failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.464Z"
+    },
+    {
+      "category": "integration",
+      "test": "Response Format - /api/ai/learning-metrics",
+      "details": "Format validation failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.466Z"
+    },
+    {
+      "category": "integration",
+      "test": "404 Error Handling",
+      "details": "404 endpoint returned 200",
+      "timestamp": "2025-06-15T20:12:39.471Z"
+    },
+    {
+      "category": "integration",
+      "test": "Data Consistency",
+      "details": "Consistency check failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.491Z"
+    },
+    {
+      "category": "performance",
+      "test": "Concurrent Request Handling",
+      "details": "0% success rate, 13ms total time",
+      "timestamp": "2025-06-15T20:12:39.568Z"
+    },
+    {
+      "category": "performance",
+      "test": "Caching Validation",
+      "details": "Caching check failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.572Z"
+    },
+    {
+      "category": "security",
+      "test": "Input Validation - XSS Script",
+      "details": "Server returned 200 for malicious input",
+      "timestamp": "2025-06-15T20:12:39.578Z"
+    },
+    {
+      "category": "security",
+      "test": "Input Validation - SQL Injection",
+      "details": "Server returned 200 for malicious input",
+      "timestamp": "2025-06-15T20:12:39.588Z"
+    },
+    {
+      "category": "security",
+      "test": "Input Validation - Large Payload",
+      "details": "Server returned 200 for malicious input",
+      "timestamp": "2025-06-15T20:12:39.597Z"
+    },
+    {
+      "category": "security",
+      "test": "Authentication - /api/admin",
+      "details": "Protected endpoint returned 200",
+      "timestamp": "2025-06-15T20:12:39.603Z"
+    },
+    {
+      "category": "security",
+      "test": "Authentication - /api/protected",
+      "details": "Protected endpoint returned 200",
+      "timestamp": "2025-06-15T20:12:39.609Z"
+    },
+    {
+      "category": "security",
+      "test": "Security Headers",
+      "details": "Security headers check failed: Request failed with status code 401",
+      "timestamp": "2025-06-15T20:12:39.621Z"
+    }
+  ],
+  "recommendations": [
+    "System health is below acceptable threshold. Immediate attention required.",
+    "Database layer requires optimization and error handling improvements.",
+    "Security layer needs strengthening. Review input validation and authentication.",
+    "Performance optimization needed. Consider caching and response time improvements."
+  ],
+  "detailedLog": [
+    {
+      "timestamp": "2025-06-15T20:12:39.272Z",
+      "category": "audit",
+      "severity": "normal",
+      "message": "🚀 STARTING COMPREHENSIVE DASHBOARD AUDIT 🚀",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.275Z",
+      "category": "audit",
+      "severity": "normal",
+      "message": "This audit will examine every layer from database to frontend",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.275Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "=== PHASE 1: DATABASE LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.275Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Analyzing database schema structure...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.276Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Schema Structure Incomplete: FAIL - Missing tables: aiTrainingData, campaignPerformance, notifications",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.277Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Database Relations: FAIL - Missing table relations",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.277Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Testing database connectivity...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.329Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Database Connection: PASS - Database connection successful",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.329Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Testing database CRUD operations...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.360Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Database CREATE: PASS - POST /api/test/create-user returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.372Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Database READ: PASS - GET /api/users returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.378Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Database UPDATE: PASS - PUT /api/test/update-user returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.387Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Database DELETE: PASS - DELETE /api/test/delete-user returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.387Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Validating data integrity...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.392Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Data Integrity Check: FAIL - Data validation failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.392Z",
+      "category": "database",
+      "severity": "normal",
+      "message": "Analyzing database performance...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.395Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Performance - /api/dashboard/metrics: FAIL - Performance test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.397Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Performance - /api/customer-service/interactions/all: FAIL - Performance test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.401Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Performance - /api/ai/learning-metrics: FAIL - Performance test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.408Z",
+      "category": "database",
+      "severity": "critical",
+      "message": "Performance - /api/notifications: FAIL - Performance test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.408Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "=== PHASE 2: BACKEND LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.408Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Analyzing server architecture...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.409Z",
+      "category": "backend",
+      "severity": "critical",
+      "message": "Server File - server/index.ts: FAIL - File missing or invalid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.411Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Server File - server/routes.ts: PASS - File structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.412Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Server File - server/storage.ts: PASS - File structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.412Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Server File - server/db.ts: PASS - File structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.413Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Server File - server/facebookAPI.ts: PASS - File structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.413Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Server File - server/openaiService.ts: PASS - File structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.413Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Verifying API endpoints...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.415Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/dashboard/metrics: PASS - GET error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.417Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/customer-service/interactions/all: PASS - GET error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.419Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/ai/learning-metrics: PASS - GET error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.421Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/notifications: PASS - GET error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.423Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/facebook/pages: PASS - GET error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.428Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/ai/suggestions: PASS - POST returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.434Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "API Endpoint - /api/feedback/submit: PASS - POST error: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.435Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Testing route handlers...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.438Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Route Error Handling: PASS - Routes have error handling",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.438Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Input Validation: PASS - Input validation present",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.438Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Validating middleware...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.442Z",
+      "category": "backend",
+      "severity": "critical",
+      "message": "CORS Middleware: FAIL - CORS not configured",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.446Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "JSON Middleware: PASS - JSON parsing working",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.447Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Checking service integrations...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.447Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "OpenAI Integration: PASS - OpenAI service configured",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.448Z",
+      "category": "backend",
+      "severity": "normal",
+      "message": "Facebook API Integration: PASS - Facebook API configured",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.448Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "=== PHASE 3: FRONTEND LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.448Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Analyzing component structure...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.449Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Component - client/src/pages/Dashboard.tsx: PASS - Component structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.449Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Component - client/src/components/dashboard/QuickActions.tsx: PASS - Component structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.450Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Component - client/src/components/dashboard/AdvancedAnalyticsChart.tsx: PASS - Component structure valid",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.450Z",
+      "category": "frontend",
+      "severity": "critical",
+      "message": "Component - client/src/components/dashboard/LiveSystemStatus.tsx: FAIL - Component structure issues",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.451Z",
+      "category": "frontend",
+      "severity": "critical",
+      "message": "Component - client/src/components/dashboard/AIRecommendations.tsx: FAIL - Component structure issues",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.451Z",
+      "category": "frontend",
+      "severity": "critical",
+      "message": "Component - client/src/lib/queryClient.ts: FAIL - Component structure issues",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.452Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Validating frontend routing...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.452Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Frontend Routing: PASS - Routing configured",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.452Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Testing state management...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.453Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "State Management - React Query: PASS - React Query configured",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.453Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Checking UI components...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.453Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "UI Components Coverage: PASS - 100.0% UI components available",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.454Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Validating data flow...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.454Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Data Fetching: PASS - Data fetching implemented",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.454Z",
+      "category": "frontend",
+      "severity": "critical",
+      "message": "Error Handling UI: FAIL - Missing error handling",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.454Z",
+      "category": "frontend",
+      "severity": "normal",
+      "message": "Loading States: PASS - Loading states implemented",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.454Z",
+      "category": "integration",
+      "severity": "normal",
+      "message": "=== PHASE 4: INTEGRATION LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.455Z",
+      "category": "integration",
+      "severity": "normal",
+      "message": "Testing frontend-backend integration...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.457Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Dashboard Metrics Flow: FAIL - Integration test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.459Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "AI Learning Metrics Flow: FAIL - Integration test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.460Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Customer Interactions Flow: FAIL - Integration test failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.461Z",
+      "category": "integration",
+      "severity": "normal",
+      "message": "Validating API response formats...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.463Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Response Format - /api/dashboard/metrics: FAIL - Format validation failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.464Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Response Format - /api/notifications: FAIL - Format validation failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.466Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Response Format - /api/ai/learning-metrics: FAIL - Format validation failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.466Z",
+      "category": "integration",
+      "severity": "normal",
+      "message": "Testing error propagation...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.471Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "404 Error Handling: FAIL - 404 endpoint returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.483Z",
+      "category": "integration",
+      "severity": "normal",
+      "message": "Checking data consistency...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.491Z",
+      "category": "integration",
+      "severity": "critical",
+      "message": "Data Consistency: FAIL - Consistency check failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.491Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "=== PHASE 5: PERFORMANCE LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.491Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "Analyzing response times...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.551Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "Testing concurrent request handling...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.568Z",
+      "category": "performance",
+      "severity": "critical",
+      "message": "Concurrent Request Handling: FAIL - 0% success rate, 13ms total time",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.568Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "Checking memory usage patterns...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.570Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "Memory Optimization: PASS - Memory optimization patterns found",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.570Z",
+      "category": "performance",
+      "severity": "normal",
+      "message": "Validating caching mechanisms...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.572Z",
+      "category": "performance",
+      "severity": "critical",
+      "message": "Caching Validation: FAIL - Caching check failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.573Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "=== PHASE 6: SECURITY LAYER DEEP ANALYSIS ===",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.573Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "Checking input validation...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.578Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Input Validation - XSS Script: FAIL - Server returned 200 for malicious input",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.588Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Input Validation - SQL Injection: FAIL - Server returned 200 for malicious input",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.597Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Input Validation - Large Payload: FAIL - Server returned 200 for malicious input",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.597Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "Validating authentication mechanisms...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.603Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Authentication - /api/admin: FAIL - Protected endpoint returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.609Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Authentication - /api/protected: FAIL - Protected endpoint returned 200",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.609Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "Testing SQL injection protection...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.614Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "SQL Injection Protection: PASS - SQL payload handled safely: 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.616Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "SQL Injection Protection: PASS - SQL payload handled safely: 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.619Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "SQL Injection Protection: PASS - SQL payload handled safely: 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.619Z",
+      "category": "security",
+      "severity": "normal",
+      "message": "Checking security headers...",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.621Z",
+      "category": "security",
+      "severity": "critical",
+      "message": "Security Headers: FAIL - Security headers check failed: Request failed with status code 401",
+      "component": "audit"
+    },
+    {
+      "timestamp": "2025-06-15T20:12:39.621Z",
+      "category": "audit",
+      "severity": "normal",
+      "message": "=== GENERATING COMPREHENSIVE AUDIT REPORT ===",
+      "component": "audit"
+    }
+  ]
+}

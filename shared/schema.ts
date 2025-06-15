@@ -249,6 +249,59 @@ export const contentQueue = pgTable("content_queue", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// AI Training Data - Missing table identified in audit
+export const aiTrainingData = pgTable("ai_training_data", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  inputData: jsonb("input_data").notNull(),
+  expectedOutput: jsonb("expected_output").notNull(),
+  actualOutput: jsonb("actual_output"),
+  accuracy: decimal("accuracy", { precision: 5, scale: 4 }),
+  trainingType: varchar("training_type").notNull(), // 'engagement', 'interaction', 'content'
+  modelVersion: varchar("model_version"),
+  isValidated: boolean("is_validated").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Campaign Performance - Missing table identified in audit
+export const campaignPerformance = pgTable("campaign_performance", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  campaignId: varchar("campaign_id").notNull(),
+  campaignName: varchar("campaign_name").notNull(),
+  adAccountId: uuid("ad_account_id").notNull().references(() => facebookAdAccounts.id),
+  spend: decimal("spend", { precision: 10, scale: 2 }).default("0"),
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  conversions: integer("conversions").default(0),
+  reach: integer("reach").default(0),
+  frequency: decimal("frequency", { precision: 5, scale: 2 }),
+  cpm: decimal("cpm", { precision: 10, scale: 2 }),
+  cpc: decimal("cpc", { precision: 10, scale: 2 }),
+  ctr: decimal("ctr", { precision: 5, scale: 4 }),
+  conversionRate: decimal("conversion_rate", { precision: 5, scale: 4 }),
+  roas: decimal("roas", { precision: 10, scale: 2 }),
+  qualityScore: integer("quality_score"),
+  dateStart: timestamp("date_start").notNull(),
+  dateEnd: timestamp("date_end").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Notifications - Missing table identified in audit  
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  type: varchar("type").notNull(), // 'campaign', 'performance', 'alert', 'system'
+  priority: varchar("priority").notNull().default("medium"), // 'low', 'medium', 'high', 'urgent'
+  status: varchar("status").notNull().default("unread"), // 'unread', 'read', 'archived'
+  actionUrl: varchar("action_url"),
+  metadata: jsonb("metadata"),
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const contentTemplates = pgTable("content_templates", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: varchar("user_id").notNull(),
@@ -297,6 +350,73 @@ export const postingSchedules = pgTable("posting_schedules", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Database Relations - Required for audit compliance
+import { relations } from "drizzle-orm";
+
+export const usersRelations = relations(users, ({ many }) => ({
+  facebookPages: many(facebookPages),
+  facebookAdAccounts: many(facebookAdAccounts),
+  notifications: many(notifications),
+  aiTrainingData: many(aiTrainingData),
+  aiRecommendations: many(aiRecommendations),
+  watchedCompetitors: many(watchedCompetitors),
+  competitorData: many(competitorData),
+}));
+
+export const facebookPagesRelations = relations(facebookPages, ({ one, many }) => ({
+  user: one(users, {
+    fields: [facebookPages.userId],
+    references: [users.id],
+  }),
+  customerInteractions: many(customerInteractions),
+  restrictionAlerts: many(restrictionAlerts),
+}));
+
+export const facebookAdAccountsRelations = relations(facebookAdAccounts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [facebookAdAccounts.userId],
+    references: [users.id],
+  }),
+  adMetrics: many(adMetrics),
+  campaignPerformance: many(campaignPerformance),
+  restrictionAlerts: many(restrictionAlerts),
+}));
+
+export const customerInteractionsRelations = relations(customerInteractions, ({ one }) => ({
+  facebookPage: one(facebookPages, {
+    fields: [customerInteractions.pageId],
+    references: [facebookPages.id],
+  }),
+}));
+
+export const adMetricsRelations = relations(adMetrics, ({ one }) => ({
+  facebookAdAccount: one(facebookAdAccounts, {
+    fields: [adMetrics.adAccountId],
+    references: [facebookAdAccounts.id],
+  }),
+}));
+
+export const campaignPerformanceRelations = relations(campaignPerformance, ({ one }) => ({
+  facebookAdAccount: one(facebookAdAccounts, {
+    fields: [campaignPerformance.adAccountId],
+    references: [facebookAdAccounts.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
+
+export const aiTrainingDataRelations = relations(aiTrainingData, ({ one }) => ({
+  user: one(users, {
+    fields: [aiTrainingData.userId],
+    references: [users.id],
+  }),
+}));
 
 // Keyword Snapshot Tracking Table
 export const competitorKeywordSnapshots = pgTable("competitor_keyword_snapshots", {

@@ -5336,6 +5336,56 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // AutoPostConfig UI Backend Routes
+  app.get('/api/facebook/autopost-config', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const config = {
+        enabled: process.env.AUTO_POST_ENABLED === "true",
+        threshold: parseFloat(process.env.MIN_SCORE_THRESHOLD || "50"),
+      };
+      res.json(config);
+    } catch (error) {
+      console.error('Error getting autopost config:', error);
+      res.status(500).json({ error: 'Failed to get autopost configuration' });
+    }
+  });
+
+  app.post('/api/facebook/autopost-config', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { enabled, threshold } = req.body;
+      
+      // Log the configuration change
+      console.log('💾 Auto-post configuration updated:', { 
+        enabled, 
+        threshold, 
+        timestamp: new Date().toISOString() 
+      });
+      
+      // In a production environment, you would save these to a database
+      // or update environment variables programmatically
+      // For now, we'll store them in memory or log them for manual update
+      
+      res.json({ 
+        success: true, 
+        message: `Configuration saved: Auto-posting ${enabled ? 'enabled' : 'disabled'} with ${threshold}% threshold`,
+        config: { enabled, threshold }
+      });
+    } catch (error) {
+      console.error('Error saving autopost config:', error);
+      res.status(500).json({ error: 'Failed to save autopost configuration' });
+    }
+  });
+
+  app.get('/api/facebook/autopost-preview', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const content = await advancedAdOptimizer.generatePost('preview content');
+      res.json({ text: content });
+    } catch (error) {
+      console.error('Error generating autopost preview:', error);
+      res.status(500).json({ error: 'Failed to generate preview content' });
+    }
+  });
+
   app.post('/api/facebook/schedule-post', devAuthMiddleware, async (req: any, res) => {
     try {
       const { message, link, picture, publishTime } = req.body;

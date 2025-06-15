@@ -39,6 +39,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
+import AutoPostAdmin from "@/pages/AutoPostAdmin";
 import PageStatus from "@/pages/PageStatus";
 import ContentQueue from "@/pages/ContentQueue";
 import Analytics from "@/pages/Analytics";
@@ -90,6 +91,7 @@ function Router() {
             <Route path="/" component={Dashboard} />
             <Route path="/ads" component={AdOptimizer} />
             <Route path="/auto-poster" component={AutoPoster} />
+            <Route path="/admin/auto-post-config" component={AutoPostAdmin} />
             <Route path="/content-queue" component={ContentQueue} />
             <Route path="/analytics" component={Analytics} />
             <Route path="/page-status" component={PageStatus} />

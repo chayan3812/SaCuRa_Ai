@@ -1,0 +1,113 @@
+// server/meta/adCampaignService.ts
+import axios from "axios";
+
+const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+const AD_ACCOUNT_ID = process.env.FACEBOOK_AD_ACCOUNT_ID;
+const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+
+export const adCampaignService = {
+  async boostExistingPost({ pagePostId, dailyBudget, durationDays, targeting = null }) {
+    const now = new Date();
+    const startTime = Math.floor(now.getTime() / 1000);
+    const endTime = Math.floor(now.setDate(now.getDate() + durationDays) / 1000);
+
+    const campaignRes = await axios.post(
+      `https://graph.facebook.com/v17.0/act_${AD_ACCOUNT_ID}/campaigns`,
+      {
+        name: `Boost ${pagePostId}`,
+        objective: "POST_ENGAGEMENT",
+        status: "PAUSED",
+        access_token: ACCESS_TOKEN,
+      }
+    );
+
+    const campaignId = campaignRes.data.id;
+
+    const adSetRes = await axios.post(
+      `https://graph.facebook.com/v17.0/act_${AD_ACCOUNT_ID}/adsets`,
+      {
+        name: `AdSet ${pagePostId}`,
+        campaign_id: campaignId,
+        daily_budget: dailyBudget * 100, // in cents
+        billing_event: "IMPRESSIONS",
+        optimization_goal: "POST_ENGAGEMENT",
+        start_time: startTime,
+        end_time: endTime,
+        targeting: targeting || {
+          geo_locations: { countries: ["US"] },
+        },
+        status: "PAUSED",
+        access_token: ACCESS_TOKEN,
+      }
+    );
+
+    const adSetId = adSetRes.data.id;
+
+    const creativeRes = await axios.post(
+      `https://graph.facebook.com/v17.0/act_${AD_ACCOUNT_ID}/adcreatives`,
+      {
+        name: `Creative ${pagePostId}`,
+        object_story_id: `${PAGE_ID}_${pagePostId}`,
+        access_token: ACCESS_TOKEN,
+      }
+    );
+
+    const creativeId = creativeRes.data.id;
+
+    const adRes = await axios.post(
+      `https://graph.facebook.com/v17.0/act_${AD_ACCOUNT_ID}/ads`,
+      {
+        name: `Ad ${pagePostId}`,
+        adset_id: adSetId,
+        creative: { creative_id: creativeId },
+        status: "PAUSED",
+        access_token: ACCESS_TOKEN,
+      }
+    );
+
+    return {
+      campaignId,
+      adSetId,
+      adId: adRes.data.id,
+    };
+  },
+
+  async getCampaignStatus(campaignId) {
+    const url = `https://graph.facebook.com/v17.0/${campaignId}/insights?access_token=${ACCESS_TOKEN}`;
+    const res = await axios.get(url);
+    return res.data;
+  },
+};
+
+// server/routes/facebookAdsRoutes.ts
+import express from "express";
+import { adCampaignService } from "../meta/adCampaignService";
+
+const router = express.Router();
+
+router.post("/facebook/boost-post", async (req, res) => {
+  try {
+    const { pagePostId, budget, days } = req.body;
+    const result = await adCampaignService.boostExistingPost({
+      pagePostId,
+      dailyBudget: budget,
+      durationDays: days,
+    });
+    res.json(result);
+  } catch (e) {
+    console.error("Boost Post Error:", e);
+    res.status(500).json({ error: "Failed to boost post" });
+  }
+});
+
+router.get("/facebook/campaign-status/:id", async (req, res) => {
+  try {
+    const result = await adCampaignService.getCampaignStatus(req.params.id);
+    res.json(result);
+  } catch (e) {
+    console.error("Get Status Error:", e);
+    res.status(500).json({ error: "Failed to get campaign status" });
+  }
+});
+
+export default router;

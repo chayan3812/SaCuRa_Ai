@@ -331,64 +331,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Facebook OAuth routes
-  app.get('/api/facebook/auth', isAuthenticated, (req: any, res) => {
-    const clientId = process.env.FACEBOOK_APP_ID;
-    const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
-    const scopes = [
-      'pages_show_list',
-      'pages_read_engagement',
-      'pages_manage_posts',
-      'pages_messaging',
-      'business_management',
-      'ads_read',
-      'ads_management'
-    ];
-
-    if (!clientId) {
-      return res.status(500).json({ message: 'Facebook App ID not configured' });
+  app.get('/api/facebook/auth', isAuthenticated, async (req: any, res) => {
+    try {
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+      const authUrl = tokenManager.generateLoginUrl(redirectUri);
+      
+      res.redirect(authUrl);
+    } catch (error) {
+      console.error('Error generating Facebook auth URL:', error);
+      res.status(500).json({ message: 'Failed to generate auth URL' });
     }
-
-    const authUrl = getFacebookOAuthUrl(clientId, redirectUri, scopes);
-    res.redirect(authUrl);
   });
 
-  app.get('/api/facebook/callback', isAuthenticated, async (req: any, res) => {
+  app.get('/api/facebook/callback', async (req, res) => {
     try {
-      const { code } = req.query;
-      const clientId = process.env.FACEBOOK_APP_ID;
-      const clientSecret = process.env.FACEBOOK_APP_SECRET;
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
-
-      if (!code || !clientId || !clientSecret) {
-        return res.status(400).json({ message: 'Missing required parameters' });
+      const { code, state } = req.query;
+      if (!code) {
+        return res.redirect('/?error=auth_failed');
       }
 
-      // Exchange code for access token
-      const tokenData = await exchangeCodeForToken(clientId, clientSecret, redirectUri, code);
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
       
-      // Get long-lived token
-      const longLivedToken = await getLongLivedToken(clientId, clientSecret, tokenData.access_token);
+      const tokenResult = await tokenManager.exchangeCodeForToken(code as string, redirectUri);
+      
+      if (tokenResult.error) {
+        console.error('Token exchange failed:', tokenResult.error);
+        return res.redirect('/?error=token_exchange_failed');
+      }
 
-      // Get user's pages and store them
-      const fbService = new FacebookAPIService(longLivedToken.access_token);
-      const pages = await fbService.getUserPages();
-      const userId = req.user.claims.sub;
+      // Get user pages and store them if user is authenticated
+      if (req.user && tokenResult.access_token) {
+        try {
+          const pages = await tokenManager.getUserPages(tokenResult.access_token);
+          const userId = req.user.claims.sub;
 
-      for (const page of pages) {
-        await storage.createFacebookPage({
-          userId,
-          pageId: page.id,
-          pageName: page.name,
-          accessToken: page.access_token,
-          category: page.category,
-          followerCount: page.follower_count || 0
-        });
+          for (const page of pages) {
+            await storage.createFacebookPage({
+              userId,
+              pageId: page.id,
+              pageName: page.name,
+              accessToken: page.access_token,
+              category: page.category || 'Unknown',
+              followerCount: page.follower_count || 0
+            });
+          }
+        } catch (pageError) {
+          console.error('Error storing pages:', pageError);
+        }
       }
 
       res.redirect('/?connected=true');
     } catch (error) {
-      console.error('Facebook OAuth error:', error);
-      res.status(500).json({ message: 'Failed to connect Facebook account' });
+      console.error('Facebook callback error:', error);
+      res.redirect('/?error=callback_failed');
     }
   });
 

@@ -8,6 +8,10 @@ import AILearningProgress from "@/components/dashboard/AILearningProgress";
 import QuickActions from "@/components/dashboard/QuickActions";
 import LiveSystemStatus from "@/components/dashboard/LiveSystemStatus";
 import PerformanceInsights from "@/components/dashboard/PerformanceInsights";
+import AdvancedAnalyticsChart from "@/components/dashboard/AdvancedAnalyticsChart";
+import FuturisticMetricsGrid from "@/components/dashboard/FuturisticMetricsGrid";
+import CircularProgressDashboard from "@/components/dashboard/CircularProgressDashboard";
+import RealTimeDataVisualizer from "@/components/dashboard/RealTimeDataVisualizer";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -318,6 +322,21 @@ export default function Dashboard() {
               {/* Connected Accounts */}
               <ConnectedAccounts />
             </div>
+          </div>
+
+          {/* Advanced Analytics Section */}
+          <div className="space-y-6">
+            {/* Real-Time Data Visualizer */}
+            <RealTimeDataVisualizer />
+            
+            {/* Main Analytics Chart */}
+            <AdvancedAnalyticsChart />
+            
+            {/* Futuristic Metrics Grid */}
+            <FuturisticMetricsGrid />
+            
+            {/* Circular Progress Dashboard */}
+            <CircularProgressDashboard />
           </div>
 
           {/* Bottom Section - Additional Modules */}

@@ -5,6 +5,12 @@ import {
   aiSuggestionFeedback,
   type AiSuggestionFeedback,
   type InsertAiSuggestionFeedback,
+  feedbackReplayLog,
+  type FeedbackReplayLog,
+  type InsertFeedbackReplayLog,
+  trainingLog,
+  type TrainingLog,
+  type InsertTrainingLog,
   trainingPrompts,
   type TrainingPrompt,
   type InsertTrainingPrompt,
@@ -180,6 +186,17 @@ export interface IStorage {
     dailyBreakdown: { date: string; useful: number; total: number }[];
     topNegativeMessages: { message: string; aiReply: string; agentReply: string }[];
   }>;
+  
+  // Advanced Feedback Replay System
+  storeFeedbackReplay(replay: InsertFeedbackReplayLog): Promise<FeedbackReplayLog>;
+  getFeedbackReplays(userId: string, limit?: number): Promise<FeedbackReplayLog[]>;
+  getWorstReplies(limit?: number): Promise<FeedbackReplayLog[]>;
+  
+  // Training Log Pipeline
+  storeTrainingExample(training: InsertTrainingLog): Promise<TrainingLog>;
+  getTrainingExamples(limit?: number): Promise<TrainingLog[]>;
+  exportTrainingData(batchId: string): Promise<string>; // Returns JSONL format
+  markTrainingDataExported(batchId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1068,6 +1085,78 @@ export class DatabaseStorage implements IStorage {
         agentReply: example.agentReply || '',
       })),
     };
+  }
+
+  // Advanced Feedback Replay System Implementation
+  async storeFeedbackReplay(replay: InsertFeedbackReplayLog): Promise<FeedbackReplayLog> {
+    const [result] = await db
+      .insert(feedbackReplayLog)
+      .values(replay)
+      .returning();
+    return result;
+  }
+
+  async getFeedbackReplays(userId: string, limit: number = 50): Promise<FeedbackReplayLog[]> {
+    return await db
+      .select()
+      .from(feedbackReplayLog)
+      .where(eq(feedbackReplayLog.userId, userId))
+      .orderBy(desc(feedbackReplayLog.createdAt))
+      .limit(limit);
+  }
+
+  async getWorstReplies(limit: number = 10): Promise<FeedbackReplayLog[]> {
+    return await db
+      .select()
+      .from(feedbackReplayLog)
+      .where(eq(feedbackReplayLog.feedback, "no"))
+      .orderBy(desc(feedbackReplayLog.createdAt))
+      .limit(limit);
+  }
+
+  // Training Log Pipeline Implementation
+  async storeTrainingExample(training: InsertTrainingLog): Promise<TrainingLog> {
+    const [result] = await db
+      .insert(trainingLog)
+      .values(training)
+      .returning();
+    return result;
+  }
+
+  async getTrainingExamples(limit: number = 100): Promise<TrainingLog[]> {
+    return await db
+      .select()
+      .from(trainingLog)
+      .orderBy(desc(trainingLog.createdAt))
+      .limit(limit);
+  }
+
+  async exportTrainingData(batchId: string): Promise<string> {
+    const examples = await db
+      .select()
+      .from(trainingLog)
+      .where(and(
+        eq(trainingLog.trainingBatch, batchId),
+        eq(trainingLog.exported, false)
+      ));
+
+    const jsonl = examples.map(({ prompt, completion }) =>
+      JSON.stringify({ 
+        messages: [
+          { role: "user", content: prompt },
+          { role: "assistant", content: completion },
+        ]
+      })
+    ).join("\n");
+
+    return jsonl;
+  }
+
+  async markTrainingDataExported(batchId: string): Promise<void> {
+    await db
+      .update(trainingLog)
+      .set({ exported: true })
+      .where(eq(trainingLog.trainingBatch, batchId));
   }
 }
 

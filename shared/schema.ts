@@ -421,10 +421,48 @@ export type InsertWatchedCompetitor = z.infer<typeof insertWatchedCompetitorSche
 export type CompetitorSnapshot = typeof competitorSnapshots.$inferSelect;
 export type InsertCompetitorSnapshot = z.infer<typeof insertCompetitorSnapshotSchema>;
 
+// Advanced Feedback Replay System for AI vs Agent Comparison
+export const feedbackReplayLog = pgTable("feedback_replay_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull(),
+  message: text("message").notNull(),
+  aiReply: text("ai_reply").notNull(),
+  agentReply: text("agent_reply"),
+  feedback: varchar("feedback", { enum: ["yes", "no"] }).notNull(),
+  improvementNotes: text("improvement_notes"),
+  sessionId: varchar("session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Training Log for Model Fine-tuning Pipeline
+export const trainingLog = pgTable("training_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  prompt: text("prompt").notNull(),
+  completion: text("completion").notNull(),
+  feedbackScore: integer("feedback_score").default(0),
+  trainingBatch: varchar("training_batch"),
+  exported: boolean("exported").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertAiSuggestionFeedbackSchema = createInsertSchema(aiSuggestionFeedback).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertFeedbackReplayLogSchema = createInsertSchema(feedbackReplayLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTrainingLogSchema = createInsertSchema(trainingLog).omit({
   id: true,
   createdAt: true,
 });
 
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
 export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;
+export type FeedbackReplayLog = typeof feedbackReplayLog.$inferSelect;
+export type InsertFeedbackReplayLog = z.infer<typeof insertFeedbackReplayLogSchema>;
+export type TrainingLog = typeof trainingLog.$inferSelect;
+export type InsertTrainingLog = z.infer<typeof insertTrainingLogSchema>;

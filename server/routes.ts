@@ -1442,6 +1442,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced Feedback Replay API - AI vs Agent Comparison
+  app.post('/api/feedback-replay', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, aiReply, agentReply, feedback, improvementNotes, sessionId } = req.body;
+      const userId = req.user.claims.sub;
+
+      const replay = await storage.storeFeedbackReplay({
+        userId,
+        message,
+        aiReply,
+        agentReply,
+        feedback,
+        improvementNotes,
+        sessionId,
+      });
+
+      // Auto-generate training example for bad feedback
+      if (feedback === 'no' && agentReply) {
+        const trainingBatch = `batch_${Date.now()}`;
+        await storage.storeTrainingExample({
+          prompt: message,
+          completion: agentReply,
+          feedbackScore: -1,
+          trainingBatch,
+        });
+      }
+
+      res.json({
+        success: true,
+        replayId: replay.id,
+        message: 'Feedback replay stored successfully',
+      });
+    } catch (error) {
+      console.error('Feedback replay error:', error);
+      res.status(500).json({ message: 'Failed to store feedback replay' });
+    }
+  });
+
+  // Get Worst Performing Replies for Training
+  app.get('/api/feedback-replay/worst', isAuthenticated, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const worstReplies = await storage.getWorstReplies(limit);
+      
+      res.json(worstReplies);
+    } catch (error) {
+      console.error('Error fetching worst replies:', error);
+      res.status(500).json({ message: 'Failed to fetch worst replies' });
+    }
+  });
+
+  // Export Training Data as JSONL
+  app.get('/api/training/export/:batchId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { batchId } = req.params;
+      const jsonlData = await storage.exportTrainingData(batchId);
+      
+      res.setHeader('Content-Type', 'application/jsonl');
+      res.setHeader('Content-Disposition', `attachment; filename="training_${batchId}.jsonl"`);
+      res.send(jsonlData);
+      
+      // Mark as exported
+      await storage.markTrainingDataExported(batchId);
+    } catch (error) {
+      console.error('Training export error:', error);
+      res.status(500).json({ message: 'Failed to export training data' });
+    }
+  });
+
   app.post('/api/ads/auto-fix', isAuthenticated, async (req, res) => {
     try {
       const { pageId } = req.body;

@@ -981,6 +981,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Facebook Pages API route
+  app.get('/api/facebook/pages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userPages = await storage.getFacebookPagesByUser(userId);
+      
+      if (userPages.length === 0) {
+        return res.json([]);
+      }
+
+      const { facebookAPI } = await import('./facebookAPI');
+      const pages = await facebookAPI.getPages();
+      
+      res.json(pages);
+    } catch (error) {
+      console.error('Error fetching Facebook pages:', error);
+      res.status(500).json({ message: 'Failed to fetch Facebook pages' });
+    }
+  });
+
   // Employee management routes
   app.get('/api/employees', isAuthenticated, async (req: any, res) => {
     try {

@@ -924,3 +924,56 @@ Return as a JSON array of reply strings.`;
     return [];
   }
 }
+
+// AgentAssistChat - Enterprise-grade GPT-powered reply suggestion
+export async function generateSuggestedReply(messageText: string, customerName?: string, previousContext?: string): Promise<string> {
+  if (!messageText || messageText.trim() === '') {
+    return 'Thank you for reaching out. How can I assist you today?';
+  }
+
+  const contextPrompt = previousContext 
+    ? `Previous conversation context: ${previousContext}\n\n`
+    : '';
+
+  const customerPrefix = customerName ? `Customer ${customerName}` : 'Customer';
+
+  const prompt = `You are an expert customer service agent. Generate a single, professional, helpful response to this customer message.
+
+${contextPrompt}${customerPrefix} says: "${messageText}"
+
+Requirements:
+- Be empathetic and understanding
+- Address their specific concern directly
+- Offer concrete help or next steps
+- Use a friendly but professional tone
+- Keep it concise (2-3 sentences max)
+- If it's a complaint, acknowledge their frustration
+- If it's a question, provide helpful guidance
+- If it's urgent, show urgency in your response
+
+Return only the suggested reply text, no quotes or formatting.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        { 
+          role: "system", 
+          content: "You are an expert customer service representative with years of experience handling customer inquiries with empathy and professionalism." 
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 200,
+    });
+
+    const suggestedReply = response.choices[0].message.content?.trim() || 'Thank you for reaching out. I\'ll help you resolve this right away.';
+    return suggestedReply;
+  } catch (error) {
+    console.error('Error generating suggested reply:', error);
+    return 'Thank you for your message. I\'ll look into this and get back to you shortly.';
+  }
+}

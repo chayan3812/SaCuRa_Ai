@@ -106,6 +106,10 @@ export const customerInteractions = pgTable("customer_interactions", {
   aiFeedbackScore: integer("ai_feedback_score"), // 1-5 rating of AI suggestion quality
   aiFeedbackNotes: text("ai_feedback_notes"), // Optional feedback comments
   aiFeedbackAt: timestamp("ai_feedback_at"), // When feedback was provided
+  // AgentAssistChat - GPT-powered reply suggestions
+  agentSuggestedReply: text("agent_suggested_reply"), // AI-generated reply suggestion
+  agentReplyUsed: boolean("agent_reply_used").default(false), // Whether agent used the suggested reply
+  agentReplyFeedback: varchar("agent_reply_feedback"), // 'useful' | 'not_useful' | null
 });
 
 // Employee Performance Tracking

@@ -125,8 +125,6 @@ async function main() {
   process.exit(0);
 }
 
-if (require.main === module) {
-  main().catch(console.error);
-}
+main().catch(console.error);
 
-module.exports = { seedTestMessages, clearTestMessages };
+export { seedTestMessages, clearTestMessages };

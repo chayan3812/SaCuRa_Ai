@@ -17,7 +17,8 @@ import {
   analyzeCompetitorPosts,
   classifyCustomerMessage,
   calculateUrgencyScore,
-  suggestReply
+  suggestReply,
+  generateSuggestedReply
 } from "./openai";
 import { initializeWebSocket } from "./websocket";
 import { systemOptimizer } from "./systemOptimizer";
@@ -583,6 +584,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error creating message:', error);
       res.status(500).json({ message: 'Failed to create message' });
+    }
+  });
+
+  // Seed test messages for SmartInboxAI development
+  app.post('/api/messages/seed-test-data', isAuthenticated, async (req: any, res) => {
+    try {
+      const testMessages = [
+        {
+          customerName: "Sarah Johnson",
+          message: "This is the third time my payment failed, what's going on?? I'm getting really frustrated and considering switching to a competitor. Fix this now!",
+          expectedType: "Complaint"
+        },
+        {
+          customerName: "Mike Chen", 
+          message: "Hey, can I connect my bank account to this platform or does it only work with credit cards? Also wondering about international transfers.",
+          expectedType: "Question"
+        },
+        {
+          customerName: "Emma Rodriguez",
+          message: "URGENT! My online store is completely down and it's Black Friday! Customers can't place orders and I'm losing thousands of dollars every minute!",
+          expectedType: "Urgent Issue"
+        },
+        {
+          customerName: "David Kumar",
+          message: "Cool interface! Really impressed with the design. Just wanted to check if this works for international businesses? I'm based in Singapore.",
+          expectedType: "Positive Feedback"
+        },
+        {
+          customerName: "Lisa Thompson",
+          message: "I can't find the export button anywhere in the dashboard. I need to download my data for compliance reporting. Where is it located?",
+          expectedType: "Support Request"
+        },
+        {
+          customerName: "Janet Wilson",
+          message: "I was charged twice for last month's subscription. Please refund the duplicate charge immediately. This is unacceptable.",
+          expectedType: "Billing Issue"
+        }
+      ];
+
+      const demoPageId = "demo-page-001";
+      const seededMessages = [];
+
+      // Clear existing test messages first
+      await db.delete(customerInteractions).where(eq(customerInteractions.pageId, demoPageId));
+
+      for (const testMsg of testMessages) {
+        const [newMessage] = await db
+          .insert(customerInteractions)
+          .values({
+            pageId: demoPageId,
+            customerId: `customer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            customerName: testMsg.customerName,
+            message: testMsg.message,
+            status: 'pending',
+            createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+          })
+          .returning();
+
+        seededMessages.push({
+          id: newMessage.id,
+          customerName: testMsg.customerName,
+          expectedType: testMsg.expectedType,
+          message: testMsg.message.substring(0, 50) + '...'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: `Successfully seeded ${testMessages.length} test messages`,
+        seededMessages,
+        note: "Visit SmartInbox AI to analyze these messages with AI"
+      });
+    } catch (error) {
+      console.error('Error seeding test messages:', error);
+      res.status(500).json({ message: 'Failed to seed test messages' });
+    }
+  });
+
+  // AgentAssistChat - Enterprise GPT-powered reply suggestions
+  app.post('/api/agent-suggest-reply/:messageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId } = req.params;
+      
+      if (!messageId) {
+        return res.status(400).json({ message: 'Message ID is required' });
+      }
+
+      // Get the message
+      const message = await storage.getMessageById(messageId);
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      // Generate context-aware reply suggestion
+      const suggestedReply = await generateSuggestedReply(
+        message.message,
+        message.customerName || undefined,
+        message.response || undefined // Previous context if available
+      );
+
+      // Store the suggestion in database
+      const [updatedMessage] = await db
+        .update(customerInteractions)
+        .set({
+          agentSuggestedReply: suggestedReply,
+          updatedAt: new Date(),
+        })
+        .where(eq(customerInteractions.id, messageId))
+        .returning();
+
+      res.json({
+        messageId,
+        suggestedReply,
+        customerName: message.customerName,
+        originalMessage: message.message,
+        generatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error generating suggested reply:', error);
+      res.status(500).json({ message: 'Failed to generate reply suggestion' });
+    }
+  });
+
+  // Mark agent reply as used/not used with feedback
+  app.post('/api/agent-reply-feedback', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, used, feedback } = req.body;
+      
+      if (!messageId || typeof used !== 'boolean') {
+        return res.status(400).json({ message: 'Message ID and used status are required' });
+      }
+
+      const [updatedMessage] = await db
+        .update(customerInteractions)
+        .set({
+          agentReplyUsed: used,
+          agentReplyFeedback: feedback || null,
+          updatedAt: new Date(),
+        })
+        .where(eq(customerInteractions.id, messageId))
+        .returning();
+
+      if (!updatedMessage) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      res.json({
+        messageId,
+        used,
+        feedback,
+        updatedAt: updatedMessage.updatedAt,
+      });
+    } catch (error) {
+      console.error('Error saving agent reply feedback:', error);
+      res.status(500).json({ message: 'Failed to save feedback' });
     }
   });
 

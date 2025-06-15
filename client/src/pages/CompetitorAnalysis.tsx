@@ -548,67 +548,7 @@ export default function CompetitorAnalysis() {
         </Tabs>
       </div>
     </div>
-  );
-}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-3">Opportunities</h4>
-                    <div className="space-y-2">
-                      {analysisResult.analysis.opportunities.map((opp, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <Globe className="h-4 w-4 mt-0.5 text-purple-600 flex-shrink-0" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{opp}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Posts */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Recent Posts Analysis
-                </CardTitle>
-                <CardDescription>
-                  Latest {analysisResult.posts.length} posts with engagement metrics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {analysisResult.posts.map((post, index) => (
-                    <div key={post.id} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-                            {post.message ? post.message.substring(0, 300) + (post.message.length > 300 ? '...' : '') : 'No message content'}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="ml-4">
-                          {formatDate(post.created_time)}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <Heart className="h-4 w-4" />
-                          <span>{post.reactions?.summary?.total_count || 0} reactions</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="h-4 w-4" />
-                          <span>{post.comments?.summary?.total_count || 0} comments</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Share className="h-4 w-4" />
-                          <span>{post.shares?.count || 0} shares</span>
-                        </div>
-                        {post.permalink_url && (
-                          <a 
+a 
                             href={post.permalink_url} 
                             target="_blank" 
                             rel="noopener noreferrer"

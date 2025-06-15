@@ -17,7 +17,13 @@ import {
   Zap,
   Brain,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  RefreshCw,
+  Copy,
+  Lightbulb,
+  ThumbsUp,
+  ThumbsDown,
+  Sparkles
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -39,6 +45,9 @@ interface CustomerInteraction {
   aiClassification?: string;
   aiSuggestedReplies?: string[];
   aiAnalyzedAt?: string;
+  agentSuggestedReply?: string;
+  agentReplyUsed?: boolean;
+  agentReplyFeedback?: string;
 }
 
 interface AIAnalysis {
@@ -49,9 +58,19 @@ interface AIAnalysis {
   analyzedAt: string;
 }
 
+interface AgentSuggestion {
+  messageId: string;
+  suggestedReply: string;
+  customerName?: string;
+  originalMessage: string;
+  generatedAt: string;
+}
+
 export default function SmartInbox() {
   const [selectedMessage, setSelectedMessage] = useState<CustomerInteraction | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [agentSuggestion, setAgentSuggestion] = useState<AgentSuggestion | null>(null);
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,6 +95,36 @@ export default function SmartInbox() {
         description: "Could not analyze message with AI",
         variant: "destructive",
       });
+    },
+  });
+
+  // AgentAssistChat - GPT-powered reply suggestions
+  const suggestReplyMutation = useMutation({
+    mutationFn: async (messageId: string): Promise<AgentSuggestion> => {
+      return await apiRequest(`/api/agent-suggest-reply/${messageId}`, "POST");
+    },
+    onSuccess: (data) => {
+      setAgentSuggestion(data);
+      toast({
+        title: "AI Reply Generated",
+        description: "GPT has suggested a reply for this message",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Suggestion Failed",
+        description: "Could not generate reply suggestion",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: async (data: { messageId: string; used: boolean; feedback?: string }) => {
+      return await apiRequest("/api/agent-reply-feedback", "POST", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });
     },
   });
 
@@ -119,6 +168,56 @@ export default function SmartInbox() {
       default: return <MessageSquare className="h-4 w-4 text-gray-500" />;
     }
   };
+
+  // AgentAssistChat helper functions
+  const handleGenerateReply = async (messageId: string) => {
+    setLoadingSuggestion(true);
+    setAgentSuggestion(null);
+    try {
+      await suggestReplyMutation.mutateAsync(messageId);
+    } finally {
+      setLoadingSuggestion(false);
+    }
+  };
+
+  const handleUseReply = (suggestedReply: string) => {
+    setReplyText(suggestedReply);
+    if (selectedMessage && agentSuggestion) {
+      feedbackMutation.mutate({
+        messageId: selectedMessage.id,
+        used: true,
+        feedback: 'useful'
+      });
+    }
+  };
+
+  const handleCopyReply = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: "Reply suggestion copied successfully",
+    });
+  };
+
+  const seedTestDataMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/messages/seed-test-data", "POST");
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });
+      toast({
+        title: "Test Data Added",
+        description: `${data.seededMessages?.length || 6} realistic customer messages have been added for AI analysis`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Seeding Failed",
+        description: "Could not add test messages",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAnalyzeMessage = (messageId: string) => {
     analyzeMessageMutation.mutate(messageId);

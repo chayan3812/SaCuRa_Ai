@@ -460,9 +460,26 @@ export const insertTrainingLogSchema = createInsertSchema(trainingLog).omit({
   createdAt: true,
 });
 
+// AI Self-Awareness: Failure Analysis System
+export const aiReplyFailures = pgTable("ai_reply_failures", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  message: text("message").notNull(),
+  aiReply: text("ai_reply").notNull(),
+  agentReply: text("agent_reply"),
+  explanation: text("explanation").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAiReplyFailureSchema = createInsertSchema(aiReplyFailures).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
 export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;
 export type FeedbackReplayLog = typeof feedbackReplayLog.$inferSelect;
 export type InsertFeedbackReplayLog = z.infer<typeof insertFeedbackReplayLogSchema>;
 export type TrainingLog = typeof trainingLog.$inferSelect;
 export type InsertTrainingLog = z.infer<typeof insertTrainingLogSchema>;
+export type AiReplyFailure = typeof aiReplyFailures.$inferSelect;
+export type InsertAiReplyFailure = z.infer<typeof insertAiReplyFailureSchema>;

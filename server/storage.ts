@@ -11,6 +11,9 @@ import {
   trainingLog,
   type TrainingLog,
   type InsertTrainingLog,
+  aiReplyFailures,
+  type AiReplyFailure,
+  type InsertAiReplyFailure,
   trainingPrompts,
   type TrainingPrompt,
   type InsertTrainingPrompt,
@@ -197,6 +200,10 @@ export interface IStorage {
   getTrainingExamples(limit?: number): Promise<TrainingLog[]>;
   exportTrainingData(batchId: string): Promise<string>; // Returns JSONL format
   markTrainingDataExported(batchId: string): Promise<void>;
+  
+  // AI Self-Awareness System
+  storeFailureExplanation(data: InsertAiReplyFailure): Promise<AiReplyFailure>;
+  getFailureExplanations(): Promise<AiReplyFailure[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1157,6 +1164,22 @@ export class DatabaseStorage implements IStorage {
       .update(trainingLog)
       .set({ exported: true })
       .where(eq(trainingLog.trainingBatch, batchId));
+  }
+
+  // AI Self-Awareness System Implementation
+  async storeFailureExplanation(data: InsertAiReplyFailure): Promise<AiReplyFailure> {
+    const [result] = await db
+      .insert(aiReplyFailures)
+      .values(data)
+      .returning();
+    return result;
+  }
+
+  async getFailureExplanations(): Promise<AiReplyFailure[]> {
+    return await db
+      .select()
+      .from(aiReplyFailures)
+      .orderBy(desc(aiReplyFailures.createdAt));
   }
 }
 

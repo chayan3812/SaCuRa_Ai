@@ -33,6 +33,7 @@ import FacebookAnalytics from "@/pages/FacebookAnalytics";
 import FacebookSetup from "@/pages/FacebookSetup";
 import FacebookConversions from "@/pages/FacebookConversions";
 import FacebookAds from "@/pages/FacebookAds";
+import Facebook from "@/pages/Facebook";
 import MarketingAPI from "@/pages/MarketingAPI";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HybridAI from "@/pages/HybridAI";

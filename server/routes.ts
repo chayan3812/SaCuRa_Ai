@@ -5803,6 +5803,130 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Core Facebook API Routes - Simplified Interface
+  app.get('/api/facebook/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAPI } = await import('./facebookAPIService');
+      const insights = await facebookAPI.fetchPageInsights();
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching Facebook insights:', error);
+      res.status(500).json({ error: 'Failed to fetch insights' });
+    }
+  });
+
+  app.post('/api/facebook/post', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const result = await facebookAPI.publishPost({ message });
+      res.json(result);
+    } catch (error) {
+      console.error('Error publishing Facebook post:', error);
+      res.status(500).json({ error: 'Failed to publish post' });
+    }
+  });
+
+  app.get('/api/facebook/posts', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { facebookAPI } = await import('./facebookAPIService');
+      const posts = await facebookAPI.getRecentPosts(limit);
+      res.json({ data: posts });
+    } catch (error) {
+      console.error('Error fetching Facebook posts:', error);
+      res.status(500).json({ error: 'Failed to fetch posts' });
+    }
+  });
+
+  app.get('/api/facebook/page-info', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAPI } = await import('./facebookAPIService');
+      const pageInfo = await facebookAPI.getPageInfo();
+      res.json(pageInfo);
+    } catch (error) {
+      console.error('Error fetching page info:', error);
+      res.status(500).json({ error: 'Failed to fetch page info' });
+    }
+  });
+
+  app.get('/api/facebook/post-engagement/:postId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { postId } = req.params;
+      const { facebookAPI } = await import('./facebookAPIService');
+      const engagement = await facebookAPI.getPostEngagement(postId);
+      res.json(engagement);
+    } catch (error) {
+      console.error('Error fetching post engagement:', error);
+      res.status(500).json({ error: 'Failed to fetch post engagement' });
+    }
+  });
+
+  app.post('/api/facebook/upload-media', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { imageUrl, caption } = req.body;
+      
+      if (!imageUrl) {
+        return res.status(400).json({ error: 'Image URL is required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const result = await facebookAPI.uploadMedia(imageUrl, caption);
+      res.json(result);
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      res.status(500).json({ error: 'Failed to upload media' });
+    }
+  });
+
+  app.post('/api/facebook/schedule-post', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message, publishTime, link, picture } = req.body;
+      
+      if (!message || !publishTime) {
+        return res.status(400).json({ error: 'Message and publish time are required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const postData = { message, link, picture };
+      const result = await facebookAPI.schedulePost(postData, new Date(publishTime));
+      res.json(result);
+    } catch (error) {
+      console.error('Error scheduling post:', error);
+      res.status(500).json({ error: 'Failed to schedule post' });
+    }
+  });
+
+  app.get('/api/facebook/status', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAPI } = await import('./facebookAPIService');
+      const credentials = await facebookAPI.validateCredentials();
+      const pageInfo = credentials.valid ? await facebookAPI.getPageInfo() : null;
+      
+      res.json({
+        connected: credentials.valid,
+        pageId: pageInfo?.id || null,
+        pageName: pageInfo?.name || null,
+        canPost: pageInfo?.can_post || false,
+        error: credentials.error || null
+      });
+    } catch (error) {
+      console.error('Error checking Facebook status:', error);
+      res.json({
+        connected: false,
+        pageId: null,
+        pageName: null,
+        canPost: false,
+        error: 'Failed to check status'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

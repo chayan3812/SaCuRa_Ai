@@ -46,9 +46,9 @@ export default function FacebookSetup() {
 
   // Mutation to validate individual tokens
   const validateTokenMutation = useMutation({
-    mutationFn: (token: string) => apiRequest('/api/facebook/validate-token', {
+    mutationFn: (tokenData: { token: string }) => apiRequest('/api/facebook/validate-token', {
       method: 'POST',
-      body: { token }
+      body: JSON.stringify(tokenData)
     }),
     onSuccess: (data) => {
       toast({
@@ -140,7 +140,7 @@ export default function FacebookSetup() {
                 <div className="flex items-center justify-center p-8">
                   <RefreshCw className="h-8 w-8 animate-spin" />
                 </div>
-              ) : credentialsStatus && 'results' in credentialsStatus ? (
+              ) : credentialsStatus && typeof credentialsStatus === 'object' && 'results' in credentialsStatus ? (
                 <div className="space-y-4">
                   {/* User Token Status */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -180,14 +180,14 @@ export default function FacebookSetup() {
                   </div>
 
                   {/* Recommendations */}
-                  {credentialsStatus.results.recommendations?.length > 0 && (
+                  {(credentialsStatus as any)?.results?.recommendations?.length > 0 && (
                     <Alert>
                       <AlertTriangle className="h-4 w-4" />
                       <AlertDescription>
                         <div className="space-y-2">
                           <strong>Recommendations:</strong>
                           <ul className="list-disc list-inside space-y-1">
-                            {credentialsStatus.results.recommendations.map((rec: string, index: number) => (
+                            {(credentialsStatus as any).results.recommendations.map((rec: string, index: number) => (
                               <li key={index} className="text-sm">{rec}</li>
                             ))}
                           </ul>

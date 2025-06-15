@@ -820,10 +820,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (body.customerMessage) {
         const { TrainingPromptBuilder } = await import('./trainingPromptBuilder');
         
-        const trainingData = {
+        const trainingData: any = {
           message: body.customerMessage,
           aiReply: body.aiSuggestion,
-          feedback: body.feedback ? 'yes' as const : 'no' as const,
+          feedback: body.feedback ? 'yes' : 'no',
           agentReply: body.agentReply,
         };
 

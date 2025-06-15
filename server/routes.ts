@@ -751,7 +751,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message ID and AI suggestion are required' });
       }
 
-      const feedbackRecord = await storage.createAiSuggestionFeedback({
+      // Use the new storeFeedback method
+      await storage.storeFeedback({
         messageId,
         aiSuggestion,
         feedback: feedback === 'useful' ? true : feedback === 'not_useful' ? false : null,
@@ -759,13 +760,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         platformContext: platformContext || 'inbox',
         modelVersion: 'gpt-4o',
         responseTime: responseTime || null,
+        usageCount: feedback === 'useful' ? 1 : 0,
       });
 
       res.json({
-        id: feedbackRecord.id,
         tracked: true,
         feedback: feedback,
-        timestamp: feedbackRecord.createdAt,
+        timestamp: new Date().toISOString(),
+        message: 'AI feedback stored successfully',
       });
     } catch (error) {
       console.error('Error tracking AI feedback:', error);

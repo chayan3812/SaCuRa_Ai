@@ -156,6 +156,7 @@ export interface IStorage {
   createAiSuggestionFeedback(feedback: InsertAiSuggestionFeedback): Promise<AiSuggestionFeedback>;
   getAiSuggestionFeedback(messageId: string): Promise<AiSuggestionFeedback[]>;
   updateSuggestionUsage(feedbackId: string, used: boolean): Promise<void>;
+  storeFeedback(input: InsertAiSuggestionFeedback): Promise<void>;
   getAiPerformanceMetrics(days?: number): Promise<{
     totalSuggestions: number;
     positiveRating: number;
@@ -895,6 +896,22 @@ export class DatabaseStorage implements IStorage {
         usageCount: sql`${aiSuggestionFeedback.usageCount} + 1`,
       })
       .where(eq(aiSuggestionFeedback.id, feedbackId));
+  }
+
+  async storeFeedback(input: InsertAiSuggestionFeedback): Promise<void> {
+    await db
+      .insert(aiSuggestionFeedback)
+      .values({
+        messageId: input.messageId,
+        aiSuggestion: input.aiSuggestion,
+        feedback: input.feedback,
+        reviewedBy: input.reviewedBy,
+        platformContext: input.platformContext || 'inbox',
+        modelVersion: input.modelVersion || 'gpt-4o',
+        responseTime: input.responseTime,
+        usageCount: input.usageCount || 0,
+        createdAt: new Date(),
+      });
   }
 
   async getAiPerformanceMetrics(days: number = 30): Promise<{

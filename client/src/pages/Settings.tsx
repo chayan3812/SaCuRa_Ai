@@ -69,7 +69,7 @@ export default function Settings() {
 
   // Update profile mutation
   const profileMutation = useMutation({
-    mutationFn: async (profileData: any) => {
+    mutationFn: async (profileData: UserProfile) => {
       return await apiRequest('/api/user/profile', {
         method: 'PUT',
         body: JSON.stringify(profileData)
@@ -93,7 +93,7 @@ export default function Settings() {
 
   // Update notifications mutation
   const notificationsMutation = useMutation({
-    mutationFn: async (notificationPrefs: any) => {
+    mutationFn: async (notificationPrefs: NotificationSettings) => {
       return await apiRequest('/api/user/notifications', {
         method: 'PUT',
         body: JSON.stringify(notificationPrefs)
@@ -167,11 +167,11 @@ export default function Settings() {
       if ('profile' in settings && settings.profile && typeof settings.profile === 'object') {
         setProfile(prev => ({
           ...prev,
-          ...settings.profile
+          ...(settings.profile as any)
         }));
       }
       if ('notifications' in settings && settings.notifications && typeof settings.notifications === 'object') {
-        setNotifications(settings.notifications);
+        setNotifications(settings.notifications as any);
       }
     }
   }, [settings, notifications]);

@@ -80,6 +80,10 @@ export default function CompetitorAnalysis() {
   // Multi-Page Benchmarking State
   const [benchmarkPages, setBenchmarkPages] = useState(['', '', '']);
   const [benchmarkResults, setBenchmarkResults] = useState<any>(null);
+
+  // Keyword Extraction State
+  const [keywordPages, setKeywordPages] = useState(['']);
+  const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
   const [analysisResult, setAnalysisResult] = useState<{
     posts: CompetitorPost[];
     analysis: CompetitorAnalysisResult;
@@ -195,6 +199,36 @@ export default function CompetitorAnalysis() {
     }
   });
 
+  // Keyword Extraction Mutation
+  const keywordExtractionMutation = useMutation({
+    mutationFn: async (pageIds: string[]) => {
+      const validPageIds = pageIds.filter(id => id.trim() !== '');
+      if (validPageIds.length === 0) {
+        throw new Error('Please provide at least one Facebook Page ID');
+      }
+      
+      return apiRequest('/api/competitor/extract-keywords', {
+        method: 'POST',
+        body: JSON.stringify({ pageIds: validPageIds }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: (data) => {
+      setExtractedKeywords(data.keywords || []);
+      toast({
+        title: "Keywords Extracted",
+        description: `Found ${data.keywords?.length || 0} keywords from ${data.postsAnalyzed} posts`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Extraction Failed",
+        description: error.message || "Failed to extract keywords",
+        variant: "destructive",
+      });
+    }
+  });
+
   const analyzeCompetitorMutation = useMutation({
     mutationFn: async (pageId: string) => {
       return apiRequest('/api/competitor/analyze', {
@@ -264,7 +298,7 @@ export default function CompetitorAnalysis() {
         </div>
 
         <Tabs defaultValue="track" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="track" className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
               Track Competitors
@@ -276,6 +310,10 @@ export default function CompetitorAnalysis() {
             <TabsTrigger value="benchmark" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
               Benchmark Pages
+            </TabsTrigger>
+            <TabsTrigger value="keywords" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Keywords
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -723,6 +761,127 @@ export default function CompetitorAnalysis() {
                   </CardContent>
                 </Card>
               </div>
+            )}
+          </TabsContent>
+
+          {/* Keywords Extraction Tab */}
+          <TabsContent value="keywords" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Keyword Heatmap Extraction
+                </CardTitle>
+                <CardDescription>
+                  Extract trending keywords, hashtags, and marketing phrases from Facebook Pages using AI analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {keywordPages.map((page, index) => (
+                      <Input
+                        key={index}
+                        placeholder={`Facebook Page ${index + 1} ID`}
+                        value={page}
+                        onChange={(e) => {
+                          const newPages = [...keywordPages];
+                          newPages[index] = e.target.value;
+                          setKeywordPages(newPages);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setKeywordPages([...keywordPages, ''])}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Page
+                    </Button>
+                    {keywordPages.length > 1 && (
+                      <Button
+                        onClick={() => setKeywordPages(keywordPages.slice(0, -1))}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => keywordExtractionMutation.mutate(keywordPages)}
+                    disabled={keywordExtractionMutation.isPending}
+                    className="w-full"
+                  >
+                    {keywordExtractionMutation.isPending ? (
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Target className="mr-2 h-4 w-4" />
+                    )}
+                    {keywordExtractionMutation.isPending ? "Extracting Keywords..." : "Extract Keywords"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Keyword Heatmap Results */}
+            {extractedKeywords.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-600" />
+                    Keyword Heatmap ({extractedKeywords.length} keywords found)
+                  </CardTitle>
+                  <CardDescription>
+                    Trending keywords, hashtags, and phrases extracted from competitor posts
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    {extractedKeywords.map((keyword, index) => (
+                      <div
+                        key={index}
+                        className="group relative"
+                      >
+                        <span
+                          className="inline-block text-xs sm:text-sm px-3 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200 hover:from-blue-200 hover:to-purple-200 dark:hover:from-blue-800 dark:hover:to-purple-800 transition-all duration-200 cursor-pointer border border-blue-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transform hover:scale-105"
+                          title={`Keyword: ${keyword}`}
+                        >
+                          #{keyword.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')}
+                        </span>
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                          {keyword}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex justify-between items-center">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Click keywords to copy • Hover for full text
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const keywordText = extractedKeywords.join(', ');
+                        navigator.clipboard.writeText(keywordText);
+                        toast({
+                          title: "Copied!",
+                          description: "All keywords copied to clipboard",
+                        });
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Export Keywords
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
 

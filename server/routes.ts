@@ -791,6 +791,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Keyword Extraction Route
+  app.post('/api/competitor/extract-keywords', isAuthenticated, async (req, res) => {
+    try {
+      const { pageIds } = req.body;
+      
+      if (!pageIds || !Array.isArray(pageIds) || pageIds.length === 0) {
+        return res.status(400).json({ error: 'Please provide Facebook Page IDs' });
+      }
+
+      // Get user's Facebook access token
+      const userId = (req as any).user.claims.sub;
+      const userPages = await storage.getFacebookPagesByUser(userId);
+      
+      if (userPages.length === 0) {
+        return res.status(400).json({ message: 'No Facebook pages connected' });
+      }
+
+      const accessToken = userPages[0].accessToken;
+      const fbService = new FacebookAPIService(accessToken);
+      const allPosts: string[] = [];
+
+      // Aggregate posts from all specified pages
+      for (const pageId of pageIds) {
+        try {
+          const posts = await fbService.getRecentPosts(pageId, 20); // Get more posts for better keyword extraction
+          const postTexts = posts
+            .map((post: any) => post.message || '')
+            .filter((text: string) => text.trim() !== '');
+          
+          allPosts.push(...postTexts);
+        } catch (error) {
+          console.error(`Error fetching posts from page ${pageId}:`, error);
+          // Continue with other pages even if one fails
+        }
+      }
+
+      if (allPosts.length === 0) {
+        return res.json({ keywords: [], message: 'No posts found to analyze' });
+      }
+
+      // Extract keywords using OpenAI
+      const { extractKeywordsFromPosts } = await import('./openai');
+      const keywords = await extractKeywordsFromPosts(allPosts);
+
+      res.json({ 
+        keywords,
+        postsAnalyzed: allPosts.length,
+        pagesAnalyzed: pageIds.length
+      });
+
+    } catch (error) {
+      console.error('Keyword extraction failed:', error);
+      res.status(500).json({ error: 'Failed to extract keywords' });
+    }
+  });
+
   app.post('/api/competitors/:pageId/analyze-posts', isAuthenticated, async (req, res) => {
     try {
       const { pageId } = req.params;

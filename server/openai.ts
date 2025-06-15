@@ -705,3 +705,44 @@ export const openaiService = {
   generateImage,
   analyzePagesComparison
 };
+
+// Keyword Extraction from Facebook Posts
+export async function extractKeywordsFromPosts(posts: string[]): Promise<string[]> {
+  if (!posts || posts.length === 0) {
+    return [];
+  }
+
+  const prompt = `Extract the most common keywords, hashtags, trending phrases, and marketing slogans from these Facebook posts. Return as a JSON array of strings, focusing on actionable marketing insights.`;
+  const textBlock = posts.filter(p => p && p.trim()).join("\n\n");
+
+  if (!textBlock.trim()) {
+    return [];
+  }
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a social media marketing analyst specializing in keyword extraction and trend identification. Return only valid JSON arrays." 
+        },
+        { 
+          role: "user", 
+          content: `${prompt}\n\nPosts:\n${textBlock}` 
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.5,
+    });
+
+    const content = response.choices[0].message.content || '{"keywords": []}';
+    const parsed = JSON.parse(content);
+    const keywords = parsed.keywords || parsed || [];
+    
+    return Array.isArray(keywords) ? keywords.slice(0, 50) : []; // Limit to 50 keywords
+  } catch (error) {
+    console.error('Error extracting keywords:', error);
+    return [];
+  }
+}

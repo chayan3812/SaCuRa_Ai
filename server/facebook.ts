@@ -176,23 +176,7 @@ export class FacebookAPIService {
     }
   }
 
-  // Get Page Insights
-  async getPageInsights(pageId: string, pageAccessToken: string, metrics: string, period: string = 'day') {
-    try {
-      const response = await axios.get(`${FB_BASE_URL}/${pageId}/insights`, {
-        params: {
-          access_token: pageAccessToken,
-          metric: metrics,
-          period
-        }
-      });
 
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching page insights:', error);
-      throw new Error('Failed to fetch page insights');
-    }
-  }
 
   // Check Ad Account Status
   async checkAdAccountStatus(adAccountId: string): Promise<{
@@ -283,7 +267,7 @@ export class FacebookAPIService {
   }
 
   // Get Page Insights for Competitor Analysis
-  async getPageInsights(pageId: string, metrics: string[] = ['page_fans', 'page_engaged_users', 'page_impressions']): Promise<any> {
+  async getCompetitorPageInsights(pageId: string, metrics: string[] = ['page_fans', 'page_engaged_users', 'page_impressions']): Promise<any> {
     // Skip API calls for demo/invalid tokens
     if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
       console.log('Skipping Facebook API call - demo/invalid token detected');

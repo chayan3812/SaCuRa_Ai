@@ -210,6 +210,7 @@ export const contentQueue = pgTable("content_queue", {
   actualReach: integer("actual_reach"),
   engagement: jsonb("engagement"),
   publishedAt: timestamp("published_at"),
+  externalPostId: varchar("external_post_id"), // Facebook post ID after publishing
   failureReason: text("failure_reason"),
   retryCount: integer("retry_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),

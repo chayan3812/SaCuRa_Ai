@@ -80,9 +80,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-700">
           {/* Dashboard Header */}
-          <div className="flex flex-col space-y-3 sm:space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+          <div className="flex flex-col space-y-3 sm:space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 animate-in slide-in-from-top duration-500">
             <div className="space-y-1 sm:space-y-2">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">SaCuRa AI Dashboard</h1>
               <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
@@ -117,8 +117,8 @@ export default function Dashboard() {
           </div>
 
           {/* Real-time System Status */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 animate-in slide-in-from-bottom duration-600 delay-100">
+            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-in zoom-in duration-500 delay-150">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
@@ -131,7 +131,7 @@ export default function Dashboard() {
                       </p>
                     )}
                   </div>
-                  <DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-blue-200 flex-shrink-0" />
+                  <DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-blue-200 flex-shrink-0 group-hover:animate-bounce" />
                 </div>
                 <div className="mt-1 sm:mt-2">
                   <span className="text-xs text-blue-100">
@@ -141,7 +141,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-in zoom-in duration-500 delay-200">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
@@ -154,7 +154,7 @@ export default function Dashboard() {
                       </p>
                     )}
                   </div>
-                  <Users className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-green-200 flex-shrink-0" />
+                  <Users className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-green-200 flex-shrink-0 group-hover:animate-pulse" />
                 </div>
                 <div className="mt-2">
                   <span className="text-xs text-green-100">

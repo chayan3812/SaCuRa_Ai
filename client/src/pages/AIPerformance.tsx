@@ -187,15 +187,15 @@ export default function AIPerformance() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{metrics?.positiveRating || 0}</span>
                     <Badge variant="outline" className="text-green-600 border-green-200">
-                      {metrics?.totalSuggestions > 0 
-                        ? Math.round(((metrics?.positiveRating || 0) / metrics.totalSuggestions) * 100)
+                      {(metrics?.totalSuggestions ?? 0) > 0 
+                        ? Math.round(((metrics?.positiveRating || 0) / (metrics?.totalSuggestions ?? 1)) * 100)
                         : 0}%
                     </Badge>
                   </div>
                 </div>
                 <Progress 
-                  value={metrics?.totalSuggestions > 0 
-                    ? ((metrics?.positiveRating || 0) / metrics.totalSuggestions) * 100
+                  value={(metrics?.totalSuggestions ?? 0) > 0 
+                    ? ((metrics?.positiveRating || 0) / (metrics?.totalSuggestions ?? 1)) * 100
                     : 0} 
                   className="h-2" 
                 />
@@ -212,15 +212,15 @@ export default function AIPerformance() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{metrics?.negativeRating || 0}</span>
                     <Badge variant="outline" className="text-red-600 border-red-200">
-                      {metrics?.totalSuggestions > 0 
-                        ? Math.round(((metrics?.negativeRating || 0) / metrics.totalSuggestions) * 100)
+                      {(metrics?.totalSuggestions ?? 0) > 0 
+                        ? Math.round(((metrics?.negativeRating || 0) / (metrics?.totalSuggestions ?? 1)) * 100)
                         : 0}%
                     </Badge>
                   </div>
                 </div>
                 <Progress 
-                  value={metrics?.totalSuggestions > 0 
-                    ? ((metrics?.negativeRating || 0) / metrics.totalSuggestions) * 100
+                  value={(metrics?.totalSuggestions ?? 0) > 0 
+                    ? ((metrics?.negativeRating || 0) / (metrics?.totalSuggestions ?? 1)) * 100
                     : 0} 
                   className="h-2" 
                 />

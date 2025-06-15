@@ -80,7 +80,10 @@ export default function SmartInbox() {
 
   const analyzeMessageMutation = useMutation({
     mutationFn: async (messageId: string): Promise<AIAnalysis> => {
-      return await apiRequest("/api/messages/analyze", "POST", { messageId });
+      return await apiRequest("/api/messages/analyze", {
+        method: 'POST',
+        body: JSON.stringify({ messageId })
+      });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });
@@ -101,7 +104,10 @@ export default function SmartInbox() {
   // AgentAssistChat - GPT-powered reply suggestions
   const suggestReplyMutation = useMutation({
     mutationFn: async (messageId: string): Promise<AgentSuggestion> => {
-      return await apiRequest(`/api/agent-suggest-reply/${messageId}`, "POST", {});
+      return await apiRequest(`/api/agent-suggest-reply/${messageId}`, {
+        method: 'POST',
+        body: JSON.stringify({})
+      });
     },
     onSuccess: (data) => {
       setAgentSuggestion(data);

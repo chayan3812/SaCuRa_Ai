@@ -742,6 +742,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SmartFeedback - AI Performance Metrics and Tracking
+  app.post('/api/smart-feedback', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, aiSuggestion, feedback, platformContext, responseTime } = req.body;
+      
+      if (!messageId || !aiSuggestion) {
+        return res.status(400).json({ message: 'Message ID and AI suggestion are required' });
+      }
+
+      const feedbackRecord = await storage.createAiSuggestionFeedback({
+        messageId,
+        aiSuggestion,
+        feedback: feedback === 'useful' ? true : feedback === 'not_useful' ? false : null,
+        reviewedBy: req.user.claims.sub,
+        platformContext: platformContext || 'inbox',
+        modelVersion: 'gpt-4o',
+        responseTime: responseTime || null,
+      });
+
+      res.json({
+        id: feedbackRecord.id,
+        tracked: true,
+        feedback: feedback,
+        timestamp: feedbackRecord.createdAt,
+      });
+    } catch (error) {
+      console.error('Error tracking AI feedback:', error);
+      res.status(500).json({ message: 'Failed to track feedback' });
+    }
+  });
+
+  app.get('/api/ai-performance-metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const metrics = await storage.getAiPerformanceMetrics(days);
+
+      res.json({
+        period: `${days} days`,
+        metrics,
+        qualityScore: metrics.totalSuggestions > 0 
+          ? Math.round(((metrics.positiveRating - metrics.negativeRating) / metrics.totalSuggestions) * 100)
+          : 0,
+        trend: metrics.usageRate > 50 ? 'improving' : 'needs_attention',
+      });
+    } catch (error) {
+      console.error('Error fetching AI performance metrics:', error);
+      res.status(500).json({ message: 'Failed to fetch metrics' });
+    }
+  });
+
   // 👁️ Enhanced by AI on 2025-06-15 — Feature: CompetitorAnalysis
   app.post('/api/competitor/analyze', isAuthenticated, async (req, res) => {
     try {

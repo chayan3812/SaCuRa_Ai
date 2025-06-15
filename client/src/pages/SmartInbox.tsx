@@ -246,7 +246,10 @@ export default function SmartInbox() {
 
   const seedTestDataMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/messages/seed-test-data", "POST");
+      return await apiRequest("/api/messages/seed-test-data", {
+        method: 'POST',
+        body: JSON.stringify({})
+      });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });

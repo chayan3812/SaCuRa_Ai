@@ -32,6 +32,7 @@ const navigation = [
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "SmartInbox AI", href: "/smart-inbox", icon: Bot, badge: "AI" },
+  { name: "AI Performance", href: "/ai-performance", icon: Brain, badge: "NEW" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

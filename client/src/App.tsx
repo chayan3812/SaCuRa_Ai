@@ -16,6 +16,7 @@ import RestrictionMonitor from "@/pages/RestrictionMonitor";
 import EmployeeMonitor from "@/pages/EmployeeMonitor";
 import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
 import AIInsights from "@/pages/AIInsights";
+import AIPerformance from "@/pages/AIPerformance";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -69,6 +70,7 @@ function Router() {
             <Route path="/page-status" component={PageStatus} />
             <Route path="/customer-service" component={CustomerService} />
             <Route path="/smart-inbox" component={SmartInbox} />
+            <Route path="/ai-performance" component={AIPerformance} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

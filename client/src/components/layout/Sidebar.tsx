@@ -32,6 +32,7 @@ const navigation = [
   { name: "Auto Poster", href: "/auto-poster", icon: Send, badge: "NEW" },
   { name: "Content Queue", href: "/content-queue", icon: Calendar, badge: "QUEUE" },
   { name: "Analytics", href: "/analytics", icon: BarChart3, badge: "LIVE" },
+  { name: "Facebook Analytics", href: "/facebook-analytics", icon: BarChart3, badge: "PIXEL" },
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "SmartInbox AI", href: "/smart-inbox", icon: Bot, badge: "AI" },

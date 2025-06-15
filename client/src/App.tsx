@@ -94,6 +94,7 @@ function Router() {
             <Route path="/sla-dashboard" component={SLADashboard} />
             <Route path="/admin/ai-replay" component={AdminAIReplay} />
             <Route path="/admin/ai-digest" component={AdminAIDigest} />
+            <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

@@ -1,0 +1,104 @@
+// server/facebookAPIService.ts
+import axios from "axios";
+
+const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+
+export const FacebookAPIService = {
+  async fetchPageInsights() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/insights/page_impressions,page_engaged_users?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  },
+
+  async publishPost(message: string) {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/feed`;
+    const response = await axios.post(url, {
+      message,
+      access_token: ACCESS_TOKEN
+    });
+    return response.data;
+  },
+
+  async getPosts() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/posts?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  }
+};
+
+// server/facebookAnalytics.ts
+import express from 'express';
+import { FacebookAPIService } from './facebookAPIService';
+
+const router = express.Router();
+
+router.get("/insights", async (req, res) => {
+  try {
+    const data = await FacebookAPIService.fetchPageInsights();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch insights" });
+  }
+});
+
+router.post("/post", async (req, res) => {
+  try {
+    const { message } = req.body;
+    const result = await FacebookAPIService.publishPost(message);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Post failed" });
+  }
+});
+
+router.get("/posts", async (req, res) => {
+  try {
+    const result = await FacebookAPIService.getPosts();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to retrieve posts" });
+  }
+});
+
+export default router;
+
+// server/routes.ts (add this line where other routes are mounted)
+app.use("/api/facebook", require("./facebookAnalytics").default);
+
+// client/src/hooks/useFacebookInsights.ts
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+export const useFacebookInsights = () => {
+  return useQuery(["facebookInsights"], async () => {
+    const { data } = await axios.get("/api/facebook/insights");
+    return data;
+  });
+};
+
+// client/src/hooks/useFacebookPosts.ts
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+export const useFacebookPosts = () => {
+  return useQuery(["facebookPosts"], async () => {
+    const { data } = await axios.get("/api/facebook/posts");
+    return data;
+  });
+};
+
+// client/src/hooks/useFacebookPublisher.ts
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+
+export const useFacebookPublisher = () => {
+  return useMutation(async (message: string) => {
+    const { data } = await axios.post("/api/facebook/post", { message });
+    return data;
+  });
+};
+
+// ✅ Add these ENV keys to .env.template
+// FACEBOOK_PAGE_ID=
+// FACEBOOK_ACCESS_TOKEN=

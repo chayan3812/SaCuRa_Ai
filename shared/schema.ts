@@ -142,6 +142,30 @@ export const restrictionAlerts = pgTable("restriction_alerts", {
   resolvedAt: timestamp("resolved_at"),
 });
 
+// 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+// Watched Competitors - Pages users want to track over time
+export const watchedCompetitors = pgTable("watched_competitors", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  pageId: varchar("page_id").notNull(),
+  pageName: varchar("page_name"),
+  category: varchar("category"),
+  addedAt: timestamp("added_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
+// Competitor Snapshots - Weekly snapshots of top posts for trend analysis
+export const competitorSnapshots = pgTable("competitor_snapshots", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pageId: varchar("page_id").notNull(),
+  snapshotDate: timestamp("snapshot_date").defaultNow(),
+  postData: jsonb("post_data").notNull(), // Array of top posts with engagement data
+  totalEngagement: integer("total_engagement").default(0),
+  avgEngagementPerPost: decimal("avg_engagement_per_post", { precision: 10, scale: 2 }),
+  topKeywords: jsonb("top_keywords"), // Array of extracted keywords
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Competitor Analysis Data
 export const competitorData = pgTable("competitor_data", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -293,6 +317,18 @@ export const insertPostingScheduleSchema = createInsertSchema(postingSchedules).
   updatedAt: true,
 });
 
+// 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+export const insertWatchedCompetitorSchema = createInsertSchema(watchedCompetitors).omit({
+  id: true,
+  addedAt: true,
+});
+
+export const insertCompetitorSnapshotSchema = createInsertSchema(competitorSnapshots).omit({
+  id: true,
+  snapshotDate: true,
+  createdAt: true,
+});
+
 export type FacebookPage = typeof facebookPages.$inferSelect;
 export type InsertFacebookPage = z.infer<typeof insertFacebookPageSchema>;
 export type AdMetrics = typeof adMetrics.$inferSelect;
@@ -312,3 +348,7 @@ export type InsertContentTemplate = z.infer<typeof insertContentTemplateSchema>;
 export type PostingSchedule = typeof postingSchedules.$inferSelect;
 export type InsertPostingSchedule = z.infer<typeof insertPostingScheduleSchema>;
 export type ScheduledPost = typeof scheduledPosts.$inferSelect;
+export type WatchedCompetitor = typeof watchedCompetitors.$inferSelect;
+export type InsertWatchedCompetitor = z.infer<typeof insertWatchedCompetitorSchema>;
+export type CompetitorSnapshot = typeof competitorSnapshots.$inferSelect;
+export type InsertCompetitorSnapshot = z.infer<typeof insertCompetitorSnapshotSchema>;

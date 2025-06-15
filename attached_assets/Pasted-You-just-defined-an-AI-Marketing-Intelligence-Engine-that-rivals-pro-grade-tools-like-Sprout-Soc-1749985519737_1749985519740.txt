@@ -1,0 +1,110 @@
+You just defined an **AI Marketing Intelligence Engine** that rivals pro-grade tools like Sprout Social, Brandwatch, or AdEspresso. Here’s how we’ll break this down — 4 feature modules, **each with its own Replit-safe master prompt** using the ⚙️ Full Pre-Check framework:
+
+---
+
+## 📊 PHASE I: Save & Track Competitor Over Time
+
+**Feature Summary:**
+
+* Let users "watch" Facebook Pages (save them to DB)
+* Schedule weekly snapshots of top 3–5 posts
+* Analyze and visualize engagement trends over time
+
+### 🧠 MASTER PROMPT
+
+```ts
+// === ⚙️ PRE-CHECK LOGIC (DO NOT SKIP) ===
+
+// ✅ 1. CHECK if `watchedCompetitors` table exists in `shared/schema.ts`
+//   → If not, create it: { id, userId, pageId, addedAt }
+// ✅ 2. CHECK if weekly snapshot logic exists in `PageWatcher.ts` — enhance it, don’t duplicate
+// ✅ 3. Add function to `facebook.ts`: `getTopPosts(pageId)`
+// ✅ 4. Add DB table: `competitorSnapshots` with { id, pageId, snapshotDate, postData (JSON), totalEngagement }
+// ✅ 5. Add cron: every Monday 3AM → fetch & save top posts for each watched page
+// ✅ 6. In frontend: Let users click “Watch This Page” in `CompetitorAnalysis.tsx`
+// ✅ 7. Add `/api/competitor/watch`, `/unwatch`, `/list`, `/snapshots/:pageId`
+// ✅ 8. Add UI for engagement graph: last 30 days (line chart using Recharts or Victory)
+// ✅ 9. All additions must follow existing structure, no mock data
+
+```
+
+---
+
+## ⚖️ PHASE II: Multi-Page Benchmarking
+
+**Feature Summary:**
+
+* Compare multiple Facebook Pages side by side
+* AI generates comparative narrative: "Page A vs B vs C"
+
+### 🧠 MASTER PROMPT
+
+```ts
+// ✅ Add UI: Input up to 3 Page IDs
+// ✅ Backend route: `/api/competitor/compare` → fetch posts from each
+// ✅ Reuse `analyzeCompetitorPosts()` with extended prompt:
+//   "Compare and contrast post frequency, engagement, tone, and topics"
+// ✅ Display chart view: bar chart per page (avg likes/comments per post)
+// ✅ Output: Table of top posts + AI-generated paragraph
+// ✅ Label output with: "👁️ Enhanced by AI on 2025-06-15 — Multi-Page Benchmarking"
+```
+
+---
+
+## 🏷️ PHASE III: Keyword/Hashtag Extraction
+
+**Feature Summary:**
+
+* Auto-extract most-used keywords + hashtags
+* Display as tag cloud or ranked list
+
+### 🧠 MASTER PROMPT
+
+```ts
+// ✅ In `openai.ts`, add `extractKeywordsFromPosts(posts[])`
+// ✅ Prompt: "From the following posts, extract a ranked list of common words, phrases, and hashtags."
+// ✅ Add UI: tag cloud or list view with counts (frontend tag cloud lib or tailwind-based grid)
+// ✅ Filter for noise (ignore "the", "is", etc.)
+// ✅ Output: Top 10–15 unique tags ranked by usage
+```
+
+---
+
+## 🧠 PHASE IV: Meta Ad Library Integration
+
+**Feature Summary:**
+
+* Fetch live ad data from Meta Ad Library for public pages
+* Analyze tone, CTA, frequency
+* Can feed into your AdOptimizer
+
+### 🧠 MASTER PROMPT
+
+```ts
+// ✅ Add route: `/api/competitor/ads/:pageId`
+// ✅ Call Meta Ad Library endpoint: 
+//    `https://graph.facebook.com/v18.0/ads_archive?search_terms=&ad_reached_countries=[...]&page_ids=[pageId]`
+// ✅ Store response in DB table: `competitorAds` with { pageId, adText, adId, impressions, lastSeen }
+// ✅ Pass ads to `analyzeAdPerformance()` in `openai.ts`
+// ✅ Output insights like:
+//   “Top-performing ad uses emotional testimonial + offer, active since May 1”
+// ✅ Display ad cards + summary + optional download CSV
+```
+
+---
+
+### 💡 Deployment Plan (Recommended Order)
+
+1. **Start with Save & Track Competitor**
+2. Then: Multi-Page Benchmarking
+3. Then: Keyword/Hashtag Extraction
+4. Finally: Meta Ad Library Integration (highest API friction)
+
+---
+
+Say:
+
+> `➤ Let's implement SaveAndTrackCompetitor (with full pre-check)`
+> to begin PHASE I.
+
+Once done, I’ll verify and roll the next prompt in the stack. Ready to go when you are.

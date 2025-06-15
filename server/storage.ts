@@ -115,6 +115,19 @@ export interface IStorage {
   getAllFacebookPages(): Promise<FacebookPage[]>;
   getAdAccountsByUser(userId: string): Promise<any[]>;
   
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+  // Watched Competitors
+  addWatchedCompetitor(competitor: InsertWatchedCompetitor): Promise<WatchedCompetitor>;
+  getWatchedCompetitorsByUser(userId: string): Promise<WatchedCompetitor[]>;
+  removeWatchedCompetitor(competitorId: string): Promise<void>;
+  getWatchedCompetitorByPageId(userId: string, pageId: string): Promise<WatchedCompetitor | undefined>;
+  
+  // Competitor Snapshots
+  createCompetitorSnapshot(snapshot: InsertCompetitorSnapshot): Promise<CompetitorSnapshot>;
+  getCompetitorSnapshots(pageId: string, limit?: number): Promise<CompetitorSnapshot[]>;
+  getLatestSnapshotForPage(pageId: string): Promise<CompetitorSnapshot | undefined>;
+  getAllActiveCompetitorPages(): Promise<{ pageId: string; pageName: string }[]>;
+  
   // Dashboard Analytics
   getDashboardMetrics(userId: string): Promise<{
     totalSpend: number;

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import multer from "multer";
 import { 
   FacebookAPIService, 
   getFacebookOAuthUrl, 
@@ -5245,13 +5246,19 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.post('/api/facebook/photo', devAuthMiddleware, async (req: any, res) => {
+  // Configure multer for file uploads
+  const upload = multer({ storage: multer.memoryStorage() });
+
+  app.post('/api/facebook/photo', devAuthMiddleware, upload.single('file'), async (req: any, res) => {
     try {
-      const formData = req.body;
-      const { caption } = formData;
+      const { caption } = req.body;
+      const file = req.file;
       
-      // Handle multipart form data for file upload
-      const result = await facebookAPI.uploadPhotoPost(req.file || req.files, caption);
+      if (!file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      
+      const result = await facebookAPI.uploadPhotoPost(file.buffer, file.mimetype, caption || '');
       res.json(result);
     } catch (error) {
       console.error('Error uploading photo to Facebook:', error);

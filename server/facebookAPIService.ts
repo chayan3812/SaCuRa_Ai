@@ -269,21 +269,28 @@ export class FacebookAPIService {
     }
   }
 
-  async uploadPhotoPost(file: any, caption?: string): Promise<{ id: string; post_id?: string }> {
+  async uploadPhotoPost(fileBuffer: Buffer, mimeType: string, caption: string): Promise<{ id: string; post_id?: string }> {
     try {
       if (!PAGE_ID || !ACCESS_TOKEN) {
         throw new Error('Facebook credentials not configured');
       }
 
-      // For now, return a success response for the file upload
-      // In production, this would handle actual file upload to Facebook
-      const mockResponse = {
-        id: `photo_${Date.now()}`,
-        post_id: `${PAGE_ID}_${Date.now()}`
-      };
+      const url = `https://graph.facebook.com/${API_VERSION}/${PAGE_ID}/photos`;
+      const FormData = require('form-data');
+      const form = new FormData();
+      
+      form.append("access_token", ACCESS_TOKEN);
+      form.append("caption", caption);
+      form.append("source", fileBuffer, {
+        filename: "image.jpg",
+        contentType: mimeType
+      });
 
-      console.log('Photo upload request received:', { file: file?.name || 'file', caption });
-      return mockResponse;
+      const response = await axios.post(url, form, {
+        headers: form.getHeaders()
+      });
+
+      return response.data;
     } catch (error: any) {
       console.error('Facebook photo upload error:', error.response?.data || error.message);
       throw new Error(`Failed to upload photo: ${error.response?.data?.error?.message || error.message}`);

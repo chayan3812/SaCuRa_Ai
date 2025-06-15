@@ -266,6 +266,20 @@ export const postingSchedules = pgTable("posting_schedules", {
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
+// Keyword Snapshot Tracking Table
+export const competitorKeywordSnapshots = pgTable("competitor_keyword_snapshots", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: varchar("user_id").notNull(),
+  pageIds: text("page_ids").array().notNull(),
+  keywordCounts: jsonb("keyword_counts").notNull(),
+  postsAnalyzed: integer("posts_analyzed").default(0),
+  capturedAt: timestamp("captured_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type CompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferSelect;
+export type InsertCompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferInsert;
+
 export const insertFacebookPageSchema = createInsertSchema(facebookPages).omit({
   id: true,
   createdAt: true,

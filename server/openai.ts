@@ -706,17 +706,17 @@ export const openaiService = {
   analyzePagesComparison
 };
 
-// Keyword Extraction from Facebook Posts
-export async function extractKeywordsFromPosts(posts: string[]): Promise<string[]> {
+// Keyword Extraction from Facebook Posts with Frequency Tracking
+export async function extractKeywordsFromPosts(posts: string[]): Promise<Record<string, number>> {
   if (!posts || posts.length === 0) {
-    return [];
+    return {};
   }
 
-  const prompt = `Extract the most common keywords, hashtags, trending phrases, and marketing slogans from these Facebook posts. Return as a JSON array of strings, focusing on actionable marketing insights.`;
+  const prompt = `Extract the most common keywords, hashtags, trending phrases, and marketing slogans from these Facebook posts. Return as a JSON object where keys are keywords and values are frequency counts (how often they appear). Focus on actionable marketing insights.`;
   const textBlock = posts.filter(p => p && p.trim()).join("\n\n");
 
   if (!textBlock.trim()) {
-    return [];
+    return {};
   }
 
   try {
@@ -725,7 +725,7 @@ export async function extractKeywordsFromPosts(posts: string[]): Promise<string[
       messages: [
         { 
           role: "system", 
-          content: "You are a social media marketing analyst specializing in keyword extraction and trend identification. Return only valid JSON arrays." 
+          content: "You are a social media marketing analyst specializing in keyword extraction and frequency analysis. Return only valid JSON objects with keyword-frequency pairs." 
         },
         { 
           role: "user", 
@@ -733,16 +733,69 @@ export async function extractKeywordsFromPosts(posts: string[]): Promise<string[
         },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.5,
+      temperature: 0.3,
     });
 
-    const content = response.choices[0].message.content || '{"keywords": []}';
+    const content = response.choices[0].message.content || '{}';
     const parsed = JSON.parse(content);
-    const keywords = parsed.keywords || parsed || [];
     
-    return Array.isArray(keywords) ? keywords.slice(0, 50) : []; // Limit to 50 keywords
+    // Ensure we have a valid object with numeric values
+    const keywordCounts: Record<string, number> = {};
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (typeof key === 'string' && (typeof value === 'number' || !isNaN(Number(value)))) {
+        keywordCounts[key] = Number(value);
+      }
+    });
+    
+    // Limit to top 50 keywords by frequency
+    const sortedKeywords = Object.entries(keywordCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 50)
+      .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
+    
+    return sortedKeywords;
   } catch (error) {
     console.error('Error extracting keywords:', error);
+    return {};
+  }
+}
+
+// AI Content Theme Generation
+export async function generateContentThemes(keywords: string[]): Promise<string[]> {
+  if (!keywords || keywords.length === 0) {
+    return [];
+  }
+
+  const prompt = `Based on these trending keywords from competitor analysis, generate 5-7 specific content themes and post ideas that a marketing team should create this week. Focus on actionable, engaging content suggestions.
+
+Keywords: ${keywords.join(', ')}
+
+Return as a JSON array of content theme strings.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a creative social media strategist. Generate specific, actionable content themes based on keyword trends." 
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const content = response.choices[0].message.content || '{"themes": []}';
+    const parsed = JSON.parse(content);
+    const themes = parsed.themes || parsed || [];
+    
+    return Array.isArray(themes) ? themes.slice(0, 7) : [];
+  } catch (error) {
+    console.error('Error generating content themes:', error);
     return [];
   }
 }

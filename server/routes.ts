@@ -831,12 +831,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ keywords: [], message: 'No posts found to analyze' });
       }
 
-      // Extract keywords using OpenAI
+      // Extract keywords with frequency tracking using OpenAI
       const { extractKeywordsFromPosts } = await import('./openai');
-      const keywords = await extractKeywordsFromPosts(allPosts);
+      const keywordCounts = await extractKeywordsFromPosts(allPosts);
+
+      // Save keyword snapshot to database
+      await storage.createCompetitorKeywordSnapshot({
+        userId,
+        pageIds: pageIds,
+        keywordCounts: keywordCounts,
+        postsAnalyzed: allPosts.length,
+        capturedAt: new Date(),
+      });
 
       res.json({ 
-        keywords,
+        keywordCounts,
         postsAnalyzed: allPosts.length,
         pagesAnalyzed: pageIds.length
       });
@@ -844,6 +853,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Keyword extraction failed:', error);
       res.status(500).json({ error: 'Failed to extract keywords' });
+    }
+  });
+
+  // AI Content Theme Generation Route
+  app.post('/api/competitor/content-themes', isAuthenticated, async (req, res) => {
+    try {
+      const { keywords } = req.body;
+      
+      if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+        return res.status(400).json({ error: 'Please provide keywords array' });
+      }
+
+      const { generateContentThemes } = await import('./openai');
+      const themes = await generateContentThemes(keywords);
+
+      res.json({ themes });
+
+    } catch (error) {
+      console.error('Content theme generation failed:', error);
+      res.status(500).json({ error: 'Failed to generate content themes' });
     }
   });
 

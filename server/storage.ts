@@ -39,6 +39,9 @@ import {
   competitorSnapshots,
   type CompetitorSnapshot,
   type InsertCompetitorSnapshot,
+  competitorKeywordSnapshots,
+  type CompetitorKeywordSnapshot,
+  type InsertCompetitorKeywordSnapshot,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql, lte, asc } from "drizzle-orm";
@@ -141,6 +144,10 @@ export interface IStorage {
     preventedRestrictions: number;
     avgResponseTime: number;
   }>;
+  
+  // Keyword Snapshot operations
+  createCompetitorKeywordSnapshot(snapshot: InsertCompetitorKeywordSnapshot): Promise<CompetitorKeywordSnapshot>;
+  getCompetitorKeywordSnapshots(userId: string): Promise<CompetitorKeywordSnapshot[]>;
 }
 
 export class DatabaseStorage implements IStorage {

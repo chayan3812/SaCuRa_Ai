@@ -51,9 +51,68 @@ import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Facebook webhook (must be registered before auth middleware)
-  const facebookWebhook = await import('./webhooks/facebook');
-  app.use('/webhook/facebook', facebookWebhook.default);
+  // Facebook webhook verification (must be before auth middleware)
+  app.get('/webhook/facebook', (req, res) => {
+    const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || "sacura_ai_webhook_token_2025";
+    
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
+
+    console.log("Facebook webhook verification:", { mode, token, challenge });
+
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      console.log("Webhook verification successful");
+      return res.status(200).send(challenge);
+    } else {
+      console.log("Webhook verification failed - invalid token");
+      return res.sendStatus(403);
+    }
+  });
+
+  // Facebook webhook events (must be before auth middleware)
+  app.post('/webhook/facebook', async (req, res) => {
+    console.log("Facebook webhook event received:", JSON.stringify(req.body, null, 2));
+    
+    try {
+      const body = req.body;
+
+      // Process incoming messages
+      if (body.object === "page") {
+        body.entry?.forEach((entry: any) => {
+          entry.messaging?.forEach(async (event: any) => {
+            if (event.message) {
+              const senderId = event.sender.id;
+              const messageText = event.message.text;
+              
+              console.log(`Message from ${senderId}: ${messageText}`);
+              
+              // Store the interaction in database
+              try {
+                await storage.createCustomerInteraction({
+                  pageId: 'facebook_messenger',
+                  customerId: senderId,
+                  customerName: 'Facebook User',
+                  message: messageText,
+                  sentiment: 'neutral',
+                  priority: 'medium',
+                  status: 'new'
+                });
+              } catch (error) {
+                console.error("Error storing message:", error);
+              }
+            }
+          });
+        });
+      }
+
+      // Always respond with 200 to acknowledge receipt
+      res.status(200).send("EVENT_RECEIVED");
+    } catch (error) {
+      console.error("Error processing webhook event:", error);
+      res.status(500).send("Error processing event");
+    }
+  });
 
   // Auth middleware
   await setupAuth(app);

@@ -40,6 +40,8 @@ import { stressTestEngine } from "./stressTestRetrainedAI";
 import { openAIFineTuning } from "./openAIFineTuning";
 import { explainableAI } from "./explainableAI";
 import { aiModelManager } from "./aiModelManager";
+import { WeeklyAIReporter } from "./weeklyAIReporter";
+import { scheduledJobsManager } from "./scheduledJobs";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3753,10 +3755,80 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Weekly AI Intelligence Reports API
+  const weeklyAIReporter = new WeeklyAIReporter();
+
+  app.get('/api/weekly-ai-reports', isAuthenticated, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const reports = await weeklyAIReporter.getAllReports(limit);
+      res.json(reports);
+    } catch (error) {
+      console.error('Error getting weekly reports:', error);
+      res.status(500).json({ error: 'Failed to get weekly reports' });
+    }
+  });
+
+  app.post('/api/weekly-ai-reports/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const report = await weeklyAIReporter.generateWeeklyReport();
+      res.json({
+        message: "Weekly AI intelligence report generated successfully",
+        report
+      });
+    } catch (error) {
+      console.error('Error generating weekly report:', error);
+      res.status(500).json({ error: 'Failed to generate weekly report' });
+    }
+  });
+
+  app.get('/api/weekly-ai-reports/:reportId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { reportId } = req.params;
+      const report = await weeklyAIReporter.getReportById(reportId);
+      
+      if (!report) {
+        return res.status(404).json({ error: 'Report not found' });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error('Error getting weekly report:', error);
+      res.status(500).json({ error: 'Failed to get weekly report' });
+    }
+  });
+
+  // Scheduled Jobs Management API
+  app.get('/api/scheduled-jobs/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const status = scheduledJobsManager.getJobStatus();
+      res.json(status);
+    } catch (error) {
+      console.error('Error getting job status:', error);
+      res.status(500).json({ error: 'Failed to get job status' });
+    }
+  });
+
+  app.post('/api/scheduled-jobs/trigger-weekly-report', isAuthenticated, async (req: any, res) => {
+    try {
+      const report = await scheduledJobsManager.triggerWeeklyReport();
+      res.json({
+        message: "Weekly report triggered manually",
+        report
+      });
+    } catch (error) {
+      console.error('Error triggering weekly report:', error);
+      res.status(500).json({ error: 'Failed to trigger weekly report' });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service
   initializeWebSocket(httpServer);
+
+  // Start scheduled jobs system
+  scheduledJobsManager.startJobs();
 
   // Advanced AI Engine Routes
   app.get('/api/ai/insights/:pageId', isAuthenticated, async (req: any, res) => {

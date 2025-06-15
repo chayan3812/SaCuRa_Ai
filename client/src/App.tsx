@@ -23,6 +23,7 @@ import AITestDashboard from "@/pages/AITestDashboard";
 import AISelfOptimizer from "@/pages/AISelfOptimizer";
 import AIVersionManager from "@/pages/AIVersionManager";
 import AIModelDashboard from "@/pages/AIModelDashboard";
+import WeeklyAIIntelligence from "@/pages/WeeklyAIIntelligence";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";

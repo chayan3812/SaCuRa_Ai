@@ -109,7 +109,9 @@ export default function WeeklyAIIntelligence() {
   // Generate new report mutation
   const generateReportMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/weekly-ai-reports/generate", "POST");
+      return await apiRequest("/api/weekly-ai-reports/generate", {
+        method: "POST"
+      });
     },
     onSuccess: (data) => {
       toast({

@@ -23,6 +23,9 @@ import { initializeWebSocket } from "./websocket";
 import { systemOptimizer } from "./systemOptimizer";
 import { mlEngine } from "./mlEngine";
 import { productionOptimizer } from "./productionOptimizer";
+import { db } from "./db";
+import { customerInteractions } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { enhancedPageFixer } from "./enhancedPageFixer";
 import { advancedAIEngine } from "./advancedAIEngine";
 import { sentimentAI } from "./sentimentAI";
@@ -478,6 +481,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error analyzing message:', error);
       res.status(500).json({ message: 'Failed to analyze message' });
+    }
+  });
+
+  // AI Feedback collection endpoint
+  app.post('/api/messages/feedback', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, score, notes } = req.body;
+      
+      if (!messageId || !score) {
+        return res.status(400).json({ message: 'Message ID and score are required' });
+      }
+
+      if (score < 1 || score > 5) {
+        return res.status(400).json({ message: 'Score must be between 1 and 5' });
+      }
+
+      // Update message with feedback
+      const [updated] = await db
+        .update(customerInteractions)
+        .set({
+          aiFeedbackScore: score,
+          aiFeedbackNotes: notes || null,
+          aiFeedbackAt: new Date(),
+        })
+        .where(eq(customerInteractions.id, messageId))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      res.json({
+        messageId,
+        score,
+        notes,
+        feedbackAt: updated.aiFeedbackAt,
+      });
+    } catch (error) {
+      console.error('Error saving AI feedback:', error);
+      res.status(500).json({ message: 'Failed to save feedback' });
+    }
+  });
+
+  // Auto-trigger AI analysis for new messages
+  app.post('/api/messages/create-and-analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId, customerId, customerName, message } = req.body;
+      
+      if (!pageId || !message) {
+        return res.status(400).json({ message: 'Page ID and message are required' });
+      }
+
+      // Create the message
+      const [newMessage] = await db
+        .insert(customerInteractions)
+        .values({
+          pageId,
+          customerId: customerId || `customer-${Date.now()}`,
+          customerName: customerName || 'Anonymous',
+          message,
+          status: 'pending',
+        })
+        .returning();
+
+      // Automatically trigger AI analysis
+      try {
+        const classification = await classifyCustomerMessage(message);
+        const urgencyScore = await calculateUrgencyScore(message, classification);
+        const replySuggestions = await suggestReply(message, classification);
+
+        // Update with AI analysis
+        const [analyzedMessage] = await db
+          .update(customerInteractions)
+          .set({
+            urgencyScore: urgencyScore.toString(),
+            aiClassification: classification,
+            aiSuggestedReplies: replySuggestions,
+            aiAnalyzedAt: new Date(),
+          })
+          .where(eq(customerInteractions.id, newMessage.id))
+          .returning();
+
+        res.json({
+          message: analyzedMessage,
+          aiAnalysis: {
+            classification,
+            urgencyScore,
+            replySuggestions,
+          }
+        });
+      } catch (aiError) {
+        console.error('AI analysis failed for new message:', aiError);
+        // Return message without AI analysis if AI fails
+        res.json({
+          message: newMessage,
+          aiAnalysis: null,
+          error: 'AI analysis failed but message was created'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating message:', error);
+      res.status(500).json({ message: 'Failed to create message' });
     }
   });
 

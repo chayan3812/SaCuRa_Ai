@@ -350,7 +350,10 @@ export class DatabaseStorage implements IStorage {
         urgencyScore: customerInteractions.urgencyScore,
         aiClassification: customerInteractions.aiClassification,
         aiSuggestedReplies: customerInteractions.aiSuggestedReplies,
-        aiAnalyzedAt: customerInteractions.aiAnalyzedAt
+        aiAnalyzedAt: customerInteractions.aiAnalyzedAt,
+        aiFeedbackScore: customerInteractions.aiFeedbackScore,
+        aiFeedbackNotes: customerInteractions.aiFeedbackNotes,
+        aiFeedbackAt: customerInteractions.aiFeedbackAt
       })
       .from(customerInteractions)
       .innerJoin(facebookPages, eq(customerInteractions.pageId, facebookPages.id))

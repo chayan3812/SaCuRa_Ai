@@ -102,6 +102,10 @@ export const customerInteractions = pgTable("customer_interactions", {
   aiClassification: varchar("ai_classification"), // AI message classification
   aiSuggestedReplies: jsonb("ai_suggested_replies"), // Array of AI-generated reply suggestions
   aiAnalyzedAt: timestamp("ai_analyzed_at"), // When AI analysis was performed
+  // AI Feedback Loop for model improvement
+  aiFeedbackScore: integer("ai_feedback_score"), // 1-5 rating of AI suggestion quality
+  aiFeedbackNotes: text("ai_feedback_notes"), // Optional feedback comments
+  aiFeedbackAt: timestamp("ai_feedback_at"), // When feedback was provided
 });
 
 // Employee Performance Tracking

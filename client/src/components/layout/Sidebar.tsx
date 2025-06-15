@@ -38,6 +38,7 @@ const navigation = [
   { name: "AI Training Pipeline", href: "/ai-training", icon: Bot, badge: "GPT OPS" },
   { name: "AI Test Dashboard", href: "/ai-test", icon: Brain, badge: "TESTING" },
   { name: "AI Self-Optimizer", href: "/ai-optimizer", icon: Bot, badge: "GOD MODE" },
+  { name: "AI Version Manager", href: "/ai-version-manager", icon: Brain, badge: "FEEDBACK LOOP" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

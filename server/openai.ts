@@ -547,6 +547,146 @@ export async function generateContentCalendar(): Promise<any> {
   return {};
 }
 
+// Multi-Page Benchmarking Analysis
+export interface PagePosts {
+  pageId: string;
+  pageName: string;
+  profilePicture: string;
+  posts: Array<{
+    message: string;
+    likes: number;
+    comments: number;
+    shares: number;
+    timestamp: string;
+    mediaType?: string;
+  }>;
+}
+
+export interface BenchmarkingResult {
+  aiSummary: string;
+  stats: Array<{
+    pageId: string;
+    pageName: string;
+    avgLikes: number;
+    avgComments: number;
+    avgShares: number;
+    postFrequency: string;
+    engagementRate: number;
+  }>;
+  topPosts: Array<{
+    pageId: string;
+    pageName: string;
+    message: string;
+    likes: number;
+    comments: number;
+    shares: number;
+    timestamp: string;
+  }>;
+  generatedAt: string;
+}
+
+export async function analyzePagesComparison(pages: PagePosts[]): Promise<BenchmarkingResult> {
+  const prompt = `
+Analyze and compare these Facebook Pages as a marketing intelligence expert. Provide a comprehensive comparison across:
+
+1. Post frequency and timing patterns
+2. Writing style (formal, casual, emotional, emoji usage)
+3. Content focus (promotions, education, testimonials, entertainment, etc.)
+4. Engagement strategies and performance
+5. Visual content usage (images, videos, carousels)
+6. Audience interaction approaches
+
+Pages Data:
+${JSON.stringify(pages, null, 2)}
+
+Return a detailed strategic analysis that reveals:
+- Key differentiators between pages
+- What each page does exceptionally well
+- Engagement patterns and why they work
+- Content strategies and their effectiveness
+- Actionable insights for competitive positioning
+
+Focus on tactical, actionable insights that a marketing team can immediately implement.
+`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert marketing intelligence analyst specializing in competitive social media analysis. Provide detailed, actionable insights based on data patterns."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
+
+    const aiSummary = response.choices[0].message.content || "Analysis completed";
+
+    // Calculate statistics
+    const stats = pages.map(page => {
+      const totalLikes = page.posts.reduce((sum, post) => sum + post.likes, 0);
+      const totalComments = page.posts.reduce((sum, post) => sum + post.comments, 0);
+      const totalShares = page.posts.reduce((sum, post) => sum + post.shares, 0);
+      const postCount = page.posts.length;
+
+      const avgLikes = postCount > 0 ? Math.round(totalLikes / postCount) : 0;
+      const avgComments = postCount > 0 ? Math.round(totalComments / postCount) : 0;
+      const avgShares = postCount > 0 ? Math.round(totalShares / postCount) : 0;
+
+      // Calculate engagement rate
+      const totalEngagement = totalLikes + totalComments + totalShares;
+      const engagementRate = postCount > 0 ? Number((totalEngagement / postCount).toFixed(2)) : 0;
+
+      // Estimate post frequency
+      const postFrequency = postCount >= 7 ? "Daily+" : postCount >= 3 ? "Regular" : "Sporadic";
+
+      return {
+        pageId: page.pageId,
+        pageName: page.pageName,
+        avgLikes,
+        avgComments,
+        avgShares,
+        postFrequency,
+        engagementRate
+      };
+    });
+
+    // Get top 2 posts per page
+    const topPosts = pages.flatMap(page => {
+      const sortedPosts = page.posts
+        .sort((a, b) => ((b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares)))
+        .slice(0, 2);
+
+      return sortedPosts.map(post => ({
+        pageId: page.pageId,
+        pageName: page.pageName,
+        message: post.message.substring(0, 150) + (post.message.length > 150 ? "..." : ""),
+        likes: post.likes,
+        comments: post.comments,
+        shares: post.shares,
+        timestamp: post.timestamp
+      }));
+    });
+
+    return {
+      aiSummary,
+      stats,
+      topPosts,
+      generatedAt: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('Error in AI analysis:', error);
+    throw new Error('Failed to analyze pages comparison');
+  }
+}
+
 // Export openaiService object for compatibility with other modules
 export const openaiService = {
   generateCustomerServiceResponse,
@@ -562,5 +702,6 @@ export const openaiService = {
   generateContentCalendar,
   analyzePostContent,
   generateSEOOptimizedContent,
-  generateImage
+  generateImage,
+  analyzePagesComparison
 };

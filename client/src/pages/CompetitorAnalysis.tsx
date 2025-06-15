@@ -23,8 +23,14 @@ import {
   Trash2,
   Eye,
   Calendar,
-  Users
+  Users,
+  Brain,
+  Download,
+  Zap
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Textarea } from '@/components/ui/textarea';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface CompetitorPost {
   id: string;
@@ -70,6 +76,10 @@ export default function CompetitorAnalysis() {
   const [pageIdInput, setPageIdInput] = useState('');
   const [pageNameInput, setPageNameInput] = useState('');
   const [categoryInput, setCategoryInput] = useState('');
+
+  // Multi-Page Benchmarking State
+  const [benchmarkPages, setBenchmarkPages] = useState(['', '', '']);
+  const [benchmarkResults, setBenchmarkResults] = useState<any>(null);
   const [analysisResult, setAnalysisResult] = useState<{
     posts: CompetitorPost[];
     analysis: CompetitorAnalysisResult;

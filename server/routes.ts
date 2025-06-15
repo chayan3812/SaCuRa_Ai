@@ -697,6 +697,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Multi-Page Benchmarking Route
+  app.post('/api/competitor/compare', isAuthenticated, async (req, res) => {
+    try {
+      const { pages } = req.body;
+      
+      if (!pages || !Array.isArray(pages) || pages.length < 2 || pages.length > 3) {
+        return res.status(400).json({ error: 'Please provide 2-3 Facebook Page IDs or URLs' });
+      }
+
+      // Get user's Facebook access token
+      const userId = (req as any).user.claims.sub;
+      const userPages = await storage.getFacebookPagesByUser(userId);
+      
+      if (userPages.length === 0) {
+        return res.status(400).json({ message: 'No Facebook pages connected' });
+      }
+
+      const accessToken = userPages[0].accessToken;
+      const fbService = new FacebookAPIService(accessToken);
+      const pagesData = [];
+
+      // Fetch data for each page
+      for (const pageInput of pages) {
+        try {
+          // Extract page ID from URL if needed
+          let pageId = pageInput;
+          if (pageInput.includes('facebook.com')) {
+            const urlParts = pageInput.split('/');
+            pageId = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2];
+          }
+
+          // Get page info
+          const pageInfo = await fbService.getPageInfo(pageId);
+          
+          // Get recent posts
+          const posts = await fbService.getRecentPosts(pageId, 10);
+          
+          const formattedPosts = posts.map((post: any) => ({
+            message: post.message || '',
+            likes: post.reactions?.summary?.total_count || 0,
+            comments: post.comments?.summary?.total_count || 0,
+            shares: post.shares?.count || 0,
+            timestamp: post.created_time,
+            mediaType: post.attachments?.data?.[0]?.type || 'text'
+          }));
+
+          pagesData.push({
+            pageId,
+            pageName: pageInfo.name || 'Unknown Page',
+            profilePicture: pageInfo.picture?.data?.url || '',
+            posts: formattedPosts
+          });
+
+        } catch (error) {
+          console.error(`Error fetching data for page ${pageInput}:`, error);
+          // Include failed page with error info
+          pagesData.push({
+            pageId: pageInput,
+            pageName: 'Access Error',
+            profilePicture: '',
+            posts: [],
+            error: 'Unable to access this page'
+          });
+        }
+      }
+
+      // Filter out pages with errors for analysis
+      const validPages = pagesData.filter((page: any) => !page.error && page.posts.length > 0);
+      
+      if (validPages.length < 2) {
+        return res.status(400).json({ 
+          error: 'Not enough accessible pages for comparison',
+          pagesData 
+        });
+      }
+
+      // Perform AI analysis
+      const { analyzePagesComparison } = await import('./openai');
+      const analysis = await analyzePagesComparison(validPages);
+
+      res.json({
+        success: true,
+        analysis,
+        pagesData,
+        validPagesCount: validPages.length,
+        totalPagesRequested: pages.length
+      });
+
+    } catch (error) {
+      console.error('Error in multi-page comparison:', error);
+      res.status(500).json({ error: 'Failed to perform page comparison' });
+    }
+  });
+
   app.post('/api/competitors/:pageId/analyze-posts', isAuthenticated, async (req, res) => {
     try {
       const { pageId } = req.params;

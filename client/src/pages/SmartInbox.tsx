@@ -147,11 +147,14 @@ export default function SmartInbox() {
       feedback: 'useful' | 'not_useful'; 
       responseTime?: number 
     }) => {
-      return await apiRequest('/api/smart-feedback', {
+      return await apiRequest('/api/feedback/submit', {
         method: 'POST',
         body: JSON.stringify({
-          ...data,
-          platformContext: 'inbox'
+          messageId: data.messageId,
+          aiSuggestion: data.aiSuggestion,
+          feedback: data.feedback === 'useful',
+          platformContext: 'inbox',
+          responseTime: data.responseTime
         })
       });
     },

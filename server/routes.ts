@@ -775,6 +775,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Feedback Submit Route with Validation
+  app.post('/api/feedback/submit', isAuthenticated, async (req: any, res) => {
+    try {
+      const FeedbackSchema = z.object({
+        messageId: z.string().min(1, 'Message ID is required'),
+        aiSuggestion: z.string().min(1, 'AI suggestion is required'),
+        feedback: z.boolean(),
+        reviewedBy: z.string().optional(),
+        platformContext: z.string().optional(),
+        responseTime: z.number().optional(),
+      });
+
+      // Validate request body before processing
+      const validationResult = FeedbackSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: 'Invalid or missing fields',
+          details: validationResult.error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message
+          }))
+        });
+      }
+
+      const body = validationResult.data;
+      
+      await storage.storeFeedback({
+        messageId: body.messageId,
+        aiSuggestion: body.aiSuggestion,
+        feedback: body.feedback,
+        reviewedBy: body.reviewedBy || req.user.claims.sub,
+        platformContext: body.platformContext || 'inbox',
+        modelVersion: 'gpt-4o',
+        responseTime: body.responseTime || null,
+        usageCount: body.feedback ? 1 : 0,
+      });
+
+      res.status(200).json({ 
+        success: true,
+        message: 'Feedback submitted successfully',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Feedback submit failed:', error);
+      res.status(500).json({ error: 'Failed to submit feedback' });
+    }
+  });
+
   app.get('/api/ai-performance-metrics', isAuthenticated, async (req: any, res) => {
     try {
       const days = parseInt(req.query.days as string) || 30;

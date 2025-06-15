@@ -1,0 +1,81 @@
+Here’s the full UI power-up for collecting SmartInboxAI feedback — fully wired to your `/api/feedback/submit` route. Let’s build that ⭐ feedback system into the reply panel.
+
+---
+
+## 🔧 SmartInboxAI Feedback Capture UI
+
+### ✅ Add This to the AI Reply Suggestion Panel
+
+Wherever you render the AI-suggested reply, add this component below it:
+
+```tsx
+// components/SmartReplyFeedback.tsx
+import { useState } from 'react'
+import axios from 'axios'
+
+export function SmartReplyFeedback({ messageId, aiSuggestion }: {
+  messageId: string
+  aiSuggestion: string
+}) {
+  const [feedbackGiven, setFeedbackGiven] = useState<boolean | null>(null)
+
+  const submitFeedback = async (isHelpful: boolean) => {
+    setFeedbackGiven(isHelpful)
+    try {
+      await axios.post('/api/feedback/submit', {
+        messageId,
+        aiSuggestion,
+        feedback: isHelpful,
+        platformContext: 'inbox', // optional
+      })
+    } catch (err) {
+      console.error('Feedback submission failed', err)
+    }
+  }
+
+  if (feedbackGiven !== null) {
+    return <p className="text-sm text-muted">✅ Thanks for the feedback!</p>
+  }
+
+  return (
+    <div className="flex gap-3 items-center mt-2">
+      <span className="text-sm text-gray-600">Was this reply helpful?</span>
+      <button
+        onClick={() => submitFeedback(true)}
+        className="text-green-600 hover:underline"
+      >
+        ⭐ Yes
+      </button>
+      <button
+        onClick={() => submitFeedback(false)}
+        className="text-red-600 hover:underline"
+      >
+        ❌ No
+      </button>
+    </div>
+  )
+}
+```
+
+---
+
+### 🧠 How to Use It
+
+Inside your SmartInboxAI reply block (wherever you show the GPT-suggested reply):
+
+```tsx
+<SmartReplyFeedback
+  messageId={interaction.id}
+  aiSuggestion={suggestedReply}
+/>
+```
+
+---
+
+✅ Done? Drop:
+
+> `➤ Wire feedback data into training prompt builder`
+> or
+> `➤ Let’s build feedback analytics dashboard`
+
+You’re now logging feedback → let’s *use* it.

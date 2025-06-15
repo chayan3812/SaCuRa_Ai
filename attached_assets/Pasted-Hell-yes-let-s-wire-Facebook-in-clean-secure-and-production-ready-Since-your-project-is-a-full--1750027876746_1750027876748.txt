@@ -1,0 +1,150 @@
+Hell yes — let's wire Facebook in clean, secure, and production-ready. Since your project is a full-stack AI platform with Facebook marketing and insights features, here’s the step-by-step plan for a **professional Facebook Graph API integration**:
+
+---
+
+## 🔌 STEP 1: What You’ll Need
+
+Before touching any code, you must get:
+
+| Key                     | Where to Find                                                       |
+| ----------------------- | ------------------------------------------------------------------- |
+| `FACEBOOK_APP_ID`       | [Facebook Developers Console](https://developers.facebook.com/apps) |
+| `FACEBOOK_APP_SECRET`   | Same as above                                                       |
+| `FACEBOOK_PAGE_ID`      | From your Facebook Page settings                                    |
+| `FACEBOOK_ACCESS_TOKEN` | Via long-lived Page Access Token (I’ll show how)                    |
+
+---
+
+## 🧠 STEP 2: Setup `.env`
+
+Open your `.env` (or `.env.template`) and add:
+
+```env
+FACEBOOK_APP_ID=your_app_id
+FACEBOOK_APP_SECRET=your_app_secret
+FACEBOOK_PAGE_ID=your_page_id
+FACEBOOK_ACCESS_TOKEN=your_long_lived_token
+```
+
+---
+
+## ⚙️ STEP 3: Backend Facebook API Client (Node.js)
+
+Inside `server/facebookAPIService.ts` (already exists!), let’s confirm or enhance it like this:
+
+```ts
+import axios from "axios";
+const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+
+export const FacebookAPIService = {
+  async fetchPageInsights() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/insights/page_impressions,page_engaged_users?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  },
+
+  async publishPost(message: string) {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/feed`;
+    const response = await axios.post(url, {
+      message,
+      access_token: ACCESS_TOKEN
+    });
+    return response.data;
+  },
+
+  async getPosts() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/posts?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  }
+};
+```
+
+Let me know if you also want to:
+
+* Upload media
+* Boost posts
+* Pull comments + replies
+* Run audience targeting suggestions (based on AI)
+
+---
+
+## 🧪 STEP 4: Wire to a Route
+
+In `routes.ts` or `facebookAnalytics.ts`, expose these as routes:
+
+```ts
+import express from 'express';
+import { FacebookAPIService } from './facebookAPIService';
+
+const router = express.Router();
+
+router.get("/insights", async (req, res) => {
+  try {
+    const data = await FacebookAPIService.fetchPageInsights();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch insights" });
+  }
+});
+
+router.post("/post", async (req, res) => {
+  try {
+    const { message } = req.body;
+    const result = await FacebookAPIService.publishPost(message);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Post failed" });
+  }
+});
+
+export default router;
+```
+
+Then mount in `server/routes.ts` like:
+
+```ts
+app.use("/api/facebook", facebookAnalytics);
+```
+
+---
+
+## 🎯 STEP 5: Frontend Hook Example
+
+In `client/src/hooks/useFacebookInsights.ts`:
+
+```ts
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+export const useFacebookInsights = () => {
+  return useQuery(["facebookInsights"], async () => {
+    const { data } = await axios.get("/api/facebook/insights");
+    return data;
+  });
+};
+```
+
+---
+
+## 🔐 BONUS: How to Get a Long-Lived Page Access Token
+
+1. Get a short-lived User Token via [Graph API Explorer](https://developers.facebook.com/tools/explorer/)
+2. Exchange it:
+
+```bash
+GET https://graph.facebook.com/v17.0/oauth/access_token?
+  grant_type=fb_exchange_token&
+  client_id={app-id}&
+  client_secret={app-secret}&
+  fb_exchange_token={short-lived-token}
+```
+
+3. Use that to generate a long-lived **Page Token**:
+
+```bash
+GET https://graph.facebook.com/v17.0/me/accounts?access_token={user_token}
+```
+
+---

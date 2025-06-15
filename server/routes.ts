@@ -8,6 +8,7 @@ import {
   exchangeCodeForToken, 
   getLongLivedToken 
 } from "./facebook";
+import { facebookAPI } from "./facebookAPIService";
 import { 
   generateCustomerServiceResponse,
   generateAdOptimizationSuggestions,
@@ -5147,6 +5148,175 @@ Prioritize by impact and feasibility.`;
     } catch (error) {
       console.error('Error triggering weekly report:', error);
       res.status(500).json({ error: 'Failed to trigger weekly report' });
+    }
+  });
+
+  // Production-Ready Facebook API Routes
+  app.get('/api/facebook/validate', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const validation = await facebookAPI.validateCredentials();
+      res.json(validation);
+    } catch (error) {
+      console.error('Error validating Facebook credentials:', error);
+      res.status(500).json({ error: 'Failed to validate credentials' });
+    }
+  });
+
+  app.get('/api/facebook/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { metrics } = req.query;
+      const metricsArray = metrics ? (metrics as string).split(',') : undefined;
+      const insights = await facebookAPI.fetchPageInsights(metricsArray);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching Facebook insights:', error);
+      res.status(500).json({ error: 'Failed to fetch insights' });
+    }
+  });
+
+  app.post('/api/facebook/post', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message, link, picture, scheduled_publish_time } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+
+      const postData = {
+        message,
+        ...(link && { link }),
+        ...(picture && { picture }),
+        ...(scheduled_publish_time && { scheduled_publish_time })
+      };
+
+      const result = await facebookAPI.publishPost(postData);
+      res.json(result);
+    } catch (error) {
+      console.error('Error publishing Facebook post:', error);
+      res.status(500).json({ error: 'Failed to publish post' });
+    }
+  });
+
+  app.get('/api/facebook/posts', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { limit } = req.query;
+      const posts = await facebookAPI.getRecentPosts(limit ? parseInt(limit as string) : 10);
+      res.json(posts);
+    } catch (error) {
+      console.error('Error fetching Facebook posts:', error);
+      res.status(500).json({ error: 'Failed to fetch posts' });
+    }
+  });
+
+  app.get('/api/facebook/page-info', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const pageInfo = await facebookAPI.getPageInfo();
+      res.json(pageInfo);
+    } catch (error) {
+      console.error('Error fetching Facebook page info:', error);
+      res.status(500).json({ error: 'Failed to fetch page info' });
+    }
+  });
+
+  app.get('/api/facebook/post/:postId/engagement', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { postId } = req.params;
+      const engagement = await facebookAPI.getPostEngagement(postId);
+      res.json(engagement);
+    } catch (error) {
+      console.error('Error fetching post engagement:', error);
+      res.status(500).json({ error: 'Failed to fetch post engagement' });
+    }
+  });
+
+  app.post('/api/facebook/upload-media', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { imageUrl, caption } = req.body;
+      
+      if (!imageUrl) {
+        return res.status(400).json({ error: 'Image URL is required' });
+      }
+
+      const result = await facebookAPI.uploadMedia(imageUrl, caption);
+      res.json(result);
+    } catch (error) {
+      console.error('Error uploading media to Facebook:', error);
+      res.status(500).json({ error: 'Failed to upload media' });
+    }
+  });
+
+  app.post('/api/facebook/schedule-post', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message, link, picture, publishTime } = req.body;
+      
+      if (!message || !publishTime) {
+        return res.status(400).json({ error: 'Message and publish time are required' });
+      }
+
+      const postData = {
+        message,
+        ...(link && { link }),
+        ...(picture && { picture })
+      };
+
+      const result = await facebookAPI.schedulePost(postData, new Date(publishTime));
+      res.json(result);
+    } catch (error) {
+      console.error('Error scheduling Facebook post:', error);
+      res.status(500).json({ error: 'Failed to schedule post' });
+    }
+  });
+
+  app.get('/api/facebook/audience-insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const insights = await facebookAPI.getAudienceInsights();
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching audience insights:', error);
+      res.status(500).json({ error: 'Failed to fetch audience insights' });
+    }
+  });
+
+  app.delete('/api/facebook/post/:postId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { postId } = req.params;
+      const result = await facebookAPI.deletePost(postId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting Facebook post:', error);
+      res.status(500).json({ error: 'Failed to delete post' });
+    }
+  });
+
+  app.post('/api/facebook/token/long-lived', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { shortLivedToken } = req.body;
+      
+      if (!shortLivedToken) {
+        return res.status(400).json({ error: 'Short-lived token is required' });
+      }
+
+      const result = await facebookAPI.getLongLivedToken(shortLivedToken);
+      res.json(result);
+    } catch (error) {
+      console.error('Error getting long-lived token:', error);
+      res.status(500).json({ error: 'Failed to get long-lived token' });
+    }
+  });
+
+  app.get('/api/facebook/page-tokens', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { userAccessToken } = req.query;
+      
+      if (!userAccessToken) {
+        return res.status(400).json({ error: 'User access token is required' });
+      }
+
+      const tokens = await facebookAPI.getPageAccessToken(userAccessToken as string);
+      res.json(tokens);
+    } catch (error) {
+      console.error('Error getting page access tokens:', error);
+      res.status(500).json({ error: 'Failed to get page access tokens' });
     }
   });
 

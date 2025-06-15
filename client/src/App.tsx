@@ -30,6 +30,7 @@ import AdminAIReplay from "@/pages/AdminAIReplay";
 import AdminAIDigest from "@/pages/AdminAIDigest";
 import FacebookAnalytics from "@/pages/FacebookAnalytics";
 import FacebookSetup from "@/pages/FacebookSetup";
+import FacebookConversions from "@/pages/FacebookConversions";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -97,6 +98,7 @@ function Router() {
             <Route path="/admin/ai-digest" component={AdminAIDigest} />
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/facebook-setup" component={FacebookSetup} />
+            <Route path="/facebook-conversions" component={FacebookConversions} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

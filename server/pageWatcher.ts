@@ -299,15 +299,17 @@ export class PageWatcherEngine {
 
   private async storeHealthCheck(userId: string, healthCheck: PageHealthCheck): Promise<void> {
     try {
-      // Store any restrictions found
-      for (const restriction of healthCheck.restrictions) {
-        await storage.createRestrictionAlert({
-          pageId: healthCheck.pageId,
-          alertType: restriction.type,
-          severity: restriction.severity,
-          message: restriction.message,
-          aiSuggestion: `Detected via automated monitoring at ${restriction.detectedAt.toISOString()}`
-        });
+      // Store any restrictions found (skip demo pages to prevent UUID errors)
+      if (healthCheck.pageId !== 'demo_page_123') {
+        for (const restriction of healthCheck.restrictions) {
+          await storage.createRestrictionAlert({
+            pageId: healthCheck.pageId,
+            alertType: restriction.type,
+            severity: restriction.severity,
+            message: restriction.message,
+            aiSuggestion: `Detected via automated monitoring at ${restriction.detectedAt.toISOString()}`
+          });
+        }
       }
     } catch (error) {
       console.error('Error storing health check results:', error);

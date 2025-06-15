@@ -168,13 +168,13 @@ export default function Settings() {
   useEffect(() => {
     if (settings && typeof settings === 'object') {
       if ('profile' in settings && settings.profile && typeof settings.profile === 'object') {
-        setProfile(prev => ({
+        setProfile((prev: UserProfile) => ({
           ...prev,
-          ...(settings.profile as any)
+          ...(settings.profile as Partial<UserProfile>)
         }));
       }
       if ('notifications' in settings && settings.notifications && typeof settings.notifications === 'object') {
-        setNotifications(settings.notifications as any);
+        setNotifications(settings.notifications as NotificationSettings);
       }
     }
   }, [settings, notifications]);

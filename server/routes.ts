@@ -5320,6 +5320,350 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Facebook Ads API Routes
+  app.get('/api/facebook-ads/accounts', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAds } = await import('./facebookAdsService');
+      const accounts = await facebookAds.getAdAccounts();
+      res.json(accounts);
+    } catch (error) {
+      console.error('Error fetching ad accounts:', error);
+      res.status(500).json({ error: 'Failed to fetch ad accounts' });
+    }
+  });
+
+  app.get('/api/facebook-ads/account/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { timeRange } = req.query;
+      const { facebookAds } = await import('./facebookAdsService');
+      const insights = await facebookAds.getAdAccountInsights(timeRange as string);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching account insights:', error);
+      res.status(500).json({ error: 'Failed to fetch account insights' });
+    }
+  });
+
+  app.get('/api/facebook-ads/campaigns', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAds } = await import('./facebookAdsService');
+      const campaigns = await facebookAds.getCampaigns();
+      res.json(campaigns);
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      res.status(500).json({ error: 'Failed to fetch campaigns' });
+    }
+  });
+
+  app.post('/api/facebook-ads/campaigns', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { name, objective, daily_budget, lifetime_budget, start_time, stop_time, special_ad_categories } = req.body;
+      
+      if (!name || !objective) {
+        return res.status(400).json({ error: 'Campaign name and objective are required' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const campaign = await facebookAds.createCampaign({
+        name,
+        objective,
+        ...(daily_budget && { daily_budget }),
+        ...(lifetime_budget && { lifetime_budget }),
+        ...(start_time && { start_time }),
+        ...(stop_time && { stop_time }),
+        ...(special_ad_categories && { special_ad_categories }),
+        status: 'PAUSED'
+      });
+
+      res.json(campaign);
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      res.status(500).json({ error: 'Failed to create campaign' });
+    }
+  });
+
+  app.put('/api/facebook-ads/campaigns/:campaignId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { campaignId } = req.params;
+      const updateData = req.body;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.updateCampaign(campaignId, updateData);
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating campaign:', error);
+      res.status(500).json({ error: 'Failed to update campaign' });
+    }
+  });
+
+  app.delete('/api/facebook-ads/campaigns/:campaignId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { campaignId } = req.params;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.deleteCampaign(campaignId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      res.status(500).json({ error: 'Failed to delete campaign' });
+    }
+  });
+
+  app.get('/api/facebook-ads/campaigns/:campaignId/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { campaignId } = req.params;
+      const { timeRange } = req.query;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const insights = await facebookAds.getCampaignInsights(campaignId, timeRange as string);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching campaign insights:', error);
+      res.status(500).json({ error: 'Failed to fetch campaign insights' });
+    }
+  });
+
+  app.get('/api/facebook-ads/adsets', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { campaignId } = req.query;
+      const { facebookAds } = await import('./facebookAdsService');
+      const adSets = await facebookAds.getAdSets(campaignId as string);
+      res.json(adSets);
+    } catch (error) {
+      console.error('Error fetching ad sets:', error);
+      res.status(500).json({ error: 'Failed to fetch ad sets' });
+    }
+  });
+
+  app.post('/api/facebook-ads/adsets', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const adSetData = req.body;
+      
+      if (!adSetData.name || !adSetData.campaign_id || !adSetData.optimization_goal || !adSetData.billing_event) {
+        return res.status(400).json({ error: 'Required fields missing for ad set creation' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const adSet = await facebookAds.createAdSet(adSetData);
+      res.json(adSet);
+    } catch (error) {
+      console.error('Error creating ad set:', error);
+      res.status(500).json({ error: 'Failed to create ad set' });
+    }
+  });
+
+  app.put('/api/facebook-ads/adsets/:adSetId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adSetId } = req.params;
+      const updateData = req.body;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.updateAdSet(adSetId, updateData);
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating ad set:', error);
+      res.status(500).json({ error: 'Failed to update ad set' });
+    }
+  });
+
+  app.delete('/api/facebook-ads/adsets/:adSetId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adSetId } = req.params;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.deleteAdSet(adSetId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting ad set:', error);
+      res.status(500).json({ error: 'Failed to delete ad set' });
+    }
+  });
+
+  app.get('/api/facebook-ads/adsets/:adSetId/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adSetId } = req.params;
+      const { timeRange } = req.query;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const insights = await facebookAds.getAdSetInsights(adSetId, timeRange as string);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching ad set insights:', error);
+      res.status(500).json({ error: 'Failed to fetch ad set insights' });
+    }
+  });
+
+  app.get('/api/facebook-ads/ads', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adSetId } = req.query;
+      const { facebookAds } = await import('./facebookAdsService');
+      const ads = await facebookAds.getAds(adSetId as string);
+      res.json(ads);
+    } catch (error) {
+      console.error('Error fetching ads:', error);
+      res.status(500).json({ error: 'Failed to fetch ads' });
+    }
+  });
+
+  app.post('/api/facebook-ads/ads', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const adData = req.body;
+      
+      if (!adData.name || !adData.adset_id || !adData.creative?.title || !adData.creative?.body) {
+        return res.status(400).json({ error: 'Required fields missing for ad creation' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const ad = await facebookAds.createAd(adData);
+      res.json(ad);
+    } catch (error) {
+      console.error('Error creating ad:', error);
+      res.status(500).json({ error: 'Failed to create ad' });
+    }
+  });
+
+  app.put('/api/facebook-ads/ads/:adId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adId } = req.params;
+      const updateData = req.body;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.updateAd(adId, updateData);
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating ad:', error);
+      res.status(500).json({ error: 'Failed to update ad' });
+    }
+  });
+
+  app.delete('/api/facebook-ads/ads/:adId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adId } = req.params;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.deleteAd(adId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting ad:', error);
+      res.status(500).json({ error: 'Failed to delete ad' });
+    }
+  });
+
+  app.get('/api/facebook-ads/ads/:adId/insights', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { adId } = req.params;
+      const { timeRange } = req.query;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const insights = await facebookAds.getAdInsights(adId, timeRange as string);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching ad insights:', error);
+      res.status(500).json({ error: 'Failed to fetch ad insights' });
+    }
+  });
+
+  app.get('/api/facebook-ads/audiences', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { facebookAds } = await import('./facebookAdsService');
+      const audiences = await facebookAds.getCustomAudiences();
+      res.json(audiences);
+    } catch (error) {
+      console.error('Error fetching custom audiences:', error);
+      res.status(500).json({ error: 'Failed to fetch custom audiences' });
+    }
+  });
+
+  app.post('/api/facebook-ads/audiences', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const audienceData = req.body;
+      
+      if (!audienceData.name || !audienceData.subtype) {
+        return res.status(400).json({ error: 'Audience name and subtype are required' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const audience = await facebookAds.createCustomAudience(audienceData);
+      res.json(audience);
+    } catch (error) {
+      console.error('Error creating custom audience:', error);
+      res.status(500).json({ error: 'Failed to create custom audience' });
+    }
+  });
+
+  app.delete('/api/facebook-ads/audiences/:audienceId', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { audienceId } = req.params;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const result = await facebookAds.deleteCustomAudience(audienceId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting custom audience:', error);
+      res.status(500).json({ error: 'Failed to delete custom audience' });
+    }
+  });
+
+  app.get('/api/facebook-ads/targeting/interests', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { query, limit } = req.query;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Search query is required' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const interests = await facebookAds.searchTargetingInterests(query as string, parseInt(limit as string) || 25);
+      res.json(interests);
+    } catch (error) {
+      console.error('Error searching targeting interests:', error);
+      res.status(500).json({ error: 'Failed to search targeting interests' });
+    }
+  });
+
+  app.get('/api/facebook-ads/targeting/behaviors', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { query, limit } = req.query;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Search query is required' });
+      }
+
+      const { facebookAds } = await import('./facebookAdsService');
+      const behaviors = await facebookAds.searchTargetingBehaviors(query as string, parseInt(limit as string) || 25);
+      res.json(behaviors);
+    } catch (error) {
+      console.error('Error searching targeting behaviors:', error);
+      res.status(500).json({ error: 'Failed to search targeting behaviors' });
+    }
+  });
+
+  app.get('/api/facebook-ads/performance', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { timeRange } = req.query;
+      const { facebookAds } = await import('./facebookAdsService');
+      const performance = await facebookAds.getAccountPerformance(timeRange as string);
+      res.json(performance);
+    } catch (error) {
+      console.error('Error fetching account performance:', error);
+      res.status(500).json({ error: 'Failed to fetch account performance' });
+    }
+  });
+
+  app.post('/api/facebook-ads/campaigns/:campaignId/optimize', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { campaignId } = req.params;
+      const { performanceThreshold } = req.body;
+      
+      const { facebookAds } = await import('./facebookAdsService');
+      const optimization = await facebookAds.optimizeCampaignBudget(campaignId, performanceThreshold);
+      res.json(optimization);
+    } catch (error) {
+      console.error('Error optimizing campaign:', error);
+      res.status(500).json({ error: 'Failed to optimize campaign' });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

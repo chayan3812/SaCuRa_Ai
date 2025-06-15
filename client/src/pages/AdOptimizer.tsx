@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,8 +39,25 @@ export default function AdOptimizer() {
   const [isAutoImproving, setIsAutoImproving] = useState(false);
   const [adCopy, setAdCopy] = useState<any>(null);
   const [advancedSuggestions, setAdvancedSuggestions] = useState<any[]>([]);
+  const [competitorKeywords, setCompetitorKeywords] = useState<string[]>([]);
 
   const { toast } = useToast();
+
+  // Load competitor keywords from localStorage
+  useEffect(() => {
+    const storedKeywords = localStorage.getItem('competitorKeywords');
+    if (storedKeywords) {
+      try {
+        const keywordData = JSON.parse(storedKeywords);
+        const isRecent = Date.now() - keywordData.timestamp < 24 * 60 * 60 * 1000; // 24 hours
+        if (isRecent && keywordData.keywords) {
+          setCompetitorKeywords(keywordData.keywords);
+        }
+      } catch (error) {
+        console.error('Error loading competitor keywords:', error);
+      }
+    }
+  }, []);
 
   // Fetch performance metrics
   const { data: performanceMetrics, isLoading: metricsLoading } = useQuery({

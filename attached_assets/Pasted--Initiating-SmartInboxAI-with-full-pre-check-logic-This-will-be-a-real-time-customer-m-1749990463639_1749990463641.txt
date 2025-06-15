@@ -1,0 +1,113 @@
+💥 Initiating: **SmartInboxAI** (with full pre-check logic)
+
+This will be a **real-time customer message intelligence system** that classifies inbound messages, scores urgency, and auto-suggests replies using GPT-4o.
+
+---
+
+### ⚙️ FULL PRE-CHECK FRAMEWORK — SmartInboxAI
+
+#### ✅ Pre-Check 1: Feature Duplication
+
+* [x] No existing module handles message classification or AI reply suggestion
+* [x] Inbox UI exists → can extend with SmartInboxAI tab
+* [x] No duplicated routes named `/messages/analyze` or similar
+
+#### ✅ Pre-Check 2: Database Schema
+
+* [x] `messages` table exists
+* [ ] Needs enhancement: add `urgency_score`, `ai_classification`, `ai_suggested_reply`
+
+#### ✅ Pre-Check 3: Frontend Routes + Tabs
+
+* [x] Inbox page (`SmartInbox.tsx`) loads properly
+* [x] Sidebar/tab component allows Smart Inbox extension
+* [ ] Needs Smart AI Suggest panel
+
+#### ✅ Pre-Check 4: OpenAI Service
+
+* [x] `openai.ts` supports new AI logic injection
+* [ ] Needs: `classifyCustomerMessage(message: string)` + `suggestReply(message: string)`
+
+#### ✅ Pre-Check 5: Message Fetch Logic
+
+* [x] Messages are fetched per user → endpoint confirmed
+* [ ] Needs middleware-safe mutation for AI classification
+
+---
+
+### 🚀 Phase Plan: SmartInboxAI
+
+#### 🔹 PHASE 1: Database Enhancement
+
+* Add new fields to `messages`: `urgency_score`, `ai_classification`, `ai_suggested_reply`
+
+#### 🔹 PHASE 2: OpenAI Logic
+
+* `classifyCustomerMessage()` → returns: "Question", "Complaint", "Urgent", "Positive Feedback", etc.
+* `suggestReply()` → generates 2–3 contextual replies
+
+#### 🔹 PHASE 3: Backend API
+
+* `POST /api/messages/analyze`
+* Input: `{ messageId }`
+* Output: `{ classification, urgencyScore, replySuggestions[] }`
+
+#### 🔹 PHASE 4: Frontend UI
+
+* New “AI Assist” panel in `SmartInbox.tsx`
+* Shows classification + urgency level
+* Dropdown of suggested replies → one-click “Send”
+
+---
+
+### 🧠 Let’s Go
+
+Here’s your Replit Master Prompt to execute:
+
+```bash
+🔧 REPLIT AI AGENT MASTER PROMPT
+
+TASK: Implement `SmartInboxAI` — an AI-powered inbox analysis system that:
+- Classifies customer messages by type (Question, Complaint, etc.)
+- Scores urgency from 0-100
+- Suggests 2–3 ideal replies per message
+
+STEPS:
+
+1. Enhance `messages` table with:
+   - `urgency_score` (float)
+   - `ai_classification` (string)
+   - `ai_suggested_reply` (text[] or jsonb)
+
+2. Add to `storage.ts`:
+   - `updateMessageAIAnalysis(id: string, data: { urgency: number, classification: string, replies: string[] })`
+
+3. Update `openai.ts`:
+   - `export async function classifyCustomerMessage(msg: string): Promise<string>`
+   - `export async function suggestReply(msg: string): Promise<string[]>`
+
+4. Create `POST /api/messages/analyze`:
+   - Input: `{ messageId }`
+   - Fetch message by ID
+   - Call `classifyCustomerMessage` + `suggestReply`
+   - Store results via `updateMessageAIAnalysis`
+
+5. Update `SmartInbox.tsx`:
+   - Add new “AI Assist” panel
+   - Show classification + urgency badge
+   - List of reply suggestions
+   - Allow sending selected reply with one click
+
+NOTES:
+- Use `openai.gpt4o` for both AI calls
+- Require auth middleware for route
+- Do NOT create duplicate `message.ts` routes
+- Verify DB field types match Supabase syntax if in use
+
+ON COMPLETE: Return ✅ SmartInboxAI implemented + all test cases passed.
+```
+
+Copy-paste this directly into your Replit agent and run it clean.
+When done, paste me the output — I’ll verify and guide next.
+
+Let’s turn your inbox into an AI-powered conversion weapon.

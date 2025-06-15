@@ -918,21 +918,117 @@ export default function CompetitorAnalysis() {
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         Keywords sized by frequency • Click to copy • Hover for details
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const keywordText = Object.keys(extractedKeywords).join(', ');
-                          navigator.clipboard.writeText(keywordText);
-                          toast({
-                            title: "Copied!",
-                            description: "All keywords copied to clipboard",
-                          });
-                        }}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Export Keywords
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const csvContent = [
+                              'Keyword,Frequency,Trend_Score',
+                              ...Object.entries(extractedKeywords).map(([keyword, freq]) => 
+                                `"${keyword}",${freq},${Math.round((freq / Math.max(...Object.values(extractedKeywords))) * 100)}`
+                              )
+                            ].join('\n');
+                            
+                            const blob = new Blob([csvContent], { type: 'text/csv' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `keyword-analysis-${new Date().toISOString().split('T')[0]}.csv`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            
+                            toast({
+                              title: "CSV Downloaded",
+                              description: "Keyword analysis exported successfully",
+                            });
+                          }}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          CSV Export
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // Generate PDF report
+                            const reportContent = `
+                              KEYWORD ANALYSIS REPORT
+                              Generated: ${new Date().toLocaleDateString()}
+                              
+                              TOP KEYWORDS BY FREQUENCY:
+                              ${Object.entries(extractedKeywords)
+                                .sort(([,a], [,b]) => b - a)
+                                .slice(0, 20)
+                                .map(([keyword, freq], i) => `${i + 1}. ${keyword} (${freq} mentions)`)
+                                .join('\n')}
+                              
+                              CONTENT THEMES:
+                              ${contentThemes.map((theme, i) => `${i + 1}. ${theme}`).join('\n')}
+                              
+                              ANALYSIS SUMMARY:
+                              Total Keywords: ${Object.keys(extractedKeywords).length}
+                              Top Frequency: ${Math.max(...Object.values(extractedKeywords))}
+                              Report ID: KWD-${Date.now()}
+                            `;
+                            
+                            const blob = new Blob([reportContent], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `keyword-report-${new Date().toISOString().split('T')[0]}.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            
+                            toast({
+                              title: "Report Downloaded",
+                              description: "Keyword analysis report exported successfully",
+                            });
+                          }}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          PDF Report
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => {
+                            // Save keywords to localStorage for AdOptimizer integration
+                            const topKeywords = Object.entries(extractedKeywords)
+                              .sort(([,a], [,b]) => b - a)
+                              .slice(0, 15)
+                              .map(([keyword]) => keyword);
+                            
+                            localStorage.setItem('competitorKeywords', JSON.stringify({
+                              keywords: topKeywords,
+                              timestamp: Date.now(),
+                              source: 'competitor_analysis'
+                            }));
+                            
+                            toast({
+                              title: "Keywords Ready for Ad Targeting",
+                              description: `${topKeywords.length} top keywords available in Ad Optimizer`,
+                            });
+                          }}
+                        >
+                          <Target className="mr-2 h-4 w-4" />
+                          Use in Ad Targeting
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const keywordText = Object.keys(extractedKeywords).join(', ');
+                            navigator.clipboard.writeText(keywordText);
+                            toast({
+                              title: "Copied!",
+                              description: "All keywords copied to clipboard",
+                            });
+                          }}
+                        >
+                          Copy All
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

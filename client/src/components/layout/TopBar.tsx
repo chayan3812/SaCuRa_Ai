@@ -89,7 +89,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.read)?.length || 0 : 0;
 
   return (
-    <header className="bg-background border-b border-border px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 md:px-6 py-3 sm:py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 sm:space-x-4">
           {/* Mobile menu button */}
@@ -103,8 +103,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </Button>
           
           <div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">PagePilot AI</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">AI-powered social media automation</p>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">PagePilot AI</h2>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">AI-powered social media automation</p>
           </div>
         </div>
         

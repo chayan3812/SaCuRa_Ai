@@ -53,17 +53,17 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <aside className="w-64 bg-sidebar-background border-r border-sidebar-border flex flex-col h-full">
+    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-lg">
       {/* Brand Header with Mobile Close Button */}
-      <div className="p-4 sm:p-6 border-b border-sidebar-border">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
               <Bot className="text-white w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-sidebar-foreground">SaCuRa</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground">JAm AI</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">SaCuRa</h1>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">JAm AI</p>
             </div>
           </div>
           {/* Mobile close button */}
@@ -91,21 +91,21 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 className={cn(
                   "w-full justify-start space-x-2 sm:space-x-3 h-10 sm:h-12 text-sm sm:text-base",
                   isActive 
-                    ? "bg-sacura-primary text-white hover:bg-sacura-primary/90" 
-                    : "text-sidebar-foreground hover:bg-sidebar-accent"
+                    ? "bg-blue-600 text-white hover:bg-blue-700" 
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 )}
               >
                 <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span className="font-medium truncate">{item.name}</span>
                 {item.badge && (
-                  <span className="ml-auto bg-sacura-secondary text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex-shrink-0">
+                  <span className="ml-auto bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex-shrink-0">
                     {item.badge}
                   </span>
                 )}
                 {item.status && (
                   <div className="ml-auto flex items-center space-x-1 flex-shrink-0">
-                    <div className="w-2 h-2 bg-sacura-secondary rounded-full notification-dot"></div>
-                    <span className="text-xs text-muted-foreground hidden sm:inline">{item.status}</span>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">{item.status}</span>
                   </div>
                 )}
               </Button>
@@ -115,7 +115,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       </nav>
 
       {/* User Profile */}
-      <div className="p-3 sm:p-4 border-t border-sidebar-border">
+      <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center space-x-2 sm:space-x-3">
           {user?.profileImageUrl ? (
             <img 
@@ -124,17 +124,17 @@ export default function Sidebar({ onClose }: SidebarProps) {
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-sacura-primary flex items-center justify-center text-white font-medium text-sm sm:text-base flex-shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm sm:text-base flex-shrink-0">
               {getUserInitials()}
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-sidebar-foreground truncate">
+            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
               {user?.firstName && user?.lastName 
                 ? `${user.firstName} ${user.lastName}` 
                 : user?.email || 'User'}
             </p>
-            <p className="text-xs text-muted-foreground">Pro Plan</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Pro Plan</p>
           </div>
           <div className="flex space-x-1 flex-shrink-0">
             <Link href="/settings" onClick={handleLinkClick}>

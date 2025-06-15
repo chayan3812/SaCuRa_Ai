@@ -549,51 +549,7 @@ export default function CompetitorAnalysis() {
       </div>
     </div>
   );
-} 
-                onClick={handleAnalyze}
-                disabled={analyzeCompetitorMutation.isPending || !pageIdInput.trim()}
-              >
-                {analyzeCompetitorMutation.isPending ? (
-                  <>
-                    <Loader className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  'Analyze Page'
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Analysis Results */}
-        {analysisResult && (
-          <div className="space-y-6">
-            {/* AI Analysis Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  AI Strategic Analysis
-                </CardTitle>
-                <CardDescription>
-                  Generated insights based on recent Facebook posts
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-2">Content Strategy</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {analysisResult.analysis.strategy}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Content Style</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {analysisResult.analysis.contentStyle}
-                    </p>
-                  </div>
+}
                   <div>
                     <h4 className="font-semibold mb-2">Audience Engagement</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">

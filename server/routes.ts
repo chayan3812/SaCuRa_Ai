@@ -3711,6 +3711,48 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // ✅ Weekly AI Intelligence Reports System
+  app.post('/api/weekly-ai-reports/generate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { weeklyAIReporter } = await import('./weeklyAIReporter');
+      const report = await weeklyAIReporter.generateWeeklyReport();
+      res.json({
+        success: true,
+        reportId: report.reportId,
+        message: `Weekly AI report generated for ${report.weekPeriod.start.toDateString()} - ${report.weekPeriod.end.toDateString()}`
+      });
+    } catch (error) {
+      console.error('Error generating weekly AI report:', error);
+      res.status(500).json({ error: 'Failed to generate weekly AI report' });
+    }
+  });
+
+  app.get('/api/weekly-ai-reports/latest', isAuthenticated, async (req: any, res) => {
+    try {
+      const { weeklyAIReporter } = await import('./weeklyAIReporter');
+      const report = await weeklyAIReporter.getLatestReport();
+      if (!report) {
+        return res.status(404).json({ error: 'No weekly reports found' });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error('Error getting latest weekly report:', error);
+      res.status(500).json({ error: 'Failed to get latest weekly report' });
+    }
+  });
+
+  app.get('/api/weekly-ai-reports', isAuthenticated, async (req: any, res) => {
+    try {
+      const { weeklyAIReporter } = await import('./weeklyAIReporter');
+      const limit = parseInt(req.query.limit as string) || 10;
+      const reports = await weeklyAIReporter.getAllReports(limit);
+      res.json(reports);
+    } catch (error) {
+      console.error('Error getting weekly reports:', error);
+      res.status(500).json({ error: 'Failed to get weekly reports' });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

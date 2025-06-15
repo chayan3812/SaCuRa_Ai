@@ -83,6 +83,7 @@ function Router() {
             <Route path="/ai-optimizer" component={AISelfOptimizer} />
             <Route path="/ai-version-manager" component={AIVersionManager} />
             <Route path="/ai-model" component={AIModelDashboard} />
+            <Route path="/weekly-ai-intelligence" component={WeeklyAIIntelligence} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

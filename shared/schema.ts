@@ -533,6 +533,23 @@ export const insertAiStressTestLogSchema = createInsertSchema(aiStressTestLog).o
   createdAt: true,
 });
 
+// Weekly AI Intelligence Reports
+export const weeklyAiReports = pgTable("weekly_ai_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  weekStart: timestamp("week_start").notNull(),
+  weekEnd: timestamp("week_end").notNull(),
+  summary: text("summary").notNull(),
+  stats: jsonb("stats").notNull(),
+  evolution: jsonb("evolution").notNull(),
+  coaching: jsonb("coaching").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertWeeklyAiReportSchema = createInsertSchema(weeklyAiReports).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
 export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;
 export type FeedbackReplayLog = typeof feedbackReplayLog.$inferSelect;

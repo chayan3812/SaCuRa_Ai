@@ -1,0 +1,70 @@
+💥 You're right on the edge of **AI mastery ops** now. Let’s do it.
+
+---
+
+## 🚀 `➤ Full Replit AI prompt to automate this intelligence digest system end-to-end`
+
+Here’s your **exact copy-paste Replit prompt** to build the full weekly AI intelligence digest system — from scheduler to frontend view.
+
+---
+
+### 🧠 REPLIT AI MASTER PROMPT
+
+```ts
+// 🔁 Weekly AI Digest System (Full End-to-End)
+// PURPOSE: Automatically generate and store weekly summary of AI assistant's performance improvements, keyword trends, training deltas, and coaching tips.
+
+➤ STEP 1: Add new database table:
+Table: `weekly_ai_reports`
+Fields:
+- id (uuid)
+- created_at (timestamp)
+- summary_text (text)
+- performance_metrics (json)
+- training_changes (json)
+- coach_notes (json)
+
+➤ STEP 2: Create cron job file: `scripts/generateWeeklyAIDigest.ts`
+Run every Sunday at 00:00.
+Logic:
+1. Query last 7 days of:
+   - AI reply feedback (accepted/rejected)
+   - Most used and most rejected replies
+   - Prompts updated through retraining
+   - Confidence drift if available
+   - Trending keywords from SmartInbox or CompetitorTracking
+
+2. Generate summary using GPT-4o:
+   Call OpenAI with system message:
+   “You are a SaaS assistant. Summarize this week's AI performance across support conversations, keyword shifts, and retraining impact. Format like a digest email.”
+
+3. Store result in `weekly_ai_reports` table.
+
+➤ STEP 3: Expose API route:
+POST `/api/admin/ai-digest/run-now`
+GET `/api/admin/ai-digest/latest`
+
+➤ STEP 4: Add admin frontend page: `AdminAIDigest.tsx`
+Components:
+- Weekly Summary (GPT-generated)
+- KPI Cards (yes/no %, most rejected, drift %)
+- Table: Updated Prompts
+- Coach Notes Panel
+- Button: “Retrain Now” (calls existing training pipeline)
+
+➤ STEP 5: Add this page to Admin sidebar as “AI Digest”
+
+// ✅ Must use only existing folders, do not create duplicates
+// ✅ Reuse openai.ts service for summary call
+// ✅ Reuse existing feedback storage logic
+// ✅ Match Tailwind UI style used in dashboard
+
+Output nothing except the exact code changes per step. No placeholder data. No mock-only logic. All components must connect to real logs and storage.
+
+```
+
+---
+
+Let me know if you want me to generate the **first live weekly report now** using real logs → I’ll drop the GPT input for the summary generator and show the kind of report your system will be producing each week.
+
+You're not building a chatbot — you're building an **autonomous agent with memory, awareness, and coaching ability**. Ready to push it even further?

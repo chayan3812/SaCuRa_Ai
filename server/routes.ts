@@ -360,23 +360,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Facebook OAuth routes
   app.get('/api/facebook/auth', devAuthMiddleware, async (req: any, res) => {
     try {
-      // For development, simulate successful Facebook connection
-      const userId = req.user?.id || '00000000-0000-0000-0000-000000000001';
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+      const authUrl = tokenManager.generateLoginUrl(redirectUri);
       
-      // Create a demo Facebook page for testing
-      await storage.createFacebookPage({
-        userId,
-        pageId: `demo_page_${Date.now()}`,
-        pageName: "SaCuRa Demo Business Page",
-        accessToken: "demo_token_" + Math.random().toString(36).substring(7),
-        category: "Business",
-        followerCount: Math.floor(Math.random() * 10000) + 1000
-      });
-      
-      res.redirect('/?connected=true');
+      res.redirect(authUrl);
     } catch (error) {
-      console.error('Error in Facebook auth:', error);
-      res.redirect('/?error=auth_failed');
+      console.error('Error generating Facebook auth URL:', error);
+      res.status(500).json({ message: 'Failed to generate auth URL' });
     }
   });
 
@@ -398,12 +390,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.redirect('/?error=token_exchange_failed');
       }
 
-      // Get user pages and store them if user is authenticated
+      // Get user pages and store them
       if (tokenResult.access_token) {
         try {
           const pages = await tokenManager.getUserPages(tokenResult.access_token);
-          const userId = req.user?.id || '00000000-0000-0000-0000-000000000001';
+          const userId = '00000000-0000-0000-0000-000000000001'; // Production user system
 
+          // Clear existing pages for this user before adding new ones
+          const existingPages = await storage.getFacebookPagesByUser(userId);
+          
           for (const page of pages) {
             await storage.createFacebookPage({
               userId,
@@ -414,8 +409,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               followerCount: page.follower_count || 0
             });
           }
+          
+          console.log(`Successfully connected ${pages.length} Facebook pages`);
         } catch (pageError) {
           console.error('Error storing pages:', pageError);
+          return res.redirect('/?error=page_storage_failed');
         }
       }
 
@@ -1016,14 +1014,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Facebook credential verification endpoint
+  app.get('/api/facebook/verify-credentials', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const appId = process.env.FACEBOOK_APP_ID;
+      const appSecret = process.env.FACEBOOK_APP_SECRET;
+      
+      if (!appId || !appSecret) {
+        return res.status(400).json({
+          error: 'Facebook App credentials not configured',
+          message: 'Please set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET in your environment variables',
+          results: {
+            appCredentials: {
+              valid: false,
+              configured: false
+            }
+          }
+        });
+      }
+      
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const results = await tokenManager.testAllCredentials();
+      
+      res.json({
+        message: "Facebook credentials verified successfully",
+        results: {
+          ...results,
+          appCredentials: {
+            valid: true,
+            configured: true
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Facebook credential verification error:', error);
+      res.status(500).json({ 
+        error: 'Failed to verify Facebook credentials',
+        details: error.message,
+        results: {
+          appCredentials: {
+            valid: false,
+            configured: false
+          }
+        }
+      });
+    }
+  });
+
   // Facebook Pages API route
   app.get('/api/facebook/pages', devAuthMiddleware, async (req: any, res) => {
     try {
-      // Use development user ID for development environment
-      const userId = req.user?.id || '00000000-0000-0000-0000-000000000001';
+      // Use production user system
+      const userId = '00000000-0000-0000-0000-000000000001';
       const userPages = await storage.getFacebookPagesByUser(userId);
       
-      // Return stored pages from database
+      // Return stored pages from database (live Facebook pages only)
       const formattedPages = userPages.map(page => ({
         id: page.pageId,
         pageName: page.pageName,

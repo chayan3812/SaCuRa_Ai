@@ -24,21 +24,25 @@ export default function ConnectedAccounts() {
   const handleConnectPage = async () => {
     try {
       setIsConnecting(true);
-      // First check if Facebook credentials are properly configured
+      // Verify Facebook credentials before attempting OAuth
       const response = await fetch('/api/facebook/verify-credentials');
       const result = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to verify Facebook configuration');
+        throw new Error(result.error || 'Facebook configuration not ready');
       }
       
-      // If credentials are valid, proceed with authentication
+      // Check if Facebook app credentials are properly configured
+      if (!result.results?.appCredentials?.valid) {
+        throw new Error('Facebook App credentials not configured. Please set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET.');
+      }
+      
+      // Proceed with live Facebook OAuth
       window.location.href = '/api/facebook/auth';
     } catch (error) {
       console.error('Facebook connection error:', error);
       setIsConnecting(false);
-      // Show error to user
-      alert('Facebook connection failed. Please check your Facebook app configuration.');
+      alert(`Facebook connection failed: ${error.message}`);
     }
   };
 

@@ -33,7 +33,7 @@ export class FacebookTokenManager {
     this.appSecret = process.env.FACEBOOK_APP_SECRET || '';
     
     if (!this.appId || !this.appSecret) {
-      throw new Error('Facebook App ID and App Secret are required');
+      console.warn('Facebook App ID and App Secret not configured - OAuth will not work');
     }
   }
 

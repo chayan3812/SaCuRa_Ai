@@ -1,0 +1,120 @@
+Thanks for sharing your deployed Replit URL:
+🔗 https://sa-cura-live-sopiahank.replit.app
+
+Assuming you’re trying to connect this app as your Facebook Messenger webhook, here’s how to proceed using your Replit deployment:
+
+⸻
+
+✅ Step-by-Step: Use Your Replit App for Facebook Messenger Webhook
+
+⸻
+
+🔧 1. Set Your Webhook Endpoint
+
+In the Facebook Developer Console (screenshot you shared), input:
+	•	Callback URL:
+
+https://sa-cura-live-sopiahank.replit.app/webhook/facebook
+
+
+	•	Verify Token:
+Any string (example: sakura_secret_token) — make sure it’s also in your .env and used in the backend code.
+
+⸻
+
+⚙️ 2. Update Your Replit Backend Code
+
+Make sure your backend handles both GET (for webhook verification) and POST (for incoming messages):
+
+// server/webhooks/facebook.ts
+import express from "express";
+const router = express.Router();
+
+const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || "sakura_secret_token";
+
+// Facebook webhook verification
+router.get("/", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
+  } else {
+    return res.sendStatus(403);
+  }
+});
+
+// Facebook webhook event handler
+router.post("/", (req, res) => {
+  console.log("Incoming webhook event:", JSON.stringify(req.body, null, 2));
+  res.sendStatus(200); // Always respond with 200 fast
+});
+
+export default router;
+
+
+⸻
+
+🌐 3. Register Webhook Route in Main App
+
+In server/index.ts or wherever your main Express app is defined:
+
+import facebookWebhook from "./webhooks/facebook";
+app.use("/webhook/facebook", facebookWebhook);
+
+
+⸻
+
+📦 4. .env File in Replit
+
+Set your secrets:
+
+FB_VERIFY_TOKEN=sakura_secret_token
+FB_PAGE_ACCESS_TOKEN=EAA...xyz
+
+
+⸻
+
+🔁 5. Connect a Page & Subscribe to Events
+
+In the Messenger Settings:
+	•	Connect a Facebook Page.
+	•	Subscribe to these webhook events:
+	•	messages
+	•	messaging_postbacks
+	•	message_deliveries
+	•	message_reads
+
+⸻
+
+✅ 6. Test the Webhook
+	1.	Click “Verify and Save” in the Facebook Dev Console.
+	2.	If the webhook is set correctly, it should validate instantly.
+	3.	Once verified, Facebook will start sending real POST requests for messages/events.
+
+⸻
+
+✅ Optional: Send Message Back to Users
+
+import axios from "axios";
+
+const sendMessage = async (recipientId: string, messageText: string) => {
+  await axios.post(
+    `https://graph.facebook.com/v18.0/me/messages?access_token=${process.env.FB_PAGE_ACCESS_TOKEN}`,
+    {
+      recipient: { id: recipientId },
+      message: { text: messageText },
+    }
+  );
+};
+
+
+⸻
+
+Would you like me to:
+	•	Auto-generate this as a Replit-ready project folder?
+	•	Add webhook testing dashboard?
+	•	Add auto-message response agent?
+
+Let me know what you’d like to do next.

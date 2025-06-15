@@ -26,6 +26,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { SmartReplyFeedback } from "@/components/SmartReplyFeedback";
 
 interface CustomerInteraction {
   id: string;
@@ -560,7 +561,7 @@ export default function SmartInbox() {
                         <div className="p-3 bg-white dark:bg-gray-800 rounded border mb-3">
                           <p className="text-sm">{agentSuggestion.suggestedReply}</p>
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-3">
                           <Button
                             size="sm"
                             onClick={() => handleUseReply(agentSuggestion.suggestedReply)}
@@ -569,49 +570,21 @@ export default function SmartInbox() {
                             <CheckCircle className="h-3 w-3" />
                             Use This Reply
                           </Button>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                feedbackMutation.mutate({
-                                  messageId: selectedMessage.id,
-                                  used: false,
-                                  feedback: 'useful'
-                                });
-                                trackSmartFeedback.mutate({
-                                  messageId: selectedMessage.id,
-                                  aiSuggestion: agentSuggestion.suggestedReply,
-                                  feedback: 'useful',
-                                  responseTime: suggestionStartTime ? Date.now() - suggestionStartTime : undefined
-                                });
-                              }}
-                              className="gap-1"
-                            >
-                              <ThumbsUp className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                feedbackMutation.mutate({
-                                  messageId: selectedMessage.id,
-                                  used: false,
-                                  feedback: 'not_useful'
-                                });
-                                trackSmartFeedback.mutate({
-                                  messageId: selectedMessage.id,
-                                  aiSuggestion: agentSuggestion.suggestedReply,
-                                  feedback: 'not_useful',
-                                  responseTime: suggestionStartTime ? Date.now() - suggestionStartTime : undefined
-                                });
-                              }}
-                              className="gap-1"
-                            >
-                              <ThumbsDown className="h-3 w-3" />
-                            </Button>
-                          </div>
                         </div>
+                        
+                        {/* Enhanced SmartReplyFeedback Component */}
+                        <SmartReplyFeedback
+                          messageId={selectedMessage.id}
+                          aiSuggestion={agentSuggestion.suggestedReply}
+                          onFeedbackSubmitted={(feedback) => {
+                            // Also track with the existing feedback system for compatibility
+                            feedbackMutation.mutate({
+                              messageId: selectedMessage.id,
+                              used: false,
+                              feedback: feedback ? 'useful' : 'not_useful'
+                            });
+                          }}
+                        />
                       </div>
                     )}
                   </div>

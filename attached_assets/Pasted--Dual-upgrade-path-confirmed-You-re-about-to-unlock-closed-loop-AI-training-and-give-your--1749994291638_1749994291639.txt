@@ -1,0 +1,118 @@
+🚀 Dual upgrade path confirmed:
+You're about to unlock **closed-loop AI training** *and* give your team **real-time insight into what’s working**. Here's how we execute both — fast, clean, and production-grade.
+
+---
+
+## 🧠 PART 1: Wire Feedback Into Prompt Builder
+
+**Goal:** Make the AI smarter by learning from actual agent feedback.
+
+### ➤ Step 1: Build a `TrainingPromptBuilder` module
+
+```ts
+// services/trainingPromptBuilder.ts
+
+export function buildTrainingPrompt({
+  message,
+  aiReply,
+  feedback,
+  agentReply,
+}: {
+  message: string;
+  aiReply: string;
+  feedback: "yes" | "no";
+  agentReply?: string;
+}) {
+  return `
+Customer Message:
+${message}
+
+AI Suggested Reply:
+${aiReply}
+
+Was this useful? → ${feedback === "yes" ? "✅ Yes" : "❌ No"}
+
+${feedback === "no" && agentReply ? `Agent replied with:\n${agentReply}` : ""}
+----
+Use this to learn how to improve the AI next time.
+`.trim();
+}
+```
+
+---
+
+### ➤ Step 2: On feedback submission, store prompt
+
+Modify your feedback route to also save a `trainingPrompts` record:
+
+```ts
+// routes/feedback.ts (inside POST handler)
+const prompt = buildTrainingPrompt({
+  message: feedback.message,
+  aiReply: feedback.aiReply,
+  feedback: feedback.useful ? "yes" : "no",
+  agentReply: feedback.agentReply ?? null,
+});
+
+await storage.storeTrainingPrompt({
+  messageId: feedback.messageId,
+  prompt,
+  rating: feedback.useful ? 1 : 0,
+});
+```
+
+---
+
+### ➤ Step 3: Create DB table `training_prompts`
+
+```sql
+CREATE TABLE training_prompts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  message_id UUID REFERENCES customer_messages(id),
+  prompt TEXT NOT NULL,
+  rating INTEGER NOT NULL, -- 1 = useful, 0 = not useful
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+---
+
+## 📊 PART 2: Feedback Analytics Dashboard
+
+### ➤ Step 1: Create `FeedbackAnalyticsPage.tsx`
+
+Tabs:
+
+* **⭐ Overview**
+  → % of AI replies marked “useful” over time
+* **📈 Trends**
+  → Top failed topics, frequent override cases
+* **🧠 Replay**
+  → See messages with thumbs down and what agent did instead
+
+---
+
+### ➤ Step 2: Backend route
+
+```ts
+GET /api/feedback/analytics
+→ Returns:
+{
+  total: number,
+  usefulCount: number,
+  notUsefulCount: number,
+  dailyBreakdown: { date: string, useful: number, total: number }[],
+  topNegativeMessages: { message: string, aiReply: string, agentReply: string }[]
+}
+```
+
+---
+
+### ➤ Step 3: Charts to build
+
+* Pie: AI Reply Usefulness (Yes/No %)
+* Line: Daily Usefulness Trend (last 30 days)
+* Table: “Most Rejected Replies”
+  → columns: Message, AI Reply, Agent Override
+
+---

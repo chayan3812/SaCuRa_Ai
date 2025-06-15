@@ -2,6 +2,9 @@ import {
   users,
   type User,
   type UpsertUser,
+  aiSuggestionFeedback,
+  type AiSuggestionFeedback,
+  type InsertAiSuggestionFeedback,
   facebookPages,
   type FacebookPage,
   type InsertFacebookPage,
@@ -148,6 +151,18 @@ export interface IStorage {
   // Keyword Snapshot operations
   createCompetitorKeywordSnapshot(snapshot: InsertCompetitorKeywordSnapshot): Promise<CompetitorKeywordSnapshot>;
   getCompetitorKeywordSnapshots(userId: string): Promise<CompetitorKeywordSnapshot[]>;
+  
+  // SmartFeedback - AI suggestion feedback tracking
+  createAiSuggestionFeedback(feedback: InsertAiSuggestionFeedback): Promise<AiSuggestionFeedback>;
+  getAiSuggestionFeedback(messageId: string): Promise<AiSuggestionFeedback[]>;
+  updateSuggestionUsage(feedbackId: string, used: boolean): Promise<void>;
+  getAiPerformanceMetrics(days?: number): Promise<{
+    totalSuggestions: number;
+    positiveRating: number;
+    negativeRating: number;
+    usageRate: number;
+    avgResponseTime: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -854,6 +869,67 @@ export class DatabaseStorage implements IStorage {
       .where(eq(competitorKeywordSnapshots.userId, userId))
       .orderBy(desc(competitorKeywordSnapshots.capturedAt))
       .limit(50);
+  }
+
+  // SmartFeedback - AI suggestion feedback tracking for self-improvement
+  async createAiSuggestionFeedback(feedback: InsertAiSuggestionFeedback): Promise<AiSuggestionFeedback> {
+    const [newFeedback] = await db
+      .insert(aiSuggestionFeedback)
+      .values(feedback)
+      .returning();
+    return newFeedback;
+  }
+
+  async getAiSuggestionFeedback(messageId: string): Promise<AiSuggestionFeedback[]> {
+    return await db
+      .select()
+      .from(aiSuggestionFeedback)
+      .where(eq(aiSuggestionFeedback.messageId, messageId))
+      .orderBy(desc(aiSuggestionFeedback.createdAt));
+  }
+
+  async updateSuggestionUsage(feedbackId: string, used: boolean): Promise<void> {
+    await db
+      .update(aiSuggestionFeedback)
+      .set({ 
+        usageCount: sql`${aiSuggestionFeedback.usageCount} + 1`,
+      })
+      .where(eq(aiSuggestionFeedback.id, feedbackId));
+  }
+
+  async getAiPerformanceMetrics(days: number = 30): Promise<{
+    totalSuggestions: number;
+    positiveRating: number;
+    negativeRating: number;
+    usageRate: number;
+    avgResponseTime: number;
+  }> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const metrics = await db
+      .select({
+        totalSuggestions: count(),
+        positiveRating: count(sql`CASE WHEN ${aiSuggestionFeedback.feedback} = true THEN 1 END`),
+        negativeRating: count(sql`CASE WHEN ${aiSuggestionFeedback.feedback} = false THEN 1 END`),
+        totalUsage: sum(aiSuggestionFeedback.usageCount),
+        avgResponseTime: avg(aiSuggestionFeedback.responseTime),
+      })
+      .from(aiSuggestionFeedback)
+      .where(gte(aiSuggestionFeedback.createdAt, startDate));
+
+    const result = metrics[0];
+    const usageRate = result.totalSuggestions > 0 
+      ? (Number(result.totalUsage) / result.totalSuggestions) * 100 
+      : 0;
+
+    return {
+      totalSuggestions: result.totalSuggestions,
+      positiveRating: result.positiveRating,
+      negativeRating: result.negativeRating,
+      usageRate: Math.round(usageRate * 100) / 100,
+      avgResponseTime: Math.round(Number(result.avgResponseTime) || 0),
+    };
   }
 }
 

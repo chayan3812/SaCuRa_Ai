@@ -293,6 +293,20 @@ export const competitorKeywordSnapshots = pgTable("competitor_keyword_snapshots"
 export type CompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferSelect;
 export type InsertCompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferInsert;
 
+// SmartFeedback - AI suggestion feedback tracking for self-improvement
+export const aiSuggestionFeedback = pgTable("ai_suggestion_feedback", {
+  id: varchar("id").primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
+  messageId: varchar("message_id").notNull(), // references customer_interactions.id
+  aiSuggestion: text("ai_suggestion").notNull(), // the AI-generated reply
+  feedback: boolean("feedback"), // true = 👍, false = 👎, null = not rated
+  createdAt: timestamp("created_at").defaultNow(),
+  reviewedBy: varchar("reviewed_by"), // agent who gave feedback (references users.id)
+  platformContext: text("platform_context"), // "inbox", "ads", etc. for multi-context AI use
+  usageCount: integer("usage_count").default(0), // how many times this suggestion was used
+  modelVersion: varchar("model_version"), // track which AI model version generated this
+  responseTime: integer("response_time"), // milliseconds to generate suggestion
+});
+
 export const insertFacebookPageSchema = createInsertSchema(facebookPages).omit({
   id: true,
   createdAt: true,
@@ -380,3 +394,11 @@ export type WatchedCompetitor = typeof watchedCompetitors.$inferSelect;
 export type InsertWatchedCompetitor = z.infer<typeof insertWatchedCompetitorSchema>;
 export type CompetitorSnapshot = typeof competitorSnapshots.$inferSelect;
 export type InsertCompetitorSnapshot = z.infer<typeof insertCompetitorSnapshotSchema>;
+
+export const insertAiSuggestionFeedbackSchema = createInsertSchema(aiSuggestionFeedback).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
+export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;

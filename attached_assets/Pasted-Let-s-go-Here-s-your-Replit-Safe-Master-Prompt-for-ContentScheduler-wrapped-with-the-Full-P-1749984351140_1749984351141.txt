@@ -1,0 +1,84 @@
+Let’s go. Here’s your **Replit-Safe Master Prompt for ContentScheduler**, wrapped with the ⚙️ Full Pre-Check Logic and designed to fully activate real scheduled Facebook posting using existing structures.
+
+---
+
+### 🧠 MASTER PROMPT: Enable Real ContentScheduler Feature
+
+**Objective:** Replace the placeholder scheduler with a live system that pulls real scheduled posts from DB, publishes via Facebook Graph API, updates status, and triggers real-time alerts.
+
+---
+
+```ts
+// === ⚙️ PRE-CHECK LOGIC (DO NOT SKIP) ===
+
+// ✅ 1. CHECK for existing scheduler logic in: `server/modules/ContentScheduler.ts`
+// ✅ 2. IF `processScheduledContent()` exists, DO NOT REPLACE. Enhance it.
+// ✅ 3. CHECK `storage.ts` for `getPostsDueForPublishing()` or similar — if missing, implement it.
+// ✅ 4. IF `postingSchedules` or `contentQueue` tables exist in `shared/schema.ts`, use them.
+// ✅ 5. DO NOT add mock publishing logic — wire `FacebookAPIService.publishToPage()` to actually call Facebook Graph API: POST /{page-id}/feed
+// ✅ 6. IF no Facebook token exists for the page, skip the post and log a warning.
+// ✅ 7. IF post is successfully published:
+//     → mark post as `published = true`, `publishedAt = new Date()` in DB
+//     → optionally store returned post ID
+// ✅ 8. EMIT a real-time alert via `socket.emit()` with post details (title, time, success, page)
+// ✅ 9. DO NOT create new files. Work only inside:
+//     - `ContentScheduler.ts`
+//     - `facebook.ts`
+//     - `storage.ts`
+//     - `shared/schema.ts` (if schema is missing a field)
+// ✅ 10. Wrap all enhancements with:
+//     // 👁️ Enhanced by AI on 2025-06-15 — Feature: ContentScheduler
+
+// === ✅ IMPLEMENTATION OBJECTIVES BELOW ===
+
+// 1. IMPLEMENT in `storage.ts`:
+export async function getPostsDueForPublishing(now = new Date()) {
+  return db.select()
+    .from(postingSchedules)
+    .where(and(eq(postingSchedules.published, false), lte(postingSchedules.scheduledTime, now)))
+    .orderBy(asc(postingSchedules.scheduledTime));
+}
+
+// 2. ENHANCE `ContentScheduler.ts` > `processScheduledContent()`:
+- CALL `getPostsDueForPublishing()`
+- FOR EACH post:
+  → FETCH associated page’s token (via `storage.getFacebookPagesByUser`)
+  → CALL `FacebookAPIService.publishToPage(pageId, message, token)`
+  → ON success:
+      → Mark as published in DB
+      → Emit `socket.emit('post-published', { title, pageId, time })`
+  → ON failure:
+      → Log and skip
+  → Add a short delay between posts to avoid API rate limits (e.g., 500ms)
+
+// 3. IN `facebook.ts`, add real implementation:
+async function publishToPage(pageId: string, message: string, accessToken: string) {
+  const res = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, access_token: accessToken }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Failed to publish post');
+  return data;
+}
+
+// 4. CONFIRM backend logs success/failure for each post and emits alert via Socket.IO
+
+// 5. DO NOT use mock engagement numbers or fake success logs anymore.
+
+```
+
+---
+
+✅ Once Replit runs this, confirm:
+
+* Scheduler picks up due posts from DB
+* Posts are actually published to Facebook
+* Posts are marked as published in DB
+* WebSocket event is emitted (`post-published`)
+* No duplicates, no mock logic remains
+
+---
+
+Reply `Ready for verification` once the agent completes this and I’ll validate the changes + move you to the next module (like RestrictionMonitor or CompetitorAI).

@@ -5,7 +5,7 @@ import CustomerServiceMonitor from "@/components/dashboard/CustomerServiceMonito
 import EmployeeMonitor from "@/components/dashboard/EmployeeMonitor";
 import ConnectedAccounts from "@/components/dashboard/ConnectedAccounts";
 import AILearningProgress from "@/components/dashboard/AILearningProgress";
-import QuickActionsSimple from "@/components/dashboard/QuickActionsSimple";
+import QuickActions from "@/components/dashboard/QuickActions";
 import LiveSystemStatus from "@/components/dashboard/LiveSystemStatus";
 import PerformanceInsights from "@/components/dashboard/PerformanceInsights";
 import AdvancedAnalyticsChart from "@/components/dashboard/AdvancedAnalyticsChart";
@@ -315,98 +315,7 @@ export default function Dashboard() {
               <AIRecommendations />
               
               {/* Quick Actions */}
-              <Card className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base sm:text-lg flex items-center justify-between text-gray-900 dark:text-gray-100">
-                    Quick Actions
-                    <Clock className="w-4 h-4 text-gray-500" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start p-3 h-auto hover:bg-gray-50 dark:hover:bg-gray-800"
-                      onClick={() => {}}
-                    >
-                      <div className="flex items-center space-x-3 w-full">
-                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="text-blue-600 w-5 h-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Smart Inbox</p>
-                            <Badge variant="secondary" className="text-xs">Medium</Badge>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">0 messages</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start p-3 h-auto hover:bg-gray-50 dark:hover:bg-gray-800"
-                      onClick={() => {}}
-                    >
-                      <div className="flex items-center space-x-3 w-full">
-                        <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                          <Target className="text-purple-600 w-5 h-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">AI Training</p>
-                            <Badge variant="destructive" className="text-xs">High</Badge>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">85% accuracy</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start p-3 h-auto hover:bg-gray-50 dark:hover:bg-gray-800"
-                      onClick={() => {}}
-                    >
-                      <div className="flex items-center space-x-3 w-full">
-                        <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                          <TrendingUp className="text-green-600 w-5 h-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">View Analytics</p>
-                            <Badge variant="destructive" className="text-xs">High</Badge>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Performance insights</p>
-                        </div>
-                      </div>
-                    </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start p-3 h-auto hover:bg-gray-50 dark:hover:bg-gray-800"
-                      onClick={() => {}}
-                    >
-                      <div className="flex items-center space-x-3 w-full">
-                        <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                          <Zap className="text-orange-600 w-5 h-5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Quick Optimize</p>
-                            <Badge variant="secondary" className="text-xs">Medium</Badge>
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Auto-enhance campaigns</p>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                      Actions prioritized by usage • Live updates
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <QuickActions />
               
               {/* AI Learning Progress */}
               <AILearningProgress />

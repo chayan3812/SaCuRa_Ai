@@ -46,6 +46,7 @@ import { agentCoPilot } from "./agentCoPilot";
 import { slaMonitor } from "./slaMonitor";
 import { aiStressTestInjector } from "./aiStressTest";
 import { weeklySlackReporter } from "./weeklySlackReporter";
+import { facebookAnalytics } from "./facebookAnalytics";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4104,6 +4105,136 @@ Prioritize by impact and feasibility.`;
     } catch (error) {
       console.error('Error testing Slack webhook:', error);
       res.status(500).json({ error: 'Failed to test Slack webhook' });
+    }
+  });
+
+  // Facebook Analytics & Pixel Integration
+  app.get('/api/facebook-analytics/conversions', isAuthenticated, async (req: any, res) => {
+    try {
+      const { start, end } = req.query;
+      const dateRange = { 
+        start: start as string || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        end: end as string || new Date().toISOString().split('T')[0]
+      };
+      
+      const conversions = await facebookAnalytics.getConversionData(dateRange);
+      
+      res.json({
+        message: 'Conversion data retrieved successfully',
+        dateRange,
+        conversions
+      });
+    } catch (error) {
+      console.error('Error fetching conversion data:', error);
+      res.status(500).json({ error: 'Failed to fetch conversion data' });
+    }
+  });
+
+  app.get('/api/facebook-analytics/audience-insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const insights = await facebookAnalytics.getAudienceInsights();
+      
+      res.json({
+        message: 'Audience insights retrieved successfully',
+        insights
+      });
+    } catch (error) {
+      console.error('Error fetching audience insights:', error);
+      res.status(500).json({ error: 'Failed to fetch audience insights' });
+    }
+  });
+
+  app.get('/api/facebook-analytics/campaign-performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const { start, end } = req.query;
+      const dateRange = { 
+        start: start as string || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        end: end as string || new Date().toISOString().split('T')[0]
+      };
+      
+      const campaigns = await facebookAnalytics.getCampaignPerformance(dateRange);
+      
+      res.json({
+        message: 'Campaign performance data retrieved successfully',
+        dateRange,
+        campaigns
+      });
+    } catch (error) {
+      console.error('Error fetching campaign performance:', error);
+      res.status(500).json({ error: 'Failed to fetch campaign performance' });
+    }
+  });
+
+  app.get('/api/facebook-analytics/pixel-performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const analysis = await facebookAnalytics.analyzePixelPerformance();
+      
+      res.json({
+        message: 'Pixel performance analysis completed',
+        analysis
+      });
+    } catch (error) {
+      console.error('Error analyzing pixel performance:', error);
+      res.status(500).json({ error: 'Failed to analyze pixel performance' });
+    }
+  });
+
+  app.get('/api/facebook-analytics/optimization-recommendations', isAuthenticated, async (req: any, res) => {
+    try {
+      const recommendations = await facebookAnalytics.generateOptimizationRecommendations();
+      
+      res.json({
+        message: 'Optimization recommendations generated successfully',
+        recommendations
+      });
+    } catch (error) {
+      console.error('Error generating optimization recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate optimization recommendations' });
+    }
+  });
+
+  app.post('/api/facebook-analytics/track-event', isAuthenticated, async (req: any, res) => {
+    try {
+      const { eventType, data } = req.body;
+      
+      await facebookAnalytics.trackPagePilotEvent(eventType, data);
+      
+      res.json({
+        message: 'Event tracked successfully',
+        eventType,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.error('Error tracking event:', error);
+      res.status(500).json({ error: 'Failed to track event' });
+    }
+  });
+
+  app.post('/api/facebook-analytics/track-conversion', isAuthenticated, async (req: any, res) => {
+    try {
+      const { eventName, value, currency, customData } = req.body;
+      
+      const success = await facebookAnalytics.trackConversion(
+        eventName, 
+        value, 
+        currency || 'USD', 
+        customData
+      );
+      
+      if (success) {
+        res.json({
+          message: 'Conversion tracked successfully',
+          eventName,
+          value,
+          currency: currency || 'USD',
+          timestamp: new Date()
+        });
+      } else {
+        res.status(500).json({ error: 'Failed to track conversion' });
+      }
+    } catch (error) {
+      console.error('Error tracking conversion:', error);
+      res.status(500).json({ error: 'Failed to track conversion' });
     }
   });
 

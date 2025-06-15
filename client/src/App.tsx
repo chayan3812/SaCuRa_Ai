@@ -28,6 +28,7 @@ import AgentCoPilot from "@/pages/AgentCoPilot";
 import SLADashboard from "@/pages/SLADashboard";
 import AdminAIReplay from "@/pages/AdminAIReplay";
 import AdminAIDigest from "@/pages/AdminAIDigest";
+import FacebookAnalytics from "@/pages/FacebookAnalytics";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";

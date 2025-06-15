@@ -154,7 +154,7 @@ export const trainingPrompts = pgTable("training_prompts", {
   rating: integer("rating").notNull(), // 1 = useful, 0 = not useful
   category: varchar("category").notNull(), // 'positive_reinforcement', 'improvement_needed'
   priority: integer("priority").default(1), // 1-3, higher = more important
-  contextData: json("context_data"),
+  contextData: jsonb("context_data"),
   processed: boolean("processed").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -310,6 +310,14 @@ export const competitorKeywordSnapshots = pgTable("competitor_keyword_snapshots"
 
 export type CompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferSelect;
 export type InsertCompetitorKeywordSnapshot = typeof competitorKeywordSnapshots.$inferInsert;
+
+export const insertTrainingPromptSchema = createInsertSchema(trainingPrompts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTrainingPrompt = z.infer<typeof insertTrainingPromptSchema>;
+export type TrainingPrompt = typeof trainingPrompts.$inferSelect;
 
 // SmartFeedback - AI suggestion feedback tracking for self-improvement
 export const aiSuggestionFeedback = pgTable("ai_suggestion_feedback", {

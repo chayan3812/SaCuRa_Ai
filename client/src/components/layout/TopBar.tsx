@@ -104,7 +104,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           
           <div>
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">PagePilot AI</h2>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">AI-powered social media automation</p>
+            <p className="text-xs sm:text-sm dark:text-gray-400 hidden sm:block text-[#476eef]">AI-powered social media automation</p>
           </div>
         </div>
         

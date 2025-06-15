@@ -19,6 +19,7 @@ The Facebook Conversions API integration provides advanced server-side conversio
 
 ### Facebook App Configuration
 - **App ID**: 4026499934285415 (Primary Facebook App)
+- **App Secret**: 0426b1ae64c6f5951bd8f974e9492ec4 (Enhanced security authentication)
 - **Pixel ID**: 1230928114675791 (extracted from app token)
 - **App User ID**: 4026499934285415 (Primary attribution identifier for all conversion events)
 - **Access Token**: EAARfhckE8E8BO3W2RgbpfkL4LcxBf3QMiPXB7qKVTm21u32wFdpAyxd3FjWd9BcGVxbmrBU2OcmcSxqcyTAS3cwB5fYSKZCVpNvEISloN5JmzFDXwZBU42OQE6pvkWZCPiITm9r9SQrzExZBwNC06EboHxb0q8sUMZChjhIiJCxMFvoSSCRou2G5I87qOxOIjGhl2OywZD

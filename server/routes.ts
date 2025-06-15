@@ -4303,6 +4303,28 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Enhanced Facebook App Security Validation
+  app.get('/api/facebook/security-validation', isAuthenticated, async (req, res) => {
+    try {
+      const { facebookAppAuth } = await import('./facebookAppAuth');
+      const validation = await facebookAppAuth.performSecurityValidation();
+      
+      res.json({
+        success: true,
+        validation,
+        appConfig: facebookAppAuth.getSecureConfig(),
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Facebook security validation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Security validation failed',
+        details: error.message
+      });
+    }
+  });
+
   // Initialize Conversions API on startup
   const PIXEL_ID = "1230928114675791"; // Extracted from your app token
   const CONVERSIONS_ACCESS_TOKEN = "EAAd0l5qoAb0BOZC4pYeYQBiNgJTglZBFuOprwc57Poe6xGkqnKGoKR3zXykrRqwaHtrJScDpH6bLT5dveNycjfp8kZAxEnZBim3g7j965w4ZBvZBxfL37KOz965znapFZBBcOPBFA5ZBdnAQ5YSkw90ngo9rXpuDr4mojRArChu1Ka6I8bhvZAbr3DeYUIE4LsQZDZD";

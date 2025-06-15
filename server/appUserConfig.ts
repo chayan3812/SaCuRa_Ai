@@ -9,6 +9,7 @@ export interface AppUserConfiguration {
   accessToken: string;
   conversionsToken: string;
   appId: string;
+  appSecret: string;
 }
 
 export const APP_USER_CONFIG: AppUserConfiguration = {
@@ -17,6 +18,7 @@ export const APP_USER_CONFIG: AppUserConfiguration = {
   accessToken: process.env.FACEBOOK_ACCESS_TOKEN || '',
   conversionsToken: process.env.FACEBOOK_CONVERSIONS_TOKEN || '',
   appId: '4026499934285415',
+  appSecret: '0426b1ae64c6f5951bd8f974e9492ec4',
 };
 
 /**

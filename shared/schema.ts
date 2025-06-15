@@ -475,6 +475,23 @@ export const insertAiReplyFailureSchema = createInsertSchema(aiReplyFailures).om
   createdAt: true,
 });
 
+// AI Reply Improvements for Self-Optimizing System
+export const aiReplyImprovements = pgTable("ai_reply_improvements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  promptId: varchar("prompt_id").notNull(),
+  originalPrompt: text("original_prompt").notNull(),
+  originalReply: text("original_reply").notNull(),
+  correctedReply: text("corrected_reply").notNull(),
+  scoreGainEstimate: integer("score_gain_estimate").default(0),
+  failureCategory: varchar("failure_category"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAiReplyImprovementSchema = createInsertSchema(aiReplyImprovements).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
 export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;
 export type FeedbackReplayLog = typeof feedbackReplayLog.$inferSelect;

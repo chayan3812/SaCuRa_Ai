@@ -2201,6 +2201,87 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // AI Self-Optimizer God-Mode Endpoints
+  app.post("/api/ai/process-failed-replies", isAuthenticated, async (req, res) => {
+    try {
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const processedCount = await aiSelfOptimizer.processAllFailedReplies();
+      res.json({ 
+        success: true, 
+        processedCount,
+        message: `Auto-corrected ${processedCount} failed replies` 
+      });
+    } catch (error) {
+      console.error("Error processing failed replies:", error);
+      res.status(500).json({ message: "Failed to process failed replies" });
+    }
+  });
+
+  app.get("/api/ai/improvement-leaderboard", isAuthenticated, async (req, res) => {
+    try {
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const limit = parseInt(req.query.limit as string) || 20;
+      const leaderboard = await aiSelfOptimizer.getImprovementLeaderboard(limit);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error getting improvement leaderboard:", error);
+      res.status(500).json({ message: "Failed to get improvement leaderboard" });
+    }
+  });
+
+  app.post("/api/ai/export-training-data", isAuthenticated, async (req, res) => {
+    try {
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const result = await aiSelfOptimizer.exportTrainingDataJSONL();
+      res.json(result);
+    } catch (error) {
+      console.error("Error exporting training data:", error);
+      res.status(500).json({ message: "Failed to export training data" });
+    }
+  });
+
+  app.get("/api/ai/optimization-stats", isAuthenticated, async (req, res) => {
+    try {
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const stats = await aiSelfOptimizer.getOptimizationStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting optimization stats:", error);
+      res.status(500).json({ message: "Failed to get optimization stats" });
+    }
+  });
+
+  app.post("/api/ai/force-reprocessing", isAuthenticated, async (req, res) => {
+    try {
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const processedCount = await aiSelfOptimizer.forceReprocessing();
+      res.json({ 
+        success: true, 
+        processedCount,
+        message: `Force reprocessed ${processedCount} failures` 
+      });
+    } catch (error) {
+      console.error("Error in force reprocessing:", error);
+      res.status(500).json({ message: "Failed to force reprocess" });
+    }
+  });
+
+  app.post("/api/ai/generate-context-prompt", isAuthenticated, async (req, res) => {
+    try {
+      const { message } = req.body;
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const contextPrompt = await aiSelfOptimizer.generateContextAwarePrompt(message);
+      res.json({ contextPrompt });
+    } catch (error) {
+      console.error("Error generating context-aware prompt:", error);
+      res.status(500).json({ message: "Failed to generate context-aware prompt" });
+    }
+  });
+
   app.post('/api/ai/predict-performance', isAuthenticated, async (req: any, res) => {
     try {
       const userId = (req.user as any).claims.sub;

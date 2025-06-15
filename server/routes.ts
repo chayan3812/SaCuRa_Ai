@@ -36,6 +36,9 @@ import { competitorAI } from "./competitorAI";
 import { intelligentTrainer } from "./intelligentTrainer";
 import { aiEngine } from "./aiEngine";
 import { hybridAI } from "./hybridAI";
+import { stressTestEngine } from "./stressTestRetrainedAI";
+import { openAIFineTuning } from "./openAIFineTuning";
+import { explainableAI } from "./explainableAI";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {

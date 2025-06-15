@@ -11,6 +11,7 @@ import {
   boolean,
   decimal,
   uuid,
+  real,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -510,6 +511,26 @@ export const insertAiAssistantVersionSchema = createInsertSchema(aiAssistantVers
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+// AI Stress Test Log for Elite Orchestration
+export const aiStressTestLog = pgTable("ai_stress_test_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  interactionId: varchar("interaction_id").notNull(),
+  originalReply: text("original_reply").notNull(),
+  improvedReply: text("improved_reply").notNull(),
+  evalScore: integer("eval_score").notNull(),
+  improvement: integer("improvement").notNull(),
+  confidenceScore: real("confidence_score").notNull(),
+  categories: jsonb("categories"), // empathy, clarity, completeness, etc.
+  comments: text("comments"),
+  processingTime: integer("processing_time"), // milliseconds
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAiStressTestLogSchema = createInsertSchema(aiStressTestLog).omit({
+  id: true,
+  createdAt: true,
 });
 
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;

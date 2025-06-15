@@ -1,0 +1,53 @@
+{
+  "summary": {
+    "totalTests": 7,
+    "passed": 6,
+    "failed": 1,
+    "successRate": "85.71%",
+    "timestamp": "2025-06-15T22:36:07.560Z"
+  },
+  "tests": [
+    {
+      "name": "Facebook OAuth URL Generation",
+      "status": "FAIL",
+      "details": "Status: 200",
+      "timestamp": "2025-06-15T22:36:07.398Z"
+    },
+    {
+      "name": "Permission Scope Validation",
+      "status": "PASS",
+      "details": "Testing 5 permission categories",
+      "timestamp": "2025-06-15T22:36:07.399Z"
+    },
+    {
+      "name": "Facebook Pages API",
+      "status": "PASS",
+      "details": "API endpoint accessible and responding",
+      "timestamp": "2025-06-15T22:36:07.425Z"
+    },
+    {
+      "name": "API Version Update",
+      "status": "PASS",
+      "details": "API version configuration active",
+      "timestamp": "2025-06-15T22:36:07.430Z"
+    },
+    {
+      "name": "Permission-Based Features",
+      "status": "PASS",
+      "details": "All 3 feature categories working",
+      "timestamp": "2025-06-15T22:36:07.546Z"
+    },
+    {
+      "name": "Instagram Integration",
+      "status": "PASS",
+      "details": "Instagram integration ready for implementation",
+      "timestamp": "2025-06-15T22:36:07.551Z"
+    },
+    {
+      "name": "Enhanced Error Handling",
+      "status": "PASS",
+      "details": "Error handling system active",
+      "timestamp": "2025-06-15T22:36:07.558Z"
+    }
+  ]
+}

@@ -100,26 +100,57 @@ export class FacebookTokenManager {
     }
   }
 
-  async validateToken(token: string): Promise<any> {
+  async validateToken(token: string): Promise<{ valid: boolean; scopes: string[]; user?: any; error?: string }> {
     try {
-      const response = await axios.get(`${this.baseUrl}/me`, {
+      // First check token validity and get user info
+      const userResponse = await axios.get(`${this.baseUrl}/me`, {
         params: {
           access_token: token,
           fields: 'id,name,email'
         }
       });
 
+      // Get granted permissions
+      const permissionsResponse = await axios.get(`${this.baseUrl}/me/permissions`, {
+        params: {
+          access_token: token
+        }
+      });
+
+      const permissions = permissionsResponse.data.data || [];
+      const grantedScopes = permissions
+        .filter((perm: any) => perm.status === 'granted')
+        .map((perm: any) => perm.permission);
+
       return {
         valid: true,
-        user: response.data
+        user: userResponse.data,
+        scopes: grantedScopes
       };
     } catch (error: any) {
       console.error('Token validation error:', error.response?.data || error.message);
       return {
         valid: false,
+        scopes: [],
         error: error.response?.data?.error?.message || 'Invalid token'
       };
     }
+  }
+
+  checkPermissions(grantedScopes: string[]): {
+    pageManagement: boolean;
+    messaging: boolean; 
+    instagram: boolean;
+    insights: boolean;
+    advertising: boolean;
+  } {
+    return {
+      pageManagement: ['pages_manage_posts', 'pages_manage_metadata'].some(p => grantedScopes.includes(p)),
+      messaging: ['pages_messaging'].includes(grantedScopes[0]) || grantedScopes.includes('pages_messaging'),
+      instagram: ['instagram_basic', 'instagram_manage_insights'].some(p => grantedScopes.includes(p)),
+      insights: grantedScopes.includes('read_insights'),
+      advertising: ['ads_management', 'ads_read'].some(p => grantedScopes.includes(p))
+    };
   }
 
   async getUserPages(userToken: string): Promise<PageInfo[]> {

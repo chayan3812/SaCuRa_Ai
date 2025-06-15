@@ -16,7 +16,8 @@ import {
   Send,
   Calendar,
   BarChart3,
-  X
+  X,
+  TestTube
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,6 +36,7 @@ const navigation = [
   { name: "AI Performance", href: "/ai-performance", icon: Brain, badge: "NEW" },
   { name: "Feedback Analytics", href: "/feedback-analytics", icon: BarChart3, badge: "LEARNING" },
   { name: "AI Training Pipeline", href: "/ai-training", icon: Bot, badge: "GPT OPS" },
+  { name: "AI Test Dashboard", href: "/ai-test", icon: Brain, badge: "TESTING" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

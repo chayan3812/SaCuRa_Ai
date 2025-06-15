@@ -51,6 +51,10 @@ import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Facebook webhook (must be registered before auth middleware)
+  const facebookWebhook = await import('./webhooks/facebook');
+  app.use('/webhook/facebook', facebookWebhook.default);
+
   // Auth middleware
   await setupAuth(app);
 

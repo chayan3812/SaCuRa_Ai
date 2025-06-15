@@ -2,28 +2,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Brain, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+
+interface AILearningMetrics {
+  customerToneAnalysis: number;
+  responseAccuracy: number;
+  policyCompliance: number;
+  totalInteractions: number;
+}
 
 export default function AILearningProgress() {
-  // Mock data structure - in production this would come from API
+  const { data: metrics, isLoading } = useQuery<AILearningMetrics>({
+    queryKey: ['/api/ai/learning-metrics'],
+    refetchInterval: 60000,
+  });
+
   const learningMetrics = [
     {
       name: "Customer Tone Analysis",
-      progress: 94,
+      progress: metrics?.customerToneAnalysis || 0,
       color: "bg-indigo-500",
     },
     {
       name: "Response Accuracy",
-      progress: 89,
+      progress: metrics?.responseAccuracy || 0,
       color: "bg-sacura-secondary",
     },
     {
       name: "Policy Compliance",
-      progress: 98,
+      progress: metrics?.policyCompliance || 0,
       color: "bg-green-500",
     },
   ];
 
-  const totalInteractions = 2847;
+  const totalInteractions = metrics?.totalInteractions || 0;
 
   return (
     <Card>

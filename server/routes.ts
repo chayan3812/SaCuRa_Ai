@@ -436,6 +436,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/ai/learning-metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const metrics = await storage.getAILearningMetrics(userId);
+      res.json(metrics);
+    } catch (error) {
+      console.error('Error fetching AI learning metrics:', error);
+      res.status(500).json({ message: 'Failed to fetch AI learning metrics' });
+    }
+  });
+
   // Customer service routes
   app.get('/api/customer-service/interactions/:pageId', isAuthenticated, async (req, res) => {
     try {

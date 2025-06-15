@@ -237,6 +237,78 @@ export class FacebookAPIService {
     }
   }
 
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+  // Get Top Performing Posts from a Page
+  async getTopPosts(pageId: string, limit: number = 10): Promise<any[]> {
+    // Skip API calls for demo/invalid tokens
+    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
+      console.log('Skipping Facebook API call - demo/invalid token detected');
+      return [];
+    }
+
+    try {
+      const response = await axios.get(`${FB_BASE_URL}/${pageId}/posts`, {
+        params: {
+          access_token: this.accessToken,
+          fields: 'id,message,story,created_time,updated_time,likes.summary(true),comments.summary(true),shares,reactions.summary(true),full_picture,permalink_url,type',
+          limit: limit * 2, // Get more posts to filter for top performing ones
+        }
+      });
+
+      // Sort posts by engagement (likes + comments + shares + reactions)
+      const postsWithEngagement = response.data.data.map((post: any) => {
+        const likes = post.likes?.summary?.total_count || 0;
+        const comments = post.comments?.summary?.total_count || 0;
+        const shares = post.shares?.count || 0;
+        const reactions = post.reactions?.summary?.total_count || 0;
+        
+        return {
+          ...post,
+          engagement_score: likes + comments + shares + reactions,
+          likes_count: likes,
+          comments_count: comments,
+          shares_count: shares,
+          reactions_count: reactions
+        };
+      });
+
+      // Sort by engagement score and return top posts
+      return postsWithEngagement
+        .sort((a: any, b: any) => b.engagement_score - a.engagement_score)
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching top posts:', error);
+      throw new Error('Failed to fetch top posts');
+    }
+  }
+
+  // Get Page Insights for Competitor Analysis
+  async getPageInsights(pageId: string, metrics: string[] = ['page_fans', 'page_engaged_users', 'page_impressions']): Promise<any> {
+    // Skip API calls for demo/invalid tokens
+    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
+      console.log('Skipping Facebook API call - demo/invalid token detected');
+      return {};
+    }
+
+    try {
+      const response = await axios.get(`${FB_BASE_URL}/${pageId}/insights`, {
+        params: {
+          access_token: this.accessToken,
+          metric: metrics.join(','),
+          period: 'day',
+          since: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Last 30 days
+          until: new Date().toISOString().split('T')[0]
+        }
+      });
+
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching page insights:', error);
+      // Return empty object instead of throwing for graceful degradation
+      return {};
+    }
+  }
+
   // Create Webhook Subscription
   async createWebhookSubscription(pageId: string, pageAccessToken: string, callbackUrl: string) {
     try {

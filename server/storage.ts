@@ -33,6 +33,12 @@ import {
   competitorData,
   aiLearningData,
   facebookAdAccounts,
+  watchedCompetitors,
+  type WatchedCompetitor,
+  type InsertWatchedCompetitor,
+  competitorSnapshots,
+  type CompetitorSnapshot,
+  type InsertCompetitorSnapshot,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql, lte, asc } from "drizzle-orm";
@@ -677,6 +683,71 @@ export class DatabaseStorage implements IStorage {
       preventedRestrictions: Number(restrictionResult[0]?.preventedRestrictions) || 0,
       avgResponseTime: avgResponseResult[0]?.avgResponseTime || 0,
     };
+  }
+
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+  // Watched Competitors
+  async addWatchedCompetitor(competitor: InsertWatchedCompetitor): Promise<WatchedCompetitor> {
+    const [result] = await db.insert(watchedCompetitors).values(competitor).returning();
+    return result;
+  }
+
+  async getWatchedCompetitorsByUser(userId: string): Promise<WatchedCompetitor[]> {
+    return await db
+      .select()
+      .from(watchedCompetitors)
+      .where(eq(watchedCompetitors.userId, userId))
+      .orderBy(desc(watchedCompetitors.addedAt));
+  }
+
+  async removeWatchedCompetitor(competitorId: string): Promise<void> {
+    await db.delete(watchedCompetitors).where(eq(watchedCompetitors.id, competitorId));
+  }
+
+  async getWatchedCompetitorByPageId(userId: string, pageId: string): Promise<WatchedCompetitor | undefined> {
+    const [result] = await db
+      .select()
+      .from(watchedCompetitors)
+      .where(and(
+        eq(watchedCompetitors.userId, userId),
+        eq(watchedCompetitors.pageId, pageId)
+      ));
+    return result;
+  }
+
+  // Competitor Snapshots
+  async createCompetitorSnapshot(snapshot: InsertCompetitorSnapshot): Promise<CompetitorSnapshot> {
+    const [result] = await db.insert(competitorSnapshots).values(snapshot).returning();
+    return result;
+  }
+
+  async getCompetitorSnapshots(pageId: string, limit: number = 30): Promise<CompetitorSnapshot[]> {
+    return await db
+      .select()
+      .from(competitorSnapshots)
+      .where(eq(competitorSnapshots.pageId, pageId))
+      .orderBy(desc(competitorSnapshots.snapshotDate))
+      .limit(limit);
+  }
+
+  async getLatestSnapshotForPage(pageId: string): Promise<CompetitorSnapshot | undefined> {
+    const [result] = await db
+      .select()
+      .from(competitorSnapshots)
+      .where(eq(competitorSnapshots.pageId, pageId))
+      .orderBy(desc(competitorSnapshots.snapshotDate))
+      .limit(1);
+    return result;
+  }
+
+  async getAllActiveCompetitorPages(): Promise<{ pageId: string; pageName: string }[]> {
+    return await db
+      .select({
+        pageId: watchedCompetitors.pageId,
+        pageName: watchedCompetitors.pageName
+      })
+      .from(watchedCompetitors)
+      .where(eq(watchedCompetitors.isActive, true));
   }
 }
 

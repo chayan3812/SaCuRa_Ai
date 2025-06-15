@@ -77,6 +77,7 @@ export interface IStorage {
   createFacebookPage(page: InsertFacebookPage): Promise<FacebookPage>;
   getFacebookPagesByUser(userId: string): Promise<FacebookPage[]>;
   getFacebookPageById(pageId: string): Promise<FacebookPage | undefined>;
+  getFacebookPageByPageId(pageId: string): Promise<FacebookPage | undefined>;
   updateFacebookPageToken(pageId: string, accessToken: string): Promise<void>;
   
   // Ad Metrics
@@ -317,6 +318,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFacebookPageById(pageId: string): Promise<FacebookPage | undefined> {
+    const [page] = await db.select().from(facebookPages).where(eq(facebookPages.id, pageId));
+    return page;
+  }
+
+  async getFacebookPageByPageId(pageId: string): Promise<FacebookPage | undefined> {
     const [page] = await db.select().from(facebookPages).where(eq(facebookPages.pageId, pageId));
     return page;
   }

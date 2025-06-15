@@ -60,21 +60,34 @@ router.post("/", async (req, res) => {
 async function handleMessage(event: any) {
   const senderId = event.sender.id;
   const messageText = event.message.text;
+  const recipientId = event.recipient.id; // Facebook Page ID
   
   console.log(`Message from ${senderId}: ${messageText}`);
   
   // Store the interaction in database
   try {
     const { storage } = await import('../storage');
+    
+    // Find or create Facebook page entry
+    let facebookPage = await storage.getFacebookPageByPageId(recipientId);
+    if (!facebookPage) {
+      // Create a default Facebook page entry for webhook messages
+      facebookPage = await storage.createFacebookPage({
+        userId: 'system', // System user for webhook messages
+        pageId: recipientId,
+        pageName: 'Facebook Messenger',
+        accessToken: 'webhook_token',
+        category: 'Business'
+      });
+    }
+    
     await storage.createCustomerInteraction({
-      pageId: 'facebook_messenger',
+      pageId: facebookPage.id,
       customerId: senderId,
       customerName: 'Facebook User',
       message: messageText,
-      source: 'facebook_messenger',
       sentiment: 'neutral',
-      priority: 'medium',
-      status: 'new'
+      status: 'pending'
     });
   } catch (error) {
     console.error("Error storing message:", error);
@@ -109,15 +122,24 @@ async function handlePostback(event: any) {
 async function sendAIResponse(recipientId: string, messageText: string) {
   try {
     // Import AI service
-    const { openAIService } = await import('../openAI');
+    const { generateCustomerServiceResponse } = await import('../openai');
     
-    // Generate AI response
-    const aiResponse = await openAIService.generateResponse(
+    // Generate AI response with context
+    const aiResult = await generateCustomerServiceResponse(
       messageText,
-      "You are a helpful customer service assistant for SaCuRa AI. Provide friendly, professional responses."
+      [], // No previous interactions for now
+      "SaCuRa AI Customer Support"
     );
     
-    await sendMessage(recipientId, aiResponse);
+    console.log(`AI Response generated for ${recipientId}: ${aiResult.response} (confidence: ${aiResult.confidence})`);
+    
+    // Only send AI response if confidence is above threshold
+    if (aiResult.confidence > 0.6 && !aiResult.requiresHuman) {
+      await sendMessage(recipientId, aiResult.response);
+    } else {
+      console.log(`Low confidence AI response (${aiResult.confidence}), requires human intervention`);
+      await sendMessage(recipientId, "Thank you for your message. A team member will respond to you shortly.");
+    }
   } catch (error) {
     console.error("Error generating AI response:", error);
     // Fallback message

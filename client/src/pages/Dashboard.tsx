@@ -205,10 +205,25 @@ export default function Dashboard() {
             </Card>
           </div>
 
+          {/* Advanced Analytics Section - Moved to Top */}
+          <div className="space-y-6 animate-in fade-in duration-800 delay-200">
+            {/* Real-Time Data Visualizer */}
+            <RealTimeDataVisualizer />
+            
+            {/* Main Analytics Chart */}
+            <AdvancedAnalyticsChart />
+            
+            {/* Futuristic Metrics Grid */}
+            <FuturisticMetricsGrid />
+            
+            {/* Circular Progress Dashboard */}
+            <CircularProgressDashboard />
+          </div>
+
           {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 animate-in slide-in-from-bottom duration-700 delay-200">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 animate-in slide-in-from-bottom duration-700 delay-300">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6 animate-in slide-in-from-left duration-600 delay-300">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6 animate-in slide-in-from-left duration-600 delay-400">
               {/* Performance Chart */}
               <Card className="hover:shadow-lg transition-shadow duration-300 animate-in zoom-in duration-500 delay-500">
                 <CardHeader>
@@ -323,21 +338,6 @@ export default function Dashboard() {
               {/* Connected Accounts */}
               <ConnectedAccounts />
             </div>
-          </div>
-
-          {/* Advanced Analytics Section */}
-          <div className="space-y-6 animate-in fade-in duration-800 delay-500">
-            {/* Real-Time Data Visualizer */}
-            <RealTimeDataVisualizer />
-            
-            {/* Main Analytics Chart */}
-            <AdvancedAnalyticsChart />
-            
-            {/* Futuristic Metrics Grid */}
-            <FuturisticMetricsGrid />
-            
-            {/* Circular Progress Dashboard */}
-            <CircularProgressDashboard />
           </div>
 
           {/* Bottom Section - Additional Modules */}

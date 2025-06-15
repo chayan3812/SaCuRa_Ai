@@ -415,7 +415,7 @@ export default function Landing() {
             <Button 
               variant="outline"
               size="lg"
-              className="border-3 border-white/40 text-white hover:bg-white/20 hover:border-white/60 backdrop-blur-md text-xl px-12 py-6 rounded-full font-bold transition-all duration-300"
+              className="border-3 border-white/40 hover:bg-white/20 hover:border-white/60 backdrop-blur-md text-xl px-12 py-6 rounded-full font-bold transition-all duration-300 text-[#ffffff] bg-[#3c83f6]"
               onClick={() => {
                 document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
               }}

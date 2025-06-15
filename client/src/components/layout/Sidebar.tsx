@@ -79,12 +79,14 @@ export default function Sidebar({ onClose }: SidebarProps) {
       <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
-              <Bot className="text-white w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
+            <img 
+              src="@assets/SaCuRa_Ai_Logo_1750010758811.png" 
+              alt="SaCuRa AI Logo" 
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+            />
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">SaCuRa</h1>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">JAm AI</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">SaCuRa AI</h1>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Business Solutions</p>
             </div>
           </div>
           {/* Mobile close button */}

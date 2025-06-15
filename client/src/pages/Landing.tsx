@@ -129,12 +129,14 @@ export default function Landing() {
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
-                <Bot className="text-white w-4 h-4 sm:w-6 sm:h-6" />
-              </div>
+              <img 
+                src="@assets/SaCuRa_Ai_Logo_1750010758811.png" 
+                alt="SaCuRa AI Logo" 
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              />
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-foreground">SaCuRa</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">JAm AI</p>
+                <h1 className="text-lg sm:text-xl font-bold text-foreground">SaCuRa AI</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">Business Solutions</p>
               </div>
             </div>
             <Button onClick={handleLogin} className="bg-sacura-primary hover:bg-sacura-primary/90 text-sm sm:text-base px-3 sm:px-4 py-2">

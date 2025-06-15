@@ -55,7 +55,7 @@ export default function SmartInbox() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: interactions = [], isLoading } = useQuery({
+  const { data: interactions = [], isLoading } = useQuery<CustomerInteraction[]>({
     queryKey: ["/api/customer-service/interactions/all"],
   });
 

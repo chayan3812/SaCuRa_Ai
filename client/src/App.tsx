@@ -11,6 +11,7 @@ import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import AdOptimizer from "@/pages/AdOptimizer";
 import CustomerService from "@/pages/CustomerService";
+import SmartInbox from "@/pages/SmartInbox";
 import RestrictionMonitor from "@/pages/RestrictionMonitor";
 import EmployeeMonitor from "@/pages/EmployeeMonitor";
 import CompetitorAnalysis from "@/pages/CompetitorAnalysis";
@@ -67,6 +68,7 @@ function Router() {
             <Route path="/analytics" component={Analytics} />
             <Route path="/page-status" component={PageStatus} />
             <Route path="/customer-service" component={CustomerService} />
+            <Route path="/smart-inbox" component={SmartInbox} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

@@ -89,13 +89,26 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.read)?.length || 0 : 0;
 
   return (
-    <header className="bg-background border-b border-border px-6 py-4">
+    <header className="bg-background border-b border-border px-3 sm:px-4 md:px-6 py-3 sm:py-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">PagePilot AI Dashboard</h2>
-          <p className="text-sm text-muted-foreground">AI-powered Facebook marketing automation platform</p>
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Mobile menu button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden w-8 h-8 sm:w-9 sm:h-9"
+            onClick={onMenuClick}
+          >
+            <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
+          </Button>
+          
+          <div>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">PagePilot AI</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">AI-powered social media automation</p>
+          </div>
         </div>
-        <div className="flex items-center space-x-4">
+        
+        <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
           {/* Real-time Status */}
           <Badge variant="secondary" className="bg-sacura-secondary/10 text-sacura-secondary hover:bg-sacura-secondary/20">
             <div className="w-2 h-2 bg-sacura-secondary rounded-full notification-dot mr-2"></div>

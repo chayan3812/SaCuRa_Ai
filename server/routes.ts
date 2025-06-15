@@ -28,6 +28,16 @@ import { db } from "./db";
 import { customerInteractions } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { enhancedPageFixer } from "./enhancedPageFixer";
+import {
+  generalApiLimiter,
+  authLimiter,
+  aiProcessingLimiter,
+  facebookApiLimiter,
+  webhookLimiter,
+  databaseLimiter,
+  adminLimiter,
+  getRateLimitStats
+} from "./rateLimiter";
 import { processFailedReplyFeedback, getFailureInsights } from "./aiSelfAwareness";
 import { advancedAISelfImprovement } from "./advancedAISelfImprovement";
 import { advancedAIEngine } from "./advancedAIEngine";
@@ -51,7 +61,10 @@ import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint for deployment verification
+  // Apply general rate limiting to all API routes
+  app.use('/api', generalApiLimiter);
+  
+  // Health check endpoint for deployment verification (no rate limiting)
   app.get('/health', (req, res) => {
     res.status(200).json({ 
       status: 'healthy', 
@@ -61,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Database health check for audit compliance
-  app.get('/api/health/database', async (req, res) => {
+  app.get('/api/health/database', databaseLimiter, async (req, res) => {
     try {
       const result = await db.execute(sql`SELECT 1 as test`);
       res.status(200).json({ status: 'healthy', database: 'connected', test: result });
@@ -70,9 +83,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Facebook webhook routes (must be before auth middleware)
+  // Facebook webhook routes with webhook-specific rate limiting
   const facebookWebhookRouter = await import('./webhooks/facebook');
-  app.use('/webhook/facebook', facebookWebhookRouter.default);
+  app.use('/webhook/facebook', webhookLimiter, facebookWebhookRouter.default);
 
   // Development authentication middleware for comprehensive testing
   const isDevelopment = process.env.NODE_ENV !== 'production';

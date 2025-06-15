@@ -24,6 +24,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
+import { UserProfile, NotificationSettings, APIKeySettings } from "@/types/settings";
 
 
 export default function Settings() {
@@ -31,7 +32,7 @@ export default function Settings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
-  const [notifications, setNotifications] = useState({
+  const [notifications, setNotifications] = useState<NotificationSettings>({
     email: true,
     push: true,
     campaignAlerts: true,
@@ -40,13 +41,14 @@ export default function Settings() {
     systemUpdates: true
   });
 
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<UserProfile>({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
     phone: '',
     company: '',
-    timezone: 'UTC-05:00'
+    timezone: 'UTC-05:00',
+    language: 'en'
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -55,10 +57,11 @@ export default function Settings() {
     confirmPassword: ''
   });
 
-  const [apiKeys, setApiKeys] = useState({
+  const [apiKeys, setApiKeys] = useState<APIKeySettings>({
     facebookAccessToken: '',
     openaiApiKey: '',
-    claudeApiKey: ''
+    anthropicApiKey: '',
+    sendgridApiKey: ''
   });
 
   // Fetch user settings
@@ -140,7 +143,7 @@ export default function Settings() {
 
   // Update API keys mutation
   const apiKeysMutation = useMutation({
-    mutationFn: async (apiKeyData: any) => {
+    mutationFn: async (apiKeyData: APIKeySettings) => {
       return await apiRequest('/api/user/api-keys', {
         method: 'PUT',
         body: JSON.stringify(apiKeyData)

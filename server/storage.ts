@@ -390,6 +390,36 @@ export class DatabaseStorage implements IStorage {
       .orderBy(customerInteractions.createdAt);
   }
 
+  // SmartInboxAI operations
+  async updateMessageAIAnalysis(
+    messageId: string, 
+    data: { 
+      urgency: number; 
+      classification: string; 
+      replies: string[]; 
+    }
+  ): Promise<CustomerInteraction> {
+    const [updated] = await db
+      .update(customerInteractions)
+      .set({
+        urgencyScore: data.urgency.toString(),
+        aiClassification: data.classification,
+        aiSuggestedReplies: data.replies,
+        aiAnalyzedAt: new Date(),
+      })
+      .where(eq(customerInteractions.id, messageId))
+      .returning();
+    return updated;
+  }
+
+  async getMessageById(messageId: string): Promise<CustomerInteraction | undefined> {
+    const [message] = await db
+      .select()
+      .from(customerInteractions)
+      .where(eq(customerInteractions.id, messageId));
+    return message;
+  }
+
   // Employees
   async createEmployee(employee: InsertEmployee): Promise<Employee> {
     const [newEmployee] = await db.insert(employees).values(employee).returning();

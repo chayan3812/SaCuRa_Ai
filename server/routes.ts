@@ -14,7 +14,10 @@ import {
   checkPolicyCompliance,
   generateAdCopy,
   analyzeSentiment,
-  analyzeCompetitorPosts
+  analyzeCompetitorPosts,
+  classifyCustomerMessage,
+  calculateUrgencyScore,
+  suggestReply
 } from "./openai";
 import { initializeWebSocket } from "./websocket";
 import { systemOptimizer } from "./systemOptimizer";
@@ -435,6 +438,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error saving response:', error);
       res.status(500).json({ message: 'Failed to save response' });
+    }
+  });
+
+  // SmartInboxAI message analysis endpoint
+  app.post('/api/messages/analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId } = req.body;
+      
+      if (!messageId) {
+        return res.status(400).json({ message: 'Message ID is required' });
+      }
+
+      // Get the message
+      const message = await storage.getMessageById(messageId);
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      // Perform AI analysis
+      const classification = await classifyCustomerMessage(message.message);
+      const urgencyScore = await calculateUrgencyScore(message.message, classification);
+      const replySuggestions = await suggestReply(message.message, classification);
+
+      // Update message with AI analysis
+      const updatedMessage = await storage.updateMessageAIAnalysis(messageId, {
+        urgency: urgencyScore,
+        classification,
+        replies: replySuggestions,
+      });
+
+      res.json({
+        messageId,
+        classification,
+        urgencyScore,
+        replySuggestions,
+        analyzedAt: updatedMessage.aiAnalyzedAt,
+      });
+    } catch (error) {
+      console.error('Error analyzing message:', error);
+      res.status(500).json({ message: 'Failed to analyze message' });
     }
   });
 

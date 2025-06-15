@@ -7,6 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from "recharts";
 import {
   TrendingUp,
   TrendingDown,
@@ -68,6 +82,21 @@ export default function FeedbackAnalytics() {
     if (rate >= 60) return "secondary";
     return "destructive";
   };
+
+  // Prepare chart data
+  const pieChartData = [
+    { name: "Useful", value: analytics?.usefulCount || 0, color: "#22c55e" },
+    { name: "Not Useful", value: analytics?.notUsefulCount || 0, color: "#ef4444" },
+  ];
+
+  const lineChartData = analytics?.learningTrends?.map(day => ({
+    date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    useful: day.useful,
+    notUseful: day.total - day.useful,
+    successRate: day.successRate,
+  })) || [];
+
+  const COLORS = ["#22c55e", "#ef4444"];
 
   if (isLoading) {
     return (
@@ -203,87 +232,107 @@ export default function FeedbackAnalytics() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Feedback Summary */}
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="font-medium">
+                    {analytics?.successRate || 0}% of replies marked "Useful" in the last {timeRange} days
+                  </span>
+                </div>
+                {analytics && analytics.notUsefulCount > 5 && (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                    <span className="text-sm text-gray-600">
+                      {analytics.notUsefulCount} replies need improvement
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                  <span className="text-sm text-gray-600">
+                    Top improvement areas: customer service responses, refund handling
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Pie Chart - AI Reply Usefulness % */}
             <Card>
               <CardHeader>
-                <CardTitle>Feedback Distribution</CardTitle>
+                <CardTitle>AI Reply Usefulness Distribution</CardTitle>
                 <CardDescription>
-                  How users rate AI suggestions over time
+                  Overall feedback breakdown for AI suggestions
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">Helpful Responses</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{analytics?.usefulCount || 0}</span>
-                      <Badge variant="default" className="text-green-600 border-green-200">
-                        {analytics?.total ? Math.round((analytics.usefulCount / analytics.total) * 100) : 0}%
-                      </Badge>
-                    </div>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-4 grid grid-cols-2 gap-4 text-center">
+                  <div className="p-3 bg-green-50 dark:bg-green-950 rounded">
+                    <div className="text-2xl font-bold text-green-600">{analytics?.usefulCount || 0}</div>
+                    <div className="text-sm text-gray-600">Useful</div>
                   </div>
-                  <Progress 
-                    value={analytics?.total ? (analytics.usefulCount / analytics.total) * 100 : 0} 
-                    className="h-2" 
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <span className="text-sm">Needs Improvement</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{analytics?.notUsefulCount || 0}</span>
-                      <Badge variant="destructive" className="text-red-600 border-red-200">
-                        {analytics?.total ? Math.round((analytics.notUsefulCount / analytics.total) * 100) : 0}%
-                      </Badge>
-                    </div>
+                  <div className="p-3 bg-red-50 dark:bg-red-950 rounded">
+                    <div className="text-2xl font-bold text-red-600">{analytics?.notUsefulCount || 0}</div>
+                    <div className="text-sm text-gray-600">Not Useful</div>
                   </div>
-                  <Progress 
-                    value={analytics?.total ? (analytics.notUsefulCount / analytics.total) * 100 : 0} 
-                    className="h-2" 
-                  />
                 </div>
               </CardContent>
             </Card>
 
+            {/* Line Chart - Daily Usefulness Trend */}
             <Card>
               <CardHeader>
-                <CardTitle>Learning Progress</CardTitle>
+                <CardTitle>Daily Usefulness Trend</CardTitle>
                 <CardDescription>
-                  AI improvement metrics and insights
+                  Tracking AI performance improvement over time
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <Brain className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-blue-600">{analytics?.total || 0}</p>
-                    <p className="text-xs text-gray-600">Training Samples</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                    <Lightbulb className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-purple-600">{analytics?.improvementOpportunities || 0}</p>
-                    <p className="text-xs text-gray-600">Improvement Areas</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Learning Efficiency</span>
-                    <Badge variant={getSuccessRateBadgeVariant(analytics?.successRate || 0)}>
-                      {analytics?.successRate || 0}%
-                    </Badge>
-                  </div>
-                  <Progress value={analytics?.successRate || 0} className="h-2" />
-                </div>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={lineChartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="useful" 
+                      stroke="#22c55e" 
+                      strokeWidth={2}
+                      name="Useful Replies"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="notUseful" 
+                      stroke="#ef4444" 
+                      strokeWidth={2}
+                      name="Not Useful Replies"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
@@ -338,18 +387,79 @@ export default function FeedbackAnalytics() {
         </TabsContent>
 
         <TabsContent value="replay" className="space-y-6">
+          {/* Most Rejected Replies Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Learning Replay</CardTitle>
+              <CardTitle>Most Rejected Replies</CardTitle>
               <CardDescription>
-                Review failed responses and agent corrections for AI improvement
+                AI responses that need improvement - for ops team review and training
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer Message</TableHead>
+                    <TableHead>AI Reply (Rejected)</TableHead>
+                    <TableHead>Agent Override</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {analytics?.topNegativeMessages?.length ? (
+                    analytics.topNegativeMessages.map((example, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="max-w-xs">
+                          <div className="truncate" title={example.message}>
+                            {example.message}
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="truncate text-red-600" title={example.aiReply}>
+                            {example.aiReply}
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          {example.agentReply ? (
+                            <div className="truncate text-green-600" title={example.agentReply}>
+                              {example.agentReply}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="destructive" className="text-xs">
+                            Needs Training
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                        No rejected replies found. AI is performing excellently!
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Detailed Learning Examples */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Detailed Learning Examples</CardTitle>
+              <CardDescription>
+                Full conversation context for AI training improvement
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-96">
                 <div className="space-y-4">
                   {analytics?.topNegativeMessages?.length ? (
-                    analytics.topNegativeMessages.map((example, index) => (
+                    analytics.topNegativeMessages.slice(0, 5).map((example, index) => (
                       <div key={index} className="border rounded-lg p-4 space-y-3">
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-blue-600" />

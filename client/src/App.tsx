@@ -22,6 +22,7 @@ import AITraining from "@/pages/AITraining";
 import AITestDashboard from "@/pages/AITestDashboard";
 import AISelfOptimizer from "@/pages/AISelfOptimizer";
 import AIVersionManager from "@/pages/AIVersionManager";
+import AIModelDashboard from "@/pages/AIModelDashboard";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -81,6 +82,7 @@ function Router() {
             <Route path="/ai-test" component={AITestDashboard} />
             <Route path="/ai-optimizer" component={AISelfOptimizer} />
             <Route path="/ai-version-manager" component={AIVersionManager} />
+            <Route path="/ai-model" component={AIModelDashboard} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

@@ -39,6 +39,7 @@ import { hybridAI } from "./hybridAI";
 import { stressTestEngine } from "./stressTestRetrainedAI";
 import { openAIFineTuning } from "./openAIFineTuning";
 import { explainableAI } from "./explainableAI";
+import { aiModelManager } from "./aiModelManager";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3593,6 +3594,120 @@ Prioritize by impact and feasibility.`;
         message: "Failed to improve reply",
         error: error.message 
       });
+    }
+  });
+
+  // AI Model Manager - A/B Testing & Performance Optimization
+  
+  // A/B Testing Endpoints
+  app.post('/api/ai/ab-test/generate-reply', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, context } = req.body;
+      const userId = req.user.claims.sub;
+      
+      const result = await aiModelManager.generateReplyWithABTest({
+        message,
+        context,
+        userId
+      });
+      
+      res.json({
+        message: "Reply generated with A/B testing",
+        ...result
+      });
+    } catch (error) {
+      console.error("A/B test reply generation error:", error);
+      res.status(500).json({ 
+        message: "Failed to generate A/B test reply",
+        error: (error as Error).message 
+      });
+    }
+  });
+
+  app.get('/api/ai/ab-test/results', isAuthenticated, async (req: any, res) => {
+    try {
+      const results = await aiModelManager.getABTestResults();
+      
+      res.json({
+        message: "A/B test results retrieved",
+        ...results
+      });
+    } catch (error) {
+      console.error("Error fetching A/B test results:", error);
+      res.status(500).json({ message: "Failed to fetch A/B test results" });
+    }
+  });
+
+  // Agent Co-Pilot Mode
+  app.post('/api/ai/improve-agent-draft', isAuthenticated, async (req: any, res) => {
+    try {
+      const { agentDraft } = req.body;
+      
+      const improvement = await aiModelManager.improveAgentDraft(agentDraft);
+      
+      res.json({
+        message: "Agent draft improved successfully",
+        ...improvement
+      });
+    } catch (error) {
+      console.error("Agent draft improvement error:", error);
+      res.status(500).json({ 
+        message: "Failed to improve agent draft",
+        error: (error as Error).message 
+      });
+    }
+  });
+
+  // Performance Drop Detection & Auto-Training
+  app.get('/api/ai/performance-drops', isAuthenticated, async (req: any, res) => {
+    try {
+      const timeframeDays = parseInt(req.query.timeframeDays as string) || 7;
+      
+      const analysis = await aiModelManager.detectPerformanceDrops(timeframeDays);
+      
+      res.json({
+        message: "Performance drop analysis completed",
+        ...analysis
+      });
+    } catch (error) {
+      console.error("Performance drop detection error:", error);
+      res.status(500).json({ message: "Failed to detect performance drops" });
+    }
+  });
+
+  app.post('/api/ai/generate-training-from-drops', isAuthenticated, async (req: any, res) => {
+    try {
+      const { dropPeriods } = req.body;
+      
+      const trainingData = await aiModelManager.generateTrainingDataFromDrops(dropPeriods);
+      
+      res.json({
+        message: "Training data generated from performance drops",
+        ...trainingData
+      });
+    } catch (error) {
+      console.error("Training data generation error:", error);
+      res.status(500).json({ 
+        message: "Failed to generate training data",
+        error: (error as Error).message 
+      });
+    }
+  });
+
+  // Confidence Drift Monitoring
+  app.get('/api/ai/confidence-drift', isAuthenticated, async (req: any, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      
+      const driftMetrics = await aiModelManager.getConfidenceDriftMetrics(days);
+      
+      res.json({
+        message: "Confidence drift metrics retrieved",
+        ...driftMetrics
+      });
+    } catch (error) {
+      console.error("Confidence drift analysis error:", error);
+      res.status(500).json({ message: "Failed to analyze confidence drift" });
     }
   });
 

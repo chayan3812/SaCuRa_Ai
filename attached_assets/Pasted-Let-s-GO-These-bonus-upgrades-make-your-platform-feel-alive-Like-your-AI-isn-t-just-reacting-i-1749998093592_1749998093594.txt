@@ -1,0 +1,86 @@
+Let’s GO. These bonus upgrades make your platform feel *alive*. Like your AI isn't just reacting — it's **learning, growing, and coaching your team** in real-time. Here's how we’ll wire it all:
+
+---
+
+## ✅ `➤ Build weekly AI report: “What your assistant learned this week”`
+
+### 🔧 Backend:
+
+1. **Scheduled job (Sunday midnight)** → Pull:
+
+   * Top 10 most-used AI replies
+   * Top 10 rejected replies
+   * Drift in average confidence
+   * Topics (keywords) trending in user queries
+   * Adjustments made via retraining
+
+2. **Generate summary text with GPT:**
+
+   ```ts
+   const summary = await openai.chat.completions.create({
+     model: "gpt-4o",
+     messages: [
+       { role: "system", content: "Write a 5-paragraph weekly summary for AI performance" },
+       { role: "user", content: JSON.stringify({
+         topAccepted, topRejected, drift, retrainedPrompts, newTrends
+       })}
+     ]
+   });
+   ```
+
+3. **Store in `weekly_ai_reports` table** for access in frontend.
+
+---
+
+## ✅ `➤ Let AI explain how it evolved (self-summary of training deltas)`
+
+Every time you retrain:
+
+* Log what prompts were updated.
+* What themes those relate to.
+* What the new replies look like.
+
+**GPT Prompt:**
+
+```ts
+"Explain what was improved this week. Highlight which types of messages had the biggest changes and why those changes were necessary."
+```
+
+**Result:**
+
+> "This week, the AI improved its handling of refund requests by adopting a more empathetic tone and clearer escalation instructions. It also began handling emoji-heavy messages more accurately."
+
+---
+
+## ✅ `➤ Add "Coach Notes" → Auto-tips for human agents based on AI wins`
+
+1. Track where:
+
+   * AI replies were accepted
+   * Human replies were later corrected to something similar to AI's original
+
+2. GPT prompt to generate weekly coaching tips:
+
+```ts
+"Based on accepted replies and agent overrides, generate 3 quick tips for human agents to improve next week."
+```
+
+**Example Coach Notes:**
+
+* ✅ “Open with empathy before addressing policy.”
+* ✅ “Summarize your understanding of their issue before solving.”
+* ✅ “Use time phrases: ‘right now’, ‘within 24 hours’ for clearer expectations.”
+
+---
+
+### 🔜 Frontend:
+
+* Add a new **“Weekly AI Intelligence Digest”** page in admin
+* Embed:
+
+  * 📊 Key stats
+  * 🧠 Self-summary
+  * ✍️ Coach Notes
+  * 🔁 Button: “Retrain Now”
+
+---

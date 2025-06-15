@@ -24,6 +24,8 @@ import AISelfOptimizer from "@/pages/AISelfOptimizer";
 import AIVersionManager from "@/pages/AIVersionManager";
 import AIModelDashboard from "@/pages/AIModelDashboard";
 import WeeklyAIIntelligence from "@/pages/WeeklyAIIntelligence";
+import AgentCoPilot from "@/pages/AgentCoPilot";
+import SLADashboard from "@/pages/SLADashboard";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -85,6 +87,8 @@ function Router() {
             <Route path="/ai-version-manager" component={AIVersionManager} />
             <Route path="/ai-model" component={AIModelDashboard} />
             <Route path="/weekly-ai-intelligence" component={WeeklyAIIntelligence} />
+            <Route path="/agent-copilot" component={AgentCoPilot} />
+            <Route path="/sla-dashboard" component={SLADashboard} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

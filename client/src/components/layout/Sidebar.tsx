@@ -17,7 +17,9 @@ import {
   Calendar,
   BarChart3,
   X,
-  TestTube
+  TestTube,
+  Activity,
+  Zap
 } from "lucide-react";
 
 interface SidebarProps {

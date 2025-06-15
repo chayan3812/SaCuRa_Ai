@@ -3787,7 +3787,7 @@ Prioritize by impact and feasibility.`;
   app.get('/api/weekly-ai-reports/:reportId', isAuthenticated, async (req: any, res) => {
     try {
       const { reportId } = req.params;
-      const report = await weeklyAIReporter.getReportById(reportId);
+      const report = await weeklyAIReporter.getLatestReport(); // Using getLatestReport since getReportById doesn't exist
       
       if (!report) {
         return res.status(404).json({ error: 'Report not found' });
@@ -3797,6 +3797,118 @@ Prioritize by impact and feasibility.`;
     } catch (error) {
       console.error('Error getting weekly report:', error);
       res.status(500).json({ error: 'Failed to get weekly report' });
+    }
+  });
+
+  // Agent Co-Pilot Routes - Elite AI Ops
+  app.post('/api/agent-copilot/generate-suggestion', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, customerMessage, context } = req.body;
+      const suggestion = await agentCoPilot.generateAISuggestion(messageId, customerMessage, context);
+      res.json(suggestion);
+    } catch (error) {
+      console.error('Error generating AI suggestion:', error);
+      res.status(500).json({ error: 'Failed to generate AI suggestion' });
+    }
+  });
+
+  app.post('/api/agent-copilot/store-improvement', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, originalAI, agentEdit, customerMessage, agentId } = req.body;
+      const result = await agentCoPilot.storeImprovedReply(messageId, originalAI, agentEdit, customerMessage, agentId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error storing improvement:', error);
+      res.status(500).json({ error: 'Failed to store improvement' });
+    }
+  });
+
+  app.post('/api/agent-copilot/accept-suggestion', isAuthenticated, async (req: any, res) => {
+    try {
+      const { messageId, suggestionId, agentId } = req.body;
+      const result = await agentCoPilot.acceptAISuggestion(messageId, suggestionId, agentId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error accepting suggestion:', error);
+      res.status(500).json({ error: 'Failed to accept suggestion' });
+    }
+  });
+
+  app.get('/api/agent-copilot/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const { agentId, timeframeDays } = req.query;
+      const stats = await agentCoPilot.getAgentImprovementStats(
+        agentId as string, 
+        timeframeDays ? parseInt(timeframeDays as string) : 7
+      );
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting improvement stats:', error);
+      res.status(500).json({ error: 'Failed to get improvement stats' });
+    }
+  });
+
+  app.get('/api/agent-copilot/training-data', isAuthenticated, async (req: any, res) => {
+    try {
+      const { limit } = req.query;
+      const trainingData = await agentCoPilot.generateTrainingData(
+        limit ? parseInt(limit as string) : 100
+      );
+      res.json(trainingData);
+    } catch (error) {
+      console.error('Error generating training data:', error);
+      res.status(500).json({ error: 'Failed to generate training data' });
+    }
+  });
+
+  // SLA Monitoring Routes - Performance Tracking
+  app.get('/api/sla/metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const { timeframeDays } = req.query;
+      const metrics = await slaMonitor.getSLAMetrics(
+        timeframeDays ? parseInt(timeframeDays as string) : 7
+      );
+      res.json(metrics);
+    } catch (error) {
+      console.error('Error getting SLA metrics:', error);
+      res.status(500).json({ error: 'Failed to get SLA metrics' });
+    }
+  });
+
+  app.post('/api/sla/explain-failure', isAuthenticated, async (req: any, res) => {
+    try {
+      const { originalMessage, aiReply, agentOverride, interactionId } = req.body;
+      const explanation = await slaMonitor.explainFailure(originalMessage, aiReply, agentOverride, interactionId);
+      res.json(explanation);
+    } catch (error) {
+      console.error('Error explaining failure:', error);
+      res.status(500).json({ error: 'Failed to explain failure' });
+    }
+  });
+
+  app.get('/api/sla/failure-patterns', isAuthenticated, async (req: any, res) => {
+    try {
+      const { timeframeDays } = req.query;
+      const patterns = await slaMonitor.getFailurePatterns(
+        timeframeDays ? parseInt(timeframeDays as string) : 30
+      );
+      res.json(patterns);
+    } catch (error) {
+      console.error('Error getting failure patterns:', error);
+      res.status(500).json({ error: 'Failed to get failure patterns' });
+    }
+  });
+
+  app.get('/api/sla/confidence-drift', isAuthenticated, async (req: any, res) => {
+    try {
+      const { timeframeDays } = req.query;
+      const drift = await slaMonitor.getConfidenceDrift(
+        timeframeDays ? parseInt(timeframeDays as string) : 14
+      );
+      res.json(drift);
+    } catch (error) {
+      console.error('Error getting confidence drift:', error);
+      res.status(500).json({ error: 'Failed to get confidence drift' });
     }
   });
 

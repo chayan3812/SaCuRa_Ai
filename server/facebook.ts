@@ -35,18 +35,72 @@ export interface FacebookAdMetrics {
 
 export class FacebookAPIService {
   private accessToken: string;
+  private appToken: string;
 
-  constructor(accessToken: string) {
-    this.accessToken = accessToken;
+  constructor(accessToken?: string) {
+    // Use provided access token or environment variable
+    this.accessToken = accessToken || process.env.FACEBOOK_ACCESS_TOKEN || 'U2OcmcSxqcyTAS3cwB5fYSKZCVpNvEISloN5JmzFDXwZBU42OQE6pvkWZCPiITm9r9SQrzExZBwNC06EboHxb0q8sUMZChjhIiJCxMFvoSSCRou2G5I87qOxOIjGhl2OywZD';
+    this.appToken = process.env.FACEBOOK_APP_TOKEN || '1230928114675791|aC5sSoJzYS48T8Qm1xlu3461ixA';
+  }
+
+  // Verify token and check permissions
+  async verifyTokenPermissions(): Promise<{
+    isValid: boolean;
+    permissions: string[];
+    tokenType: string;
+    appId?: string;
+    userId?: string;
+    expiresAt?: number;
+    scopes?: string[];
+  }> {
+    try {
+      const response = await axios.get(`${FB_BASE_URL}/me`, {
+        params: {
+          access_token: this.accessToken,
+          fields: 'id,name,permissions{permission,status}'
+        }
+      });
+
+      const permissionsResponse = await axios.get(`${FB_BASE_URL}/me/permissions`, {
+        params: {
+          access_token: this.accessToken
+        }
+      });
+
+      const tokenInfo = await axios.get(`${FB_BASE_URL}/debug_token`, {
+        params: {
+          input_token: this.accessToken,
+          access_token: this.appToken
+        }
+      });
+
+      const permissions = permissionsResponse.data.data
+        .filter((perm: any) => perm.status === 'granted')
+        .map((perm: any) => perm.permission);
+
+      const tokenData = tokenInfo.data.data;
+
+      return {
+        isValid: tokenData.is_valid,
+        permissions,
+        tokenType: tokenData.type,
+        appId: tokenData.app_id,
+        userId: tokenData.user_id,
+        expiresAt: tokenData.expires_at,
+        scopes: tokenData.scopes
+      };
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      return {
+        isValid: false,
+        permissions: [],
+        tokenType: 'unknown'
+      };
+    }
   }
 
   // Get User's Facebook Pages
   async getUserPages(): Promise<FacebookPageInfo[]> {
-    // Skip API calls for demo/invalid tokens
-    if (this.accessToken === 'demo_token_123' || !this.accessToken || this.accessToken.length < 10) {
-      console.log('Skipping Facebook API call - demo/invalid token detected');
-      return [];
-    }
 
     try {
       const response = await axios.get(`${FB_BASE_URL}/me/accounts`, {

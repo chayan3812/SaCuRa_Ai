@@ -4108,6 +4108,115 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Facebook Token Management
+  app.get('/api/facebook/verify-credentials', isAuthenticated, async (req: any, res) => {
+    try {
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const results = await tokenManager.testAllCredentials();
+      
+      res.json({
+        message: 'Facebook credentials verification completed',
+        results
+      });
+    } catch (error) {
+      console.error('Error verifying Facebook credentials:', error);
+      res.status(500).json({ error: 'Failed to verify Facebook credentials' });
+    }
+  });
+
+  app.get('/api/facebook/auth-url', isAuthenticated, async (req: any, res) => {
+    try {
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+      const authUrl = tokenManager.generateLoginUrl(redirectUri);
+      
+      res.json({
+        authUrl,
+        redirectUri
+      });
+    } catch (error) {
+      console.error('Error generating Facebook auth URL:', error);
+      res.status(500).json({ error: 'Failed to generate auth URL' });
+    }
+  });
+
+  app.get('/api/facebook/callback', async (req, res) => {
+    try {
+      const { code, state } = req.query;
+      if (!code) {
+        return res.status(400).json({ error: 'Authorization code not received' });
+      }
+
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+      
+      const tokenResult = await tokenManager.exchangeCodeForToken(code as string, redirectUri);
+      
+      if (tokenResult.error) {
+        return res.status(400).json({ error: tokenResult.error });
+      }
+
+      // Validate the new token
+      const validation = await tokenManager.validateToken(tokenResult.access_token!);
+      
+      res.json({
+        message: 'Facebook authentication successful',
+        token: tokenResult.access_token,
+        validation
+      });
+    } catch (error) {
+      console.error('Error in Facebook callback:', error);
+      res.status(500).json({ error: 'Facebook authentication failed' });
+    }
+  });
+
+  app.post('/api/facebook/validate-token', isAuthenticated, async (req: any, res) => {
+    try {
+      const { token } = req.body;
+      if (!token) {
+        return res.status(400).json({ error: 'Token is required' });
+      }
+
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const validation = await tokenManager.validateToken(token);
+      
+      res.json({
+        message: 'Token validation completed',
+        validation
+      });
+    } catch (error) {
+      console.error('Error validating token:', error);
+      res.status(500).json({ error: 'Token validation failed' });
+    }
+  });
+
+  app.get('/api/facebook/user-pages', isAuthenticated, async (req: any, res) => {
+    try {
+      const { token } = req.query;
+      const userToken = token || process.env.FACEBOOK_ACCESS_TOKEN;
+      
+      if (!userToken) {
+        return res.status(400).json({ error: 'User access token is required' });
+      }
+
+      const { createTokenManager } = await import('./facebookTokenManager');
+      const tokenManager = createTokenManager();
+      const pages = await tokenManager.getUserPages(userToken as string);
+      
+      res.json({
+        message: 'User pages retrieved successfully',
+        pages
+      });
+    } catch (error) {
+      console.error('Error fetching user pages:', error);
+      res.status(500).json({ error: 'Failed to fetch user pages' });
+    }
+  });
+
   // Facebook Analytics & Pixel Integration
   app.get('/api/facebook-analytics/conversions', isAuthenticated, async (req: any, res) => {
     try {

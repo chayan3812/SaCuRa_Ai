@@ -11,10 +11,11 @@ import FacebookCore from '@/components/facebook/FacebookCore';
 import FacebookDashboard from '@/components/facebook/FacebookDashboard';
 import FacebookAdsManager from '@/components/facebook/FacebookAdsManager';
 import AIContentOptimizer from '@/components/facebook/AIContentOptimizer';
+import SimpleFacebookDashboard from '@/components/facebook/SimpleFacebookDashboard';
 import { Facebook as FacebookIcon, Zap, Bot, BarChart3, Settings } from 'lucide-react';
 
 export default function Facebook() {
-  const [activeTab, setActiveTab] = useState('core');
+  const [activeTab, setActiveTab] = useState('simple');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -89,9 +90,13 @@ export default function Facebook() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 h-12">
+          <TabsList className="grid w-full grid-cols-6 h-12">
+            <TabsTrigger value="simple" className="flex items-center space-x-2">
+              <FacebookIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Simple</span>
+            </TabsTrigger>
             <TabsTrigger value="core" className="flex items-center space-x-2">
-              <Facebook className="h-4 w-4" />
+              <FacebookIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Core</span>
             </TabsTrigger>
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
@@ -111,6 +116,10 @@ export default function Facebook() {
               <span className="hidden sm:inline">Setup</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="simple" className="space-y-6">
+            <SimpleFacebookDashboard />
+          </TabsContent>
 
           <TabsContent value="core" className="space-y-6">
             <Card>

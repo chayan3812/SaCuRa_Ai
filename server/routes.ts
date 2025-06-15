@@ -26,7 +26,7 @@ import { mlEngine } from "./mlEngine";
 import { productionOptimizer } from "./productionOptimizer";
 import { db } from "./db";
 import { customerInteractions } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { enhancedPageFixer } from "./enhancedPageFixer";
 import { processFailedReplyFeedback, getFailureInsights } from "./aiSelfAwareness";
 import { advancedAISelfImprovement } from "./advancedAISelfImprovement";
@@ -63,10 +63,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Database health check for audit compliance
   app.get('/api/health/database', async (req, res) => {
     try {
-      await db.execute({ sql: 'SELECT 1' });
-      res.status(200).json({ status: 'healthy', database: 'connected' });
+      const result = await db.execute(sql`SELECT 1 as test`);
+      res.status(200).json({ status: 'healthy', database: 'connected', test: result });
     } catch (error) {
-      res.status(500).json({ status: 'unhealthy', database: 'disconnected' });
+      res.status(500).json({ status: 'unhealthy', database: 'disconnected', error: String(error) });
     }
   });
 

@@ -1,0 +1,117 @@
+{
+  "summary": {
+    "totalTests": 16,
+    "passed": 2,
+    "failed": 14,
+    "successRate": "12.50%",
+    "apiVersion": "v21.0",
+    "timestamp": "2025-06-15T23:09:14.072Z"
+  },
+  "tests": [
+    {
+      "name": "Ad Accounts API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.259Z"
+    },
+    {
+      "name": "Account Insights API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.367Z"
+    },
+    {
+      "name": "Campaigns API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.474Z"
+    },
+    {
+      "name": "Campaign Creation",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.582Z"
+    },
+    {
+      "name": "Ad Sets API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.710Z"
+    },
+    {
+      "name": "Ad Set Creation",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.814Z"
+    },
+    {
+      "name": "Ads API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:12.914Z"
+    },
+    {
+      "name": "Ad Creation",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.030Z"
+    },
+    {
+      "name": "Custom Audiences API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.130Z"
+    },
+    {
+      "name": "Targeting Interests Search",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.235Z"
+    },
+    {
+      "name": "Targeting Behaviors Search",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.341Z"
+    },
+    {
+      "name": "Performance Metrics API",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.462Z"
+    },
+    {
+      "name": "Campaign Optimization",
+      "status": "FAIL",
+      "details": "Status: 500",
+      "timestamp": "2025-06-15T23:09:13.602Z"
+    },
+    {
+      "name": "Insights Endpoints",
+      "status": "FAIL",
+      "details": "0/3 endpoints working",
+      "timestamp": "2025-06-15T23:09:13.963Z"
+    },
+    {
+      "name": "Ads API Error Handling",
+      "status": "PASS",
+      "details": "Error handling system active",
+      "timestamp": "2025-06-15T23:09:13.969Z"
+    },
+    {
+      "name": "Service Architecture",
+      "status": "PASS",
+      "details": "Facebook Ads service properly integrated",
+      "timestamp": "2025-06-15T23:09:14.067Z"
+    }
+  ],
+  "recommendations": [
+    "Configure Facebook Marketing API credentials",
+    "Verify Facebook App has ads_management permissions",
+    "Complete Facebook App Review process for production",
+    "Implement campaign performance monitoring",
+    "Set up automated budget optimization alerts",
+    "Create custom audience synchronization workflows",
+    "Implement A/B testing for ad creatives"
+  ]
+}

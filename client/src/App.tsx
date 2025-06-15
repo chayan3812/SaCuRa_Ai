@@ -109,6 +109,7 @@ function Router() {
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/facebook-setup" component={FacebookSetup} />
             <Route path="/facebook-conversions" component={FacebookConversions} />
+            <Route path="/facebook-ads" component={FacebookAds} />
             <Route path="/marketing-api" component={MarketingAPI} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />

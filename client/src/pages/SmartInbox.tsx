@@ -69,6 +69,7 @@ interface AgentSuggestion {
 export default function SmartInbox() {
   const [selectedMessage, setSelectedMessage] = useState<CustomerInteraction | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [suggestionStartTime, setSuggestionStartTime] = useState<number | null>(null);
   const [agentSuggestion, setAgentSuggestion] = useState<AgentSuggestion | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const { toast } = useToast();
@@ -104,6 +105,7 @@ export default function SmartInbox() {
   // AgentAssistChat - GPT-powered reply suggestions
   const suggestReplyMutation = useMutation({
     mutationFn: async (messageId: string): Promise<AgentSuggestion> => {
+      setSuggestionStartTime(Date.now());
       return await apiRequest(`/api/agent-suggest-reply/${messageId}`, {
         method: 'POST',
         body: JSON.stringify({})
@@ -127,16 +129,46 @@ export default function SmartInbox() {
 
   const feedbackMutation = useMutation({
     mutationFn: async (data: { messageId: string; used: boolean; feedback?: string }) => {
-      return await apiRequest("/api/agent-reply-feedback", "POST", data);
+      return await apiRequest("/api/agent-reply-feedback", {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });
     },
   });
 
+  // SmartFeedback - Track AI suggestion quality for self-improvement
+  const trackSmartFeedback = useMutation({
+    mutationFn: async (data: { 
+      messageId: string; 
+      aiSuggestion: string; 
+      feedback: 'useful' | 'not_useful'; 
+      responseTime?: number 
+    }) => {
+      return await apiRequest('/api/smart-feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...data,
+          platformContext: 'inbox'
+        })
+      });
+    },
+    onSuccess: (data) => {
+      console.log('SmartFeedback tracked successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Failed to track SmartFeedback:', error);
+    }
+  });
+
   const sendReplyMutation = useMutation({
     mutationFn: async (data: { interactionId: string; response: string; responseTime?: number }) => {
-      return await apiRequest("/api/customer-service/respond", "POST", data);
+      return await apiRequest("/api/customer-service/respond", {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/customer-service/interactions/all"] });
@@ -193,6 +225,13 @@ export default function SmartInbox() {
         messageId: selectedMessage.id,
         used: true,
         feedback: 'useful'
+      });
+      // Track positive feedback for SmartFeedback system
+      trackSmartFeedback.mutate({
+        messageId: selectedMessage.id,
+        aiSuggestion: agentSuggestion.suggestedReply,
+        feedback: 'useful',
+        responseTime: suggestionStartTime ? Date.now() - suggestionStartTime : undefined
       });
     }
   };
@@ -528,11 +567,19 @@ export default function SmartInbox() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => feedbackMutation.mutate({
-                                messageId: selectedMessage.id,
-                                used: false,
-                                feedback: 'useful'
-                              })}
+                              onClick={() => {
+                                feedbackMutation.mutate({
+                                  messageId: selectedMessage.id,
+                                  used: false,
+                                  feedback: 'useful'
+                                });
+                                trackSmartFeedback.mutate({
+                                  messageId: selectedMessage.id,
+                                  aiSuggestion: agentSuggestion.suggestedReply,
+                                  feedback: 'useful',
+                                  responseTime: suggestionStartTime ? Date.now() - suggestionStartTime : undefined
+                                });
+                              }}
                               className="gap-1"
                             >
                               <ThumbsUp className="h-3 w-3" />
@@ -540,11 +587,19 @@ export default function SmartInbox() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => feedbackMutation.mutate({
-                                messageId: selectedMessage.id,
-                                used: false,
-                                feedback: 'not_useful'
-                              })}
+                              onClick={() => {
+                                feedbackMutation.mutate({
+                                  messageId: selectedMessage.id,
+                                  used: false,
+                                  feedback: 'not_useful'
+                                });
+                                trackSmartFeedback.mutate({
+                                  messageId: selectedMessage.id,
+                                  aiSuggestion: agentSuggestion.suggestedReply,
+                                  feedback: 'not_useful',
+                                  responseTime: suggestionStartTime ? Date.now() - suggestionStartTime : undefined
+                                });
+                              }}
                               className="gap-1"
                             >
                               <ThumbsDown className="h-3 w-3" />

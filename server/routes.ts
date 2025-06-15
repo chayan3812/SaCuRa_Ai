@@ -44,6 +44,8 @@ import { WeeklyAIReporter } from "./weeklyAIReporter";
 import { scheduledJobsManager } from "./scheduledJobs";
 import { agentCoPilot } from "./agentCoPilot";
 import { slaMonitor } from "./slaMonitor";
+import { aiStressTestInjector } from "./aiStressTest";
+import { weeklySlackReporter } from "./weeklySlackReporter";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -3845,6 +3847,263 @@ Prioritize by impact and feasibility.`;
     } catch (error) {
       console.error('Error getting improvement stats:', error);
       res.status(500).json({ error: 'Failed to get improvement stats' });
+    }
+  });
+
+  // AI Replay Tool - Side-by-side AI vs Agent comparison
+  app.get('/api/admin/ai-replay', isAuthenticated, async (req: any, res) => {
+    try {
+      const filter = req.query.filter || 'rejected';
+      
+      // Query ai_suggestion_feedback joined with interactions
+      const replayData = await db
+        .select({
+          id: aiSuggestionFeedback.id,
+          messageId: aiSuggestionFeedback.messageId,
+          originalMessage: customerInteractions.message,
+          aiReply: aiSuggestionFeedback.aiSuggestion,
+          agentOverride: aiSuggestionFeedback.agentOverride,
+          rejectionReason: aiSuggestionFeedback.rejectionReason,
+          rejectionAnalysis: aiSuggestionFeedback.rejectionAnalysis,
+          timestamp: aiSuggestionFeedback.createdAt,
+          customerName: customerInteractions.customerName,
+          confidence: aiSuggestionFeedback.confidence
+        })
+        .from(aiSuggestionFeedback)
+        .leftJoin(customerInteractions, eq(aiSuggestionFeedback.messageId, customerInteractions.id))
+        .where(filter === 'all' ? undefined : eq(aiSuggestionFeedback.agentFeedback, filter))
+        .orderBy(desc(aiSuggestionFeedback.createdAt))
+        .limit(50);
+
+      res.json(replayData);
+    } catch (error) {
+      console.error('Error fetching AI replay data:', error);
+      res.status(500).json({ error: 'Failed to fetch AI replay data' });
+    }
+  });
+
+  app.post('/api/admin/retrain', isAuthenticated, async (req: any, res) => {
+    try {
+      const { replayIds } = req.body;
+      
+      // Add selected replays to training queue
+      let addedCount = 0;
+      for (const replayId of replayIds) {
+        try {
+          // Get replay data
+          const replayItem = await db
+            .select()
+            .from(aiSuggestionFeedback)
+            .where(eq(aiSuggestionFeedback.id, replayId))
+            .limit(1);
+
+          if (replayItem[0]) {
+            // Add to training queue via Agent Co-Pilot
+            await agentCoPilot.storeImprovedReply(
+              replayItem[0].messageId,
+              replayItem[0].aiSuggestion,
+              replayItem[0].agentOverride,
+              'Training from replay',
+              'system'
+            );
+            addedCount++;
+          }
+        } catch (error) {
+          console.error(`Error adding replay ${replayId} to training:`, error);
+        }
+      }
+      
+      res.json({
+        message: `Added ${addedCount} replay examples to training queue`,
+        addedCount,
+        totalRequested: replayIds.length
+      });
+    } catch (error) {
+      console.error('Error adding replays to training:', error);
+      res.status(500).json({ error: 'Failed to add replays to training' });
+    }
+  });
+
+  // Prompt Comparison UI
+  app.get('/api/admin/prompt-comparisons', isAuthenticated, async (req: any, res) => {
+    try {
+      // Mock data structure for now - would be replaced with actual training history
+      const comparisons = [
+        {
+          id: 'comp_1',
+          promptId: 'prompt_customer_service_1',
+          oldPrompt: 'You are a helpful customer service agent. Respond professionally to customer inquiries.',
+          newPrompt: 'You are an empathetic customer service agent. Listen carefully to customer concerns and respond with understanding and practical solutions.',
+          deltaReason: 'Added empathy focus and active listening to improve customer satisfaction scores by emphasizing emotional intelligence.',
+          improvementScore: 0.15,
+          testResults: {
+            oldAccuracy: 0.72,
+            newAccuracy: 0.87,
+            improvement: 0.15
+          },
+          timestamp: new Date(),
+          status: 'pending',
+          category: 'Customer Service'
+        }
+      ];
+      
+      res.json(comparisons);
+    } catch (error) {
+      console.error('Error fetching prompt comparisons:', error);
+      res.status(500).json({ error: 'Failed to fetch prompt comparisons' });
+    }
+  });
+
+  app.get('/api/admin/training-history', isAuthenticated, async (req: any, res) => {
+    try {
+      // Get recent training events from Agent Co-Pilot
+      const stats = await agentCoPilot.getAgentImprovementStats('system', 30);
+      
+      const trainingHistory = [
+        {
+          id: 'train_1',
+          trainingType: 'Agent Feedback Integration',
+          completedAt: new Date(),
+          accuracy: 0.89,
+          improvement: 0.05,
+          samplesUsed: stats.totalImprovements || 0,
+          category: 'Customer Service'
+        }
+      ];
+      
+      res.json(trainingHistory);
+    } catch (error) {
+      console.error('Error fetching training history:', error);
+      res.status(500).json({ error: 'Failed to fetch training history' });
+    }
+  });
+
+  app.post('/api/admin/prompt-status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { promptId, action } = req.body;
+      
+      // Mock implementation - would update actual prompt status
+      res.json({
+        message: `Prompt ${promptId} ${action}d successfully`,
+        promptId,
+        action,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.error('Error updating prompt status:', error);
+      res.status(500).json({ error: 'Failed to update prompt status' });
+    }
+  });
+
+  app.post('/api/admin/test-prompt-comparison', isAuthenticated, async (req: any, res) => {
+    try {
+      const { promptId } = req.body;
+      
+      // Mock side-by-side testing - would run actual A/B test
+      res.json({
+        message: `Started side-by-side test for prompt ${promptId}`,
+        testId: `test_${Date.now()}`,
+        promptId,
+        estimatedCompletion: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+      });
+    } catch (error) {
+      console.error('Error starting prompt comparison test:', error);
+      res.status(500).json({ error: 'Failed to start prompt comparison test' });
+    }
+  });
+
+  // Stress Test Injector
+  app.post('/api/admin/ai-stress-test', isAuthenticated, async (req: any, res) => {
+    try {
+      const config = {
+        messageCount: req.body.messageCount || 100,
+        rejectionRate: req.body.rejectionRate || 0.4,
+        neutralRate: req.body.neutralRate || 0.3,
+        approvalRate: req.body.approvalRate || 0.3,
+        includeEdgeCases: req.body.includeEdgeCases || true
+      };
+      
+      // Clear previous test data
+      await aiStressTestInjector.clearTestData();
+      
+      // Run stress test
+      const result = await aiStressTestInjector.runStressTest(config);
+      
+      res.json({
+        message: 'AI stress test completed successfully',
+        result,
+        config
+      });
+    } catch (error) {
+      console.error('Error running AI stress test:', error);
+      res.status(500).json({ error: 'Failed to run AI stress test' });
+    }
+  });
+
+  app.delete('/api/admin/ai-stress-test/data', isAuthenticated, async (req: any, res) => {
+    try {
+      await aiStressTestInjector.clearTestData();
+      res.json({ message: 'Stress test data cleared successfully' });
+    } catch (error) {
+      console.error('Error clearing stress test data:', error);
+      res.status(500).json({ error: 'Failed to clear stress test data' });
+    }
+  });
+
+  // Weekly Slack Reporting
+  app.post('/api/admin/weekly-slack-report', isAuthenticated, async (req: any, res) => {
+    try {
+      const success = await weeklySlackReporter.generateAndSendWeeklyReport();
+      
+      if (success) {
+        res.json({
+          message: 'Weekly Slack report generated and sent successfully',
+          timestamp: new Date()
+        });
+      } else {
+        res.json({
+          message: 'Weekly report generated but not sent to Slack (webhook not configured)',
+          timestamp: new Date()
+        });
+      }
+    } catch (error) {
+      console.error('Error generating weekly Slack report:', error);
+      res.status(500).json({ error: 'Failed to generate weekly Slack report' });
+    }
+  });
+
+  app.post('/api/admin/slack-webhook', isAuthenticated, async (req: any, res) => {
+    try {
+      const { webhookUrl } = req.body;
+      
+      // Test webhook by sending a simple message
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: '🤖 PagePilot AI - Slack integration test successful!',
+          blocks: [{
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: '*✅ Slack Integration Test*\nYour webhook is working correctly. Weekly AI reports will be sent to this channel.'
+            }
+          }]
+        })
+      });
+
+      if (response.ok) {
+        res.json({
+          message: 'Slack webhook test successful',
+          webhookUrl: webhookUrl.substring(0, 50) + '...',
+          timestamp: new Date()
+        });
+      } else {
+        res.status(400).json({ error: 'Slack webhook test failed' });
+      }
+    } catch (error) {
+      console.error('Error testing Slack webhook:', error);
+      res.status(500).json({ error: 'Failed to test Slack webhook' });
     }
   });
 

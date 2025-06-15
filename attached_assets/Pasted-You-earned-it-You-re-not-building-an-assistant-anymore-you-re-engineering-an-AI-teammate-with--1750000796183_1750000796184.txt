@@ -1,0 +1,81 @@
+You earned it.
+You're not building an assistant anymore — you're engineering an **AI teammate with evolution memory**.
+Let’s drop the **final upgrade prompt set** — ready for Replit execution, end-to-end, no placeholders, real data only.
+
+---
+
+## 💥 FULL NEXT PROMPT SET
+
+### 🔁 `➤ Full prompt: AI Replay Tool (Side-by-side AI vs Agent)`
+
+```ts
+// Create new admin route: /admin/ai-replay
+
+1. Query ai_suggestion_feedback joined with messages + overrides
+2. Display UI panel: Left → original AI, Right → agent override
+3. Add:
+   - 🔍 Reason shown from rejection_analysis
+   - 👍 Use for retrain checkbox
+   - 🧠 “Retrain on this” button → sends to training_queue
+
+File: pages/AdminAIReplay.tsx
+Route: /admin/ai-replay
+Backend: GET /api/admin/ai-replay, POST /api/admin/retrain
+```
+
+---
+
+### 🧪 `➤ Prompt Comparison UI: Before / After retraining`
+
+```ts
+// In AdminAIDigest.tsx → Add “Compare Prompts” tab
+
+1. Query: training_history (store {oldPrompt, newPrompt, deltaReason})
+2. Display table:
+   - ❌ Before → ✅ After
+   - 🔁 “Revert” or “Approve” button
+   - Tooltip: GPT explanation of improvement
+
+Optional: link to test simulation → fire old vs new side-by-side and see which wins (via feedback or score)
+```
+
+---
+
+### ⚔️ `➤ Stress Test Injector: Simulate 100 bad replies to test evolution`
+
+```ts
+// Add route: POST /api/admin/ai-stress-test
+
+Logic:
+1. Seed 100+ fake user messages (realistic edge cases)
+2. Force AI to reply to each
+3. Simulate 40% rejection, 30% neutral, 30% approval
+4. Auto-log into ai_suggestion_feedback + rejection_analysis
+
+Use for:
+- Load test
+- Feedback system audit
+- Retraining coverage validation
+```
+
+---
+
+### 🧾 `➤ Weekly Slack Report: “Here’s what your AI learned this week”`
+
+```ts
+// Cron job: every Sunday 08:00 UTC
+1. Query weekly_ai_reports → get last week
+2. Format digest message (use markdown):
+   - ✅ Approval Rate: 84.3%
+   - ❌ Top 3 Rejected Replies
+   - 🧠 New training themes added: [Support Delay, Refund Clarification]
+   - 🧬 Retrained prompts: 12
+
+3. POST to Slack webhook:
+   https://hooks.slack.com/services/...
+
+File: scripts/sendWeeklyAIReportToSlack.ts
+Uses: openai.ts → summarizer, storage.ts → weekly_ai_reports
+```
+
+---

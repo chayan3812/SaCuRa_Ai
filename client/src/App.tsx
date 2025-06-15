@@ -26,6 +26,8 @@ import AIModelDashboard from "@/pages/AIModelDashboard";
 import WeeklyAIIntelligence from "@/pages/WeeklyAIIntelligence";
 import AgentCoPilot from "@/pages/AgentCoPilot";
 import SLADashboard from "@/pages/SLADashboard";
+import AdminAIReplay from "@/pages/AdminAIReplay";
+import AdminAIDigest from "@/pages/AdminAIDigest";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";

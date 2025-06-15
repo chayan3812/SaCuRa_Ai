@@ -4,6 +4,7 @@ import {
   varchar,
   timestamp,
   jsonb,
+  json,
   index,
   serial,
   integer,
@@ -138,6 +139,23 @@ export const aiLearningData = pgTable("ai_learning_data", {
   feedback: varchar("feedback"), // 'positive', 'negative', 'neutral'
   confidence: decimal("confidence", { precision: 3, scale: 2 }),
   category: varchar("category"), // 'customer_service', 'ad_copy', 'policy_check'
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Training prompts for closed-loop AI learning
+export const trainingPrompts = pgTable("training_prompts", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  messageId: varchar("message_id").notNull(),
+  customerMessage: text("customer_message").notNull(),
+  aiReply: text("ai_reply").notNull(),
+  agentReply: text("agent_reply"),
+  feedbackType: varchar("feedback_type").notNull(), // 'positive', 'negative', 'correction'
+  prompt: text("prompt").notNull(),
+  rating: integer("rating").notNull(), // 1 = useful, 0 = not useful
+  category: varchar("category").notNull(), // 'positive_reinforcement', 'improvement_needed'
+  priority: integer("priority").default(1), // 1-3, higher = more important
+  contextData: json("context_data"),
+  processed: boolean("processed").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

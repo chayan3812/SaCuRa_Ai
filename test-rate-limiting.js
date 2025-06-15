@@ -265,7 +265,6 @@ async function main() {
   const report = await tester.runCompleteTest();
   
   // Write detailed report to file
-  const fs = require('fs');
   fs.writeFileSync('rate-limiting-test-report.json', JSON.stringify(report, null, 2));
   
   console.log('\n📄 Detailed report saved to: rate-limiting-test-report.json');
@@ -274,8 +273,4 @@ async function main() {
   process.exit(report.summary.failed > 0 ? 1 : 0);
 }
 
-if (require.main === module) {
-  main().catch(console.error);
-}
-
-module.exports = { RateLimitingTester };
+main().catch(console.error);

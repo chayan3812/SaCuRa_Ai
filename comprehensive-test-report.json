@@ -1,11 +1,11 @@
 {
   "summary": {
     "totalTests": 28,
-    "passed": 25,
-    "failed": 1,
+    "passed": 23,
+    "failed": 3,
     "skipped": 2,
-    "successRate": "96.15",
-    "timestamp": "2025-06-15T21:49:39.846Z"
+    "successRate": "88.46",
+    "timestamp": "2025-06-15T22:03:27.240Z"
   },
   "categories": {
     "Authentication": {
@@ -18,8 +18,8 @@
           "category": "Authentication",
           "status": "FAIL",
           "details": "Expected 401, got 200",
-          "duration": 61,
-          "timestamp": "2025-06-15T21:49:37.745Z"
+          "duration": 63,
+          "timestamp": "2025-06-15T22:03:25.198Z"
         },
         {
           "name": "Login Endpoint Availability",
@@ -27,7 +27,7 @@
           "status": "PASS",
           "details": "Login endpoint is accessible",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:37.756Z"
+          "timestamp": "2025-06-15T22:03:25.210Z"
         }
       ],
       "fail": null,
@@ -44,7 +44,7 @@
           "status": "PASS",
           "details": "Database queries are functional",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:37.851Z"
+          "timestamp": "2025-06-15T22:03:25.317Z"
         }
       ],
       "pass": null
@@ -58,65 +58,65 @@
           "name": "User Info API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 23ms",
-          "duration": 23,
-          "timestamp": "2025-06-15T21:49:37.874Z"
+          "details": "Response time: 27ms",
+          "duration": 27,
+          "timestamp": "2025-06-15T22:03:25.345Z"
         },
         {
           "name": "Dashboard Metrics API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 85ms",
-          "duration": 85,
-          "timestamp": "2025-06-15T21:49:37.960Z"
+          "details": "Response time: 96ms",
+          "duration": 96,
+          "timestamp": "2025-06-15T22:03:25.441Z"
         },
         {
           "name": "AI Learning Metrics API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 66ms",
-          "duration": 66,
-          "timestamp": "2025-06-15T21:49:38.026Z"
+          "details": "Response time: 73ms",
+          "duration": 73,
+          "timestamp": "2025-06-15T22:03:25.515Z"
         },
         {
           "name": "Facebook Pages API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 23ms",
-          "duration": 23,
-          "timestamp": "2025-06-15T21:49:38.049Z"
+          "details": "Response time: 25ms",
+          "duration": 25,
+          "timestamp": "2025-06-15T22:03:25.541Z"
         },
         {
           "name": "Customer Interactions API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 25ms",
-          "duration": 25,
-          "timestamp": "2025-06-15T21:49:38.074Z"
+          "details": "Response time: 26ms",
+          "duration": 26,
+          "timestamp": "2025-06-15T22:03:25.569Z"
         },
         {
           "name": "Employees API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 25ms",
-          "duration": 25,
-          "timestamp": "2025-06-15T21:49:38.099Z"
+          "details": "Response time: 27ms",
+          "duration": 27,
+          "timestamp": "2025-06-15T22:03:25.596Z"
         },
         {
           "name": "AI Recommendations API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 23ms",
-          "duration": 23,
-          "timestamp": "2025-06-15T21:49:38.122Z"
+          "details": "Response time: 26ms",
+          "duration": 26,
+          "timestamp": "2025-06-15T22:03:25.622Z"
         },
         {
           "name": "Notifications API",
           "category": "API",
           "status": "PASS",
-          "details": "Response time: 2ms",
-          "duration": 2,
-          "timestamp": "2025-06-15T21:49:38.125Z"
+          "details": "Response time: 3ms",
+          "duration": 3,
+          "timestamp": "2025-06-15T22:03:25.626Z"
         }
       ],
       "pass": null
@@ -132,7 +132,7 @@
           "status": "PASS",
           "details": "Retrieved 0 pages",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.149Z"
+          "timestamp": "2025-06-15T22:03:25.660Z"
         },
         {
           "name": "Facebook Webhook Processing",
@@ -140,7 +140,7 @@
           "status": "PASS",
           "details": "Webhook processes messages correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.177Z"
+          "timestamp": "2025-06-15T22:03:25.665Z"
         }
       ],
       "pass": null
@@ -156,7 +156,7 @@
           "status": "PASS",
           "details": "All required metrics fields present",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.317Z"
+          "timestamp": "2025-06-15T22:03:25.736Z"
         },
         {
           "name": "AI Feedback System",
@@ -164,7 +164,7 @@
           "status": "PASS",
           "details": "AI feedback is properly recorded",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.323Z"
+          "timestamp": "2025-06-15T22:03:25.747Z"
         }
       ],
       "pass": null
@@ -180,7 +180,7 @@
           "status": "PASS",
           "details": "Main application loads successfully",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.330Z"
+          "timestamp": "2025-06-15T22:03:25.759Z"
         },
         {
           "name": "Static Asset: /vite.svg",
@@ -188,7 +188,7 @@
           "status": "PASS",
           "details": "Asset loads correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.341Z"
+          "timestamp": "2025-06-15T22:03:25.771Z"
         },
         {
           "name": "Static Asset: /favicon.ico",
@@ -196,7 +196,7 @@
           "status": "PASS",
           "details": "Asset loads correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.348Z"
+          "timestamp": "2025-06-15T22:03:25.777Z"
         }
       ],
       "pass": null
@@ -210,25 +210,25 @@
           "name": "Performance: /api/dashboard/metrics",
           "category": "Performance",
           "status": "PASS",
-          "details": "Avg: 89.40ms, Max: 96ms",
+          "details": "Avg: 94.40ms, Max: 96ms",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:38.796Z"
+          "timestamp": "2025-06-15T22:03:26.250Z"
         },
         {
           "name": "Performance: /api/ai/learning-metrics",
           "category": "Performance",
           "status": "PASS",
-          "details": "Avg: 65.00ms, Max: 66ms",
+          "details": "Avg: 70.20ms, Max: 72ms",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.122Z"
+          "timestamp": "2025-06-15T22:03:26.602Z"
         },
         {
           "name": "Performance: /api/customer-service/interactions/all",
           "category": "Performance",
           "status": "PASS",
-          "details": "Avg: 22.80ms, Max: 24ms",
+          "details": "Avg: 26.40ms, Max: 30ms",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.237Z"
+          "timestamp": "2025-06-15T22:03:26.734Z"
         }
       ],
       "pass": null
@@ -244,7 +244,7 @@
           "status": "SKIP",
           "details": "CORS headers not detected",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.323Z"
+          "timestamp": "2025-06-15T22:03:26.826Z"
         },
         {
           "name": "SQL Injection Protection",
@@ -252,7 +252,7 @@
           "status": "PASS",
           "details": "System handles malicious SQL input safely",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.328Z"
+          "timestamp": "2025-06-15T22:03:26.832Z"
         },
         {
           "name": "Rate Limiting",
@@ -260,7 +260,7 @@
           "status": "SKIP",
           "details": "Rate limiting not detected or high threshold",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.596Z"
+          "timestamp": "2025-06-15T22:03:27.040Z"
         }
       ],
       "skip": null,
@@ -275,9 +275,9 @@
           "name": "Concurrent Load Test",
           "category": "Load",
           "status": "PASS",
-          "details": "10/10 requests succeeded in 97ms",
+          "details": "10/10 requests succeeded in 100ms",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.696Z"
+          "timestamp": "2025-06-15T22:03:27.143Z"
         }
       ],
       "pass": null
@@ -293,26 +293,27 @@
           "status": "PASS",
           "details": "database queries work",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.792Z"
+          "timestamp": "2025-06-15T22:03:27.235Z"
         },
         {
           "name": "Environment: Facebook Integration",
           "category": "Environment",
-          "status": "PASS",
-          "details": "facebook endpoints respond",
+          "status": "FAIL",
+          "details": "Request failed with status code 429",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.818Z"
+          "timestamp": "2025-06-15T22:03:27.238Z"
         },
         {
           "name": "Environment: Session Configuration",
           "category": "Environment",
-          "status": "PASS",
-          "details": "auth endpoints work",
+          "status": "FAIL",
+          "details": "Request failed with status code 429",
           "duration": 0,
-          "timestamp": "2025-06-15T21:49:39.845Z"
+          "timestamp": "2025-06-15T22:03:27.240Z"
         }
       ],
-      "pass": null
+      "pass": null,
+      "fail": null
     }
   },
   "failedTests": [
@@ -321,8 +322,24 @@
       "category": "Authentication",
       "status": "FAIL",
       "details": "Expected 401, got 200",
-      "duration": 61,
-      "timestamp": "2025-06-15T21:49:37.745Z"
+      "duration": 63,
+      "timestamp": "2025-06-15T22:03:25.198Z"
+    },
+    {
+      "name": "Environment: Facebook Integration",
+      "category": "Environment",
+      "status": "FAIL",
+      "details": "Request failed with status code 429",
+      "duration": 0,
+      "timestamp": "2025-06-15T22:03:27.238Z"
+    },
+    {
+      "name": "Environment: Session Configuration",
+      "category": "Environment",
+      "status": "FAIL",
+      "details": "Request failed with status code 429",
+      "duration": 0,
+      "timestamp": "2025-06-15T22:03:27.240Z"
     }
   ],
   "performanceMetrics": [],

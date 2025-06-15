@@ -1,0 +1,59 @@
+{
+  "summary": {
+    "totalTests": 8,
+    "passed": 8,
+    "failed": 0,
+    "successRate": "100.00%",
+    "timestamp": "2025-06-15T22:03:18.787Z"
+  },
+  "tests": [
+    {
+      "name": "General API Rate Limiting",
+      "status": "PASS",
+      "details": "Rate limiting active - requests processed normally",
+      "timestamp": "2025-06-15T22:03:18.447Z"
+    },
+    {
+      "name": "Rate Limit Headers",
+      "status": "PASS",
+      "details": "Standard headers configuration active",
+      "timestamp": "2025-06-15T22:03:18.543Z"
+    },
+    {
+      "name": "Webhook Rate Limiting",
+      "status": "PASS",
+      "details": "Webhook endpoints protected with rate limiting",
+      "timestamp": "2025-06-15T22:03:18.563Z"
+    },
+    {
+      "name": "AI Processing Rate Limiting",
+      "status": "PASS",
+      "details": "AI endpoints accessible with rate limiting protection",
+      "timestamp": "2025-06-15T22:03:18.583Z"
+    },
+    {
+      "name": "Database Rate Limiting",
+      "status": "PASS",
+      "details": "Database endpoints protected with rate limiting",
+      "timestamp": "2025-06-15T22:03:18.609Z"
+    },
+    {
+      "name": "Rate Limit Status Endpoint",
+      "status": "PASS",
+      "details": "Status endpoint confirms rate limiting is active",
+      "timestamp": "2025-06-15T22:03:18.612Z"
+    },
+    {
+      "name": "Authentication Rate Limiting",
+      "status": "PASS",
+      "details": "Auth endpoints have rate limiting protection",
+      "timestamp": "2025-06-15T22:03:18.639Z"
+    },
+    {
+      "name": "Rate Limit Response Format",
+      "status": "PASS",
+      "details": "Rate limiting configured with appropriate thresholds",
+      "timestamp": "2025-06-15T22:03:18.785Z"
+    }
+  ]
+}

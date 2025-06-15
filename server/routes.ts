@@ -2282,6 +2282,132 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Test Harness and Version Management Endpoints
+  app.post("/api/ai/run-stress-test", isAuthenticated, async (req, res) => {
+    try {
+      const { batchSize = 10 } = req.body;
+      const { aiTestHarness } = await import("./testHarness");
+      const results = await aiTestHarness.runFailureStressTest(batchSize);
+      res.json(results);
+    } catch (error) {
+      console.error("Error running stress test:", error);
+      res.status(500).json({ message: "Failed to run stress test" });
+    }
+  });
+
+  app.get("/api/ai/test-report", isAuthenticated, async (req, res) => {
+    try {
+      const { aiTestHarness } = await import("./testHarness");
+      const report = aiTestHarness.generateTestReport();
+      res.json({ report });
+    } catch (error) {
+      console.error("Error generating test report:", error);
+      res.status(500).json({ message: "Failed to generate test report" });
+    }
+  });
+
+  app.post("/api/ai/create-version", isAuthenticated, async (req, res) => {
+    try {
+      const { versionTag, description, fineTuneId, modelConfig } = req.body;
+      if (!versionTag || !description) {
+        return res.status(400).json({ message: "Version tag and description are required" });
+      }
+
+      const { aiVersionManager } = await import("./testHarness");
+      const versionId = await aiVersionManager.createNewVersion({
+        versionTag,
+        description,
+        fineTuneId,
+        modelConfig,
+      });
+      res.json({ versionId, message: `Version ${versionTag} created successfully` });
+    } catch (error) {
+      console.error("Error creating AI version:", error);
+      res.status(500).json({ message: "Failed to create AI version" });
+    }
+  });
+
+  app.get("/api/ai/versions", isAuthenticated, async (req, res) => {
+    try {
+      const { aiVersionManager } = await import("./testHarness");
+      const versions = await aiVersionManager.getAllVersions();
+      res.json(versions);
+    } catch (error) {
+      console.error("Error getting AI versions:", error);
+      res.status(500).json({ message: "Failed to get AI versions" });
+    }
+  });
+
+  app.get("/api/ai/active-version", isAuthenticated, async (req, res) => {
+    try {
+      const { aiVersionManager } = await import("./testHarness");
+      const activeVersion = await aiVersionManager.getActiveVersion();
+      res.json(activeVersion);
+    } catch (error) {
+      console.error("Error getting active version:", error);
+      res.status(500).json({ message: "Failed to get active version" });
+    }
+  });
+
+  app.post("/api/ai/generate-improved-reply", isAuthenticated, async (req, res) => {
+    try {
+      const { interactionId, originalMessage, aiReply, agentReply, feedback } = req.body;
+      
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const improvedReply = await aiSelfOptimizer.generateCorrectedReply({
+        originalPrompt: originalMessage,
+        aiReply,
+        agentReply: agentReply || "",
+        failureExplanation: `User feedback: ${feedback}`,
+      });
+
+      // Store the improvement
+      await storage.updateCustomerInteraction(interactionId, {
+        correctedReply: improvedReply,
+      });
+
+      res.json({ improvedReply });
+    } catch (error) {
+      console.error("Error generating improved reply:", error);
+      res.status(500).json({ message: "Failed to generate improved reply" });
+    }
+  });
+
+  app.post("/api/ai/submit-manual-correction", isAuthenticated, async (req, res) => {
+    try {
+      const { interactionId, correctedReply, originalAiReply, customerMessage } = req.body;
+      
+      // Update the interaction with manual correction
+      await storage.updateCustomerInteraction(interactionId, {
+        correctedReply,
+      });
+
+      // Store as training data
+      const { aiSelfOptimizer } = await import("./aiSelfOptimizer");
+      const scoreGain = await aiSelfOptimizer.estimateScoreGain(originalAiReply, correctedReply);
+      
+      res.json({ 
+        success: true, 
+        message: "Manual correction submitted successfully",
+        scoreGain 
+      });
+    } catch (error) {
+      console.error("Error submitting manual correction:", error);
+      res.status(500).json({ message: "Failed to submit manual correction" });
+    }
+  });
+
+  app.post("/api/ai/detect-drift", isAuthenticated, async (req, res) => {
+    try {
+      const { aiTestHarness } = await import("./testHarness");
+      const driftAnalysis = await aiTestHarness.runModelDriftTest();
+      res.json(driftAnalysis);
+    } catch (error) {
+      console.error("Error detecting model drift:", error);
+      res.status(500).json({ message: "Failed to detect model drift" });
+    }
+  });
+
   app.post('/api/ai/predict-performance', isAuthenticated, async (req: any, res) => {
     try {
       const userId = (req.user as any).claims.sub;

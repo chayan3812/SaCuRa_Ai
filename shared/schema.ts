@@ -492,6 +492,26 @@ export const insertAiReplyImprovementSchema = createInsertSchema(aiReplyImprovem
   createdAt: true,
 });
 
+// AI Assistant Versions for Upgrade Tracking
+export const aiAssistantVersions = pgTable("ai_assistant_versions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  versionTag: varchar("version_tag").notNull(), // e.g. v1.0, v2.0
+  fineTuneId: varchar("fine_tune_id"), // from OpenAI
+  description: text("description"),
+  modelConfig: jsonb("model_config"), // model parameters, temperature, etc.
+  trainingDataCount: integer("training_data_count").default(0),
+  performanceMetrics: jsonb("performance_metrics"), // accuracy, response time, etc.
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAiAssistantVersionSchema = createInsertSchema(aiAssistantVersions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type AiSuggestionFeedback = typeof aiSuggestionFeedback.$inferSelect;
 export type InsertAiSuggestionFeedback = z.infer<typeof insertAiSuggestionFeedbackSchema>;
 export type FeedbackReplayLog = typeof feedbackReplayLog.$inferSelect;

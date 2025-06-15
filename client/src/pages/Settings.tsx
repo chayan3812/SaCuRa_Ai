@@ -94,7 +94,10 @@ export default function Settings() {
   // Update notifications mutation
   const notificationsMutation = useMutation({
     mutationFn: async (notificationPrefs: any) => {
-      return await apiRequest('/api/user/notifications', 'PUT', notificationPrefs);
+      return await apiRequest('/api/user/notifications', {
+        method: 'PUT',
+        body: JSON.stringify(notificationPrefs)
+      });
     },
     onSuccess: () => {
       toast({
@@ -114,7 +117,10 @@ export default function Settings() {
   // Update password mutation
   const passwordMutation = useMutation({
     mutationFn: async (passwordUpdateData: any) => {
-      return await apiRequest('/api/user/password', 'PUT', passwordUpdateData);
+      return await apiRequest('/api/user/password', {
+        method: 'PUT',
+        body: JSON.stringify(passwordUpdateData)
+      });
     },
     onSuccess: () => {
       toast({
@@ -135,7 +141,10 @@ export default function Settings() {
   // Update API keys mutation
   const apiKeysMutation = useMutation({
     mutationFn: async (apiKeyData: any) => {
-      return await apiRequest('/api/user/api-keys', 'PUT', apiKeyData);
+      return await apiRequest('/api/user/api-keys', {
+        method: 'PUT',
+        body: JSON.stringify(apiKeyData)
+      });
     },
     onSuccess: () => {
       toast({

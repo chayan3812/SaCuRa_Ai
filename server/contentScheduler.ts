@@ -177,8 +177,7 @@ export class ContentScheduler {
         websocketService?.sendAlert(post.userId, {
           type: "success",
           title: "Post Published",
-          message: `"${post.title}" has been successfully published to ${page.name}`,
-          data: { postId: post.id, pageId: post.pageId }
+          message: `"${post.title}" has been successfully published to ${page.pageName || 'Facebook Page'}`
         });
 
         console.log(`Successfully published post: ${post.id}`);

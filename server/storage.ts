@@ -105,6 +105,12 @@ export interface IStorage {
   updateScheduleStatus(scheduleId: string, isActive: boolean): Promise<void>;
   deletePostingSchedule(scheduleId: string): Promise<void>;
   
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: ContentScheduler
+  getPostsDueForPublishing(now?: Date): Promise<any[]>;
+  markPostAsPublished(id: string, facebookPostId?: string): Promise<void>;
+  createScheduledPost(postData: any): Promise<any>;
+  deleteScheduledPost(id: string): Promise<void>;
+  
   // Dashboard Analytics
   getDashboardMetrics(userId: string): Promise<{
     totalSpend: number;

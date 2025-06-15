@@ -83,6 +83,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rate limiting status endpoint for monitoring
+  app.get('/api/security/rate-limit-status', adminLimiter, async (req, res) => {
+    try {
+      const stats = getRateLimitStats();
+      res.json({
+        status: 'active',
+        rateLimitingEnabled: true,
+        configuration: {
+          generalApi: { windowMs: 900000, max: 100 }, // 15 minutes, 100 requests
+          authentication: { windowMs: 900000, max: 10 }, // 15 minutes, 10 requests
+          aiProcessing: { windowMs: 300000, max: 20 }, // 5 minutes, 20 requests
+          facebookApi: { windowMs: 600000, max: 30 }, // 10 minutes, 30 requests
+          webhooks: { windowMs: 60000, max: 50 }, // 1 minute, 50 requests
+          database: { windowMs: 120000, max: 50 }, // 2 minutes, 50 requests
+          admin: { windowMs: 3600000, max: 10 } // 1 hour, 10 requests
+        },
+        statistics: stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error fetching rate limit status:', error);
+      res.status(500).json({ message: 'Failed to fetch rate limit status' });
+    }
+  });
+
   // Facebook webhook routes with webhook-specific rate limiting
   const facebookWebhookRouter = await import('./webhooks/facebook');
   app.use('/webhook/facebook', webhookLimiter, facebookWebhookRouter.default);
@@ -107,8 +132,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await setupAuth(app);
   }
 
-  // Auth routes
-  app.get('/api/auth/user', devAuthMiddleware, async (req: any, res) => {
+  // Auth routes with strict rate limiting
+  app.get('/api/auth/user', authLimiter, devAuthMiddleware, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1956,8 +1981,8 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  // AI analysis routes
-  app.post('/api/ai/analyze-sentiment', devAuthMiddleware, async (req, res) => {
+  // AI analysis routes with AI processing rate limiting
+  app.post('/api/ai/analyze-sentiment', aiProcessingLimiter, devAuthMiddleware, async (req, res) => {
     try {
       const schema = z.object({
         text: z.string()
@@ -1973,7 +1998,7 @@ Prioritize by impact and feasibility.`;
   });
 
   // AI Content Generation Routes
-  app.post("/api/ai/generate-post", devAuthMiddleware, async (req, res) => {
+  app.post("/api/ai/generate-post", aiProcessingLimiter, devAuthMiddleware, async (req, res) => {
     try {
       const { topic, audience, postType } = req.body;
       

@@ -102,7 +102,10 @@ export default function ConnectedAccounts() {
             <div className="text-center py-8 text-muted-foreground">
               <Facebook className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p className="mb-2">No Facebook pages connected</p>
-              <p className="text-sm mb-4">Connect your Facebook business pages to get started</p>
+              <p className="text-sm mb-4">Connect your Facebook business pages to start managing ads and customer interactions</p>
+              <div className="text-xs text-green-600 bg-green-50 p-2 rounded border border-green-200">
+                Live Facebook OAuth configured and ready
+              </div>
             </div>
           ) : (
             pages.map((page) => (

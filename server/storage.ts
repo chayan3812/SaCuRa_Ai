@@ -167,6 +167,19 @@ export interface IStorage {
     usageRate: number;
     avgResponseTime: number;
   }>;
+  
+  // Training Prompts - Closed-loop AI Learning System
+  storeTrainingPrompt(trainingData: InsertTrainingPrompt): Promise<TrainingPrompt>;
+  getTrainingPrompts(messageId?: string, limit?: number): Promise<TrainingPrompt[]>;
+  getUnprocessedTrainingPrompts(limit?: number): Promise<TrainingPrompt[]>;
+  markTrainingPromptProcessed(promptId: string): Promise<void>;
+  getFeedbackAnalytics(userId: string, days?: number): Promise<{
+    total: number;
+    usefulCount: number;
+    notUsefulCount: number;
+    dailyBreakdown: { date: string; useful: number; total: number }[];
+    topNegativeMessages: { message: string; aiReply: string; agentReply: string }[];
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -949,6 +962,111 @@ export class DatabaseStorage implements IStorage {
       negativeRating: result.negativeRating,
       usageRate: Math.round(usageRate * 100) / 100,
       avgResponseTime: Math.round(Number(result.avgResponseTime) || 0),
+    };
+  }
+
+  // Training Prompts - Closed-loop AI Learning System
+  async storeTrainingPrompt(trainingData: InsertTrainingPrompt): Promise<TrainingPrompt> {
+    const [trainingPrompt] = await db
+      .insert(trainingPrompts)
+      .values(trainingData)
+      .returning();
+    return trainingPrompt;
+  }
+
+  async getTrainingPrompts(messageId?: string, limit: number = 50): Promise<TrainingPrompt[]> {
+    const query = db
+      .select()
+      .from(trainingPrompts)
+      .orderBy(desc(trainingPrompts.createdAt))
+      .limit(limit);
+
+    if (messageId) {
+      return await query.where(eq(trainingPrompts.messageId, messageId));
+    }
+
+    return await query;
+  }
+
+  async getUnprocessedTrainingPrompts(limit: number = 100): Promise<TrainingPrompt[]> {
+    return await db
+      .select()
+      .from(trainingPrompts)
+      .where(eq(trainingPrompts.processed, false))
+      .orderBy(desc(trainingPrompts.priority), desc(trainingPrompts.createdAt))
+      .limit(limit);
+  }
+
+  async markTrainingPromptProcessed(promptId: string): Promise<void> {
+    await db
+      .update(trainingPrompts)
+      .set({ processed: true })
+      .where(eq(trainingPrompts.id, promptId));
+  }
+
+  async getFeedbackAnalytics(userId: string, days: number = 30): Promise<{
+    total: number;
+    usefulCount: number;
+    notUsefulCount: number;
+    dailyBreakdown: { date: string; useful: number; total: number }[];
+    topNegativeMessages: { message: string; aiReply: string; agentReply: string }[];
+  }> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Get total feedback counts
+    const [totalMetrics] = await db
+      .select({
+        total: count(),
+        usefulCount: sum(sql`CASE WHEN ${trainingPrompts.rating} = 1 THEN 1 ELSE 0 END`),
+        notUsefulCount: sum(sql`CASE WHEN ${trainingPrompts.rating} = 0 THEN 1 ELSE 0 END`),
+      })
+      .from(trainingPrompts)
+      .where(gte(trainingPrompts.createdAt, startDate));
+
+    // Get daily breakdown
+    const dailyMetrics = await db
+      .select({
+        date: sql`DATE(${trainingPrompts.createdAt})`.as('date'),
+        useful: sum(sql`CASE WHEN ${trainingPrompts.rating} = 1 THEN 1 ELSE 0 END`).as('useful'),
+        total: count().as('total'),
+      })
+      .from(trainingPrompts)
+      .where(gte(trainingPrompts.createdAt, startDate))
+      .groupBy(sql`DATE(${trainingPrompts.createdAt})`)
+      .orderBy(sql`DATE(${trainingPrompts.createdAt})`);
+
+    // Get top negative feedback examples
+    const negativeExamples = await db
+      .select({
+        message: trainingPrompts.customerMessage,
+        aiReply: trainingPrompts.aiReply,
+        agentReply: trainingPrompts.agentReply,
+      })
+      .from(trainingPrompts)
+      .where(
+        and(
+          eq(trainingPrompts.rating, 0),
+          gte(trainingPrompts.createdAt, startDate)
+        )
+      )
+      .orderBy(desc(trainingPrompts.priority))
+      .limit(10);
+
+    return {
+      total: totalMetrics.total || 0,
+      usefulCount: Number(totalMetrics.usefulCount) || 0,
+      notUsefulCount: Number(totalMetrics.notUsefulCount) || 0,
+      dailyBreakdown: dailyMetrics.map(day => ({
+        date: day.date as string,
+        useful: Number(day.useful) || 0,
+        total: Number(day.total) || 0,
+      })),
+      topNegativeMessages: negativeExamples.map(example => ({
+        message: example.message,
+        aiReply: example.aiReply,
+        agentReply: example.agentReply || '',
+      })),
     };
   }
 }

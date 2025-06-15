@@ -775,13 +775,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Enhanced Feedback Submit Route with Validation
+  // Enhanced Feedback Submit Route with Closed-Loop AI Learning
   app.post('/api/feedback/submit', isAuthenticated, async (req: any, res) => {
     try {
       const FeedbackSchema = z.object({
         messageId: z.string().min(1, 'Message ID is required'),
         aiSuggestion: z.string().min(1, 'AI suggestion is required'),
         feedback: z.boolean(),
+        customerMessage: z.string().optional(),
+        agentReply: z.string().optional(),
         reviewedBy: z.string().optional(),
         platformContext: z.string().optional(),
         responseTime: z.number().optional(),
@@ -802,6 +804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const body = validationResult.data;
       
+      // Store the feedback for performance tracking
       await storage.storeFeedback({
         messageId: body.messageId,
         aiSuggestion: body.aiSuggestion,
@@ -813,9 +816,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         usageCount: body.feedback ? 1 : 0,
       });
 
+      // Generate and store training prompt for AI improvement
+      if (body.customerMessage) {
+        const { TrainingPromptBuilder } = await import('./trainingPromptBuilder');
+        
+        const trainingData = {
+          message: body.customerMessage,
+          aiReply: body.aiSuggestion,
+          feedback: body.feedback ? 'yes' as const : 'no' as const,
+          agentReply: body.agentReply,
+        };
+
+        const prompt = TrainingPromptBuilder.buildTrainingPrompt(trainingData);
+        const { summary, category, priority } = TrainingPromptBuilder.createFeedbackSummary(trainingData);
+
+        await storage.storeTrainingPrompt({
+          messageId: body.messageId,
+          customerMessage: body.customerMessage,
+          aiReply: body.aiSuggestion,
+          agentReply: body.agentReply || null,
+          feedbackType: body.feedback ? 'positive' : 'negative',
+          prompt,
+          rating: body.feedback ? 1 : 0,
+          category,
+          priority,
+          contextData: {
+            platformContext: body.platformContext,
+            responseTime: body.responseTime,
+            reviewedBy: body.reviewedBy || req.user.claims.sub,
+          },
+          processed: false,
+        });
+      }
+
       res.status(200).json({ 
         success: true,
         message: 'Feedback submitted successfully',
+        aiLearningEnabled: !!body.customerMessage,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -1374,6 +1411,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error auto-implementing optimization:', error);
       res.status(500).json({ message: 'Failed to auto-implement optimization' });
+    }
+  });
+
+  // Feedback Analytics API for Closed-Loop AI Learning
+  app.get('/api/feedback/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const userId = req.user.claims.sub;
+      
+      const analytics = await storage.getFeedbackAnalytics(userId, days);
+      
+      res.json({
+        period: `${days} days`,
+        analytics: {
+          ...analytics,
+          successRate: analytics.total > 0 
+            ? Math.round((analytics.usefulCount / analytics.total) * 100)
+            : 0,
+          improvementOpportunities: analytics.topNegativeMessages.length,
+          learningTrends: analytics.dailyBreakdown.map(day => ({
+            ...day,
+            successRate: day.total > 0 ? Math.round((day.useful / day.total) * 100) : 0
+          }))
+        }
+      });
+    } catch (error) {
+      console.error('Feedback analytics error:', error);
+      res.status(500).json({ message: 'Failed to retrieve feedback analytics' });
     }
   });
 

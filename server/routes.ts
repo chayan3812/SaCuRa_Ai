@@ -5664,6 +5664,145 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // AI Content Optimizer Routes
+  app.get('/api/ai-content/fatigue-analysis', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { aiContentOptimizer } = await import('./aiContentOptimizer');
+      const { facebookAPI } = await import('./facebookAPIService');
+      
+      const recentPosts = await facebookAPI.getRecentPosts(20);
+      const fatigueAnalysis = await aiContentOptimizer.analyzeCreativeFatigue(recentPosts);
+      
+      res.json(fatigueAnalysis);
+    } catch (error) {
+      console.error('Error analyzing creative fatigue:', error);
+      res.status(500).json({ error: 'Failed to analyze creative fatigue' });
+    }
+  });
+
+  app.post('/api/ai-content/generate-suggestion', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { businessContext, forceGeneration } = req.body;
+      const { aiContentOptimizer } = await import('./aiContentOptimizer');
+      const { facebookAPI } = await import('./facebookAPIService');
+      
+      // Get recent posts and performance data
+      const recentPosts = await facebookAPI.getRecentPosts(20);
+      const performanceMetrics = await aiContentOptimizer['getPerformanceMetrics'](recentPosts);
+      const fatigueAnalysis = await aiContentOptimizer.analyzeCreativeFatigue(recentPosts);
+      
+      // Generate content suggestion
+      const suggestion = await aiContentOptimizer.generateContentSuggestion(
+        performanceMetrics,
+        fatigueAnalysis,
+        businessContext
+      );
+      
+      res.json(suggestion);
+    } catch (error) {
+      console.error('Error generating content suggestion:', error);
+      res.status(500).json({ error: 'Failed to generate content suggestion' });
+    }
+  });
+
+  app.post('/api/ai-content/auto-publish', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { suggestion, forcePublish } = req.body;
+      const { aiContentOptimizer } = await import('./aiContentOptimizer');
+      
+      const result = await aiContentOptimizer.autoPublishContent(suggestion, forcePublish);
+      res.json(result);
+    } catch (error) {
+      console.error('Error auto-publishing content:', error);
+      res.status(500).json({ error: 'Failed to auto-publish content' });
+    }
+  });
+
+  app.get('/api/ai-content/optimizer-integration', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { aiContentOptimizer } = await import('./aiContentOptimizer');
+      
+      // Mock campaign performance data - in production this would come from your ad optimizer
+      const campaignPerformance = {
+        performanceScore: 0.6,
+        engagementDecline: 0.4,
+        ctr: 0.02,
+        cpc: 2.5,
+        roas: 1.8
+      };
+      
+      const adCreativeFatigue = {
+        fatigueLevel: 'high',
+        fatigueScore: 0.7,
+        timeToRefresh: 6
+      };
+      
+      const integration = await aiContentOptimizer.integrateWithAdOptimizer(
+        campaignPerformance,
+        adCreativeFatigue
+      );
+      
+      res.json(integration);
+    } catch (error) {
+      console.error('Error in optimizer integration:', error);
+      res.status(500).json({ error: 'Failed to integrate with ad optimizer' });
+    }
+  });
+
+  app.post('/api/facebook/create-carousel', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message, cards } = req.body;
+      
+      if (!message || !cards || !Array.isArray(cards)) {
+        return res.status(400).json({ error: 'Message and cards array are required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const result = await facebookAPI.createCarouselPost(message, cards);
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error creating carousel post:', error);
+      res.status(500).json({ error: 'Failed to create carousel post' });
+    }
+  });
+
+  app.post('/api/facebook/create-link-post', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { message, linkUrl, linkData } = req.body;
+      
+      if (!message || !linkUrl) {
+        return res.status(400).json({ error: 'Message and link URL are required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const result = await facebookAPI.createLinkPost(message, linkUrl, linkData);
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error creating link post:', error);
+      res.status(500).json({ error: 'Failed to create link post' });
+    }
+  });
+
+  app.get('/api/facebook/link-preview', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { url } = req.query;
+      
+      if (!url) {
+        return res.status(400).json({ error: 'URL parameter is required' });
+      }
+      
+      const { facebookAPI } = await import('./facebookAPIService');
+      const preview = await facebookAPI.generateLinkPreview(url as string);
+      
+      res.json(preview);
+    } catch (error) {
+      console.error('Error generating link preview:', error);
+      res.status(500).json({ error: 'Failed to generate link preview' });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

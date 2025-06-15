@@ -35,8 +35,10 @@ import {
   AlertCircle,
   Clock,
   Send,
-  Image
+  Image,
+  Brain
 } from "lucide-react";
+import AIContentOptimizer from './AIContentOptimizer';
 
 interface PostFormData {
   message: string;

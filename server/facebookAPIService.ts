@@ -186,6 +186,7 @@ export class FacebookAPIService {
       const response = await axios.post(`${this.baseUrl}/${PAGE_ID}/photos`, {
         url: imageUrl,
         caption: caption || '',
+        published: false, // Upload but don't publish immediately
         access_token: ACCESS_TOKEN
       });
 
@@ -193,6 +194,99 @@ export class FacebookAPIService {
     } catch (error: any) {
       console.error('Facebook media upload error:', error.response?.data || error.message);
       throw new Error(`Failed to upload media: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  async createCarouselPost(message: string, cards: Array<{
+    title: string;
+    description: string;
+    imageUrl: string;
+    linkUrl: string;
+  }>): Promise<{ id: string; post_id?: string }> {
+    try {
+      if (!PAGE_ID || !ACCESS_TOKEN) {
+        throw new Error('Facebook credentials not configured');
+      }
+
+      // Upload images for carousel cards
+      const childAttachments = await Promise.all(
+        cards.map(async (card) => {
+          const photoResponse = await axios.post(`${this.baseUrl}/${PAGE_ID}/photos`, {
+            url: card.imageUrl,
+            published: false,
+            access_token: ACCESS_TOKEN
+          });
+
+          return {
+            name: card.title,
+            description: card.description,
+            link: card.linkUrl,
+            picture: card.imageUrl,
+            media_fbid: photoResponse.data.id
+          };
+        })
+      );
+
+      const response = await axios.post(`${this.baseUrl}/${PAGE_ID}/feed`, {
+        message,
+        child_attachments: childAttachments,
+        access_token: ACCESS_TOKEN
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Facebook carousel post error:', error.response?.data || error.message);
+      throw new Error(`Failed to create carousel post: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  async createLinkPost(message: string, linkUrl: string, linkData?: {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+  }): Promise<{ id: string; post_id?: string }> {
+    try {
+      if (!PAGE_ID || !ACCESS_TOKEN) {
+        throw new Error('Facebook credentials not configured');
+      }
+
+      const postData: any = {
+        message,
+        link: linkUrl,
+        access_token: ACCESS_TOKEN
+      };
+
+      if (linkData?.title) postData.name = linkData.title;
+      if (linkData?.description) postData.description = linkData.description;
+      if (linkData?.imageUrl) postData.picture = linkData.imageUrl;
+
+      const response = await axios.post(`${this.baseUrl}/${PAGE_ID}/feed`, postData);
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Facebook link post error:', error.response?.data || error.message);
+      throw new Error(`Failed to create link post: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  async generateLinkPreview(url: string): Promise<{ title?: string; description?: string; image?: string }> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/`, {
+        params: {
+          id: url,
+          scrape: true,
+          access_token: ACCESS_TOKEN
+        }
+      });
+
+      return {
+        title: response.data.title,
+        description: response.data.description,
+        image: response.data.image?.[0]?.url
+      };
+    } catch (error: any) {
+      console.error('Link preview error:', error.response?.data || error.message);
+      return {};
     }
   }
 

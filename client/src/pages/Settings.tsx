@@ -163,14 +163,18 @@ export default function Settings() {
 
   // Initialize settings when data is loaded
   useEffect(() => {
-    if (settings) {
-      setProfile(prev => ({
-        ...prev,
-        ...settings.profile
-      }));
-      setNotifications(settings.notifications || notifications);
+    if (settings && typeof settings === 'object') {
+      if ('profile' in settings && settings.profile && typeof settings.profile === 'object') {
+        setProfile(prev => ({
+          ...prev,
+          ...settings.profile
+        }));
+      }
+      if ('notifications' in settings && settings.notifications && typeof settings.notifications === 'object') {
+        setNotifications(settings.notifications);
+      }
     }
-  }, [settings]);
+  }, [settings, notifications]);
 
   const handleSaveProfile = () => {
     profileMutation.mutate(profile);
@@ -263,7 +267,7 @@ export default function Settings() {
                     {/* Avatar Section */}
                     <div className="flex items-center space-x-4">
                       <Avatar className="w-20 h-20">
-                        <AvatarImage src={user?.profileImageUrl} />
+                        <AvatarImage src={user?.profileImageUrl || undefined} />
                         <AvatarFallback className="text-lg">
                           {getUserInitials()}
                         </AvatarFallback>

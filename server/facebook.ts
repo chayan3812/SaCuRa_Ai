@@ -116,7 +116,7 @@ export class FacebookAPIService {
   }
 
   // Get Page Posts
-  async getPagePosts(pageId: string, pageAccessToken: string, limit: number = 25) {
+  async getPagePosts(pageId: string, pageAccessToken: string, limit: string = '25') {
     // Skip API calls for demo/invalid tokens or page IDs
     if (pageAccessToken === 'demo_token_123' || pageId === 'demo_page_123' || !pageAccessToken || pageAccessToken.length < 10) {
       console.log('Skipping Facebook Page Posts API call - demo/invalid token detected');
@@ -177,12 +177,12 @@ export class FacebookAPIService {
   }
 
   // Get Page Insights
-  async getPageInsights(pageId: string, pageAccessToken: string, metrics: string[], period: string = 'day') {
+  async getPageInsights(pageId: string, pageAccessToken: string, metrics: string, period: string = 'day') {
     try {
       const response = await axios.get(`${FB_BASE_URL}/${pageId}/insights`, {
         params: {
           access_token: pageAccessToken,
-          metric: metrics.join(','),
+          metric: metrics,
           period
         }
       });

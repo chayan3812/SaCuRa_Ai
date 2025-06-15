@@ -13,7 +13,13 @@ import {
   Clock,
   Users,
   Settings,
-  Bot
+  Bot,
+  History,
+  Eye,
+  Activity,
+  Navigation,
+  Database,
+  FileText
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -33,6 +39,7 @@ interface UserAction {
 export default function QuickActions() {
   const { toast } = useToast();
   const [recentActions, setRecentActions] = useState<UserAction[]>([]);
+  const [recentNavigation, setRecentNavigation] = useState<any[]>([]);
 
   // Fetch user activity data
   const { data: interactions } = useQuery({
@@ -60,6 +67,28 @@ export default function QuickActions() {
       const storedUsage = localStorage.getItem('quickActions_usage');
       let usageData = storedUsage ? JSON.parse(storedUsage) : {};
       
+      // Get recent navigation history
+      const recentNav = localStorage.getItem('recent_navigation');
+      let navHistory = recentNav ? JSON.parse(recentNav) : [];
+      
+      // Add current navigation to history
+      const navEntry = {
+        path: currentPath,
+        timestamp: timestamp.toISOString(),
+        title: document.title,
+        section: getCurrentSectionName(currentPath)
+      };
+      
+      // Remove duplicate entries and add new one
+      navHistory = navHistory.filter(entry => entry.path !== currentPath);
+      navHistory.unshift(navEntry);
+      
+      // Keep only last 10 navigations
+      navHistory = navHistory.slice(0, 10);
+      
+      // Store navigation history
+      localStorage.setItem('recent_navigation', JSON.stringify(navHistory));
+      
       // Update usage count
       if (!usageData[currentPath]) {
         usageData[currentPath] = { count: 0, lastUsed: null };
@@ -69,6 +98,21 @@ export default function QuickActions() {
       
       // Store updated usage
       localStorage.setItem('quickActions_usage', JSON.stringify(usageData));
+    };
+
+    const getCurrentSectionName = (path: string) => {
+      const sectionMap: { [key: string]: string } = {
+        '/': 'Dashboard',
+        '/analytics': 'Analytics',
+        '/customer-service': 'Customer Service',
+        '/facebook-pages': 'Facebook Pages',
+        '/ai-training': 'AI Training',
+        '/content-generator': 'Content Generator',
+        '/optimize': 'Quick Optimize',
+        '/settings': 'Settings',
+        '/reports': 'Reports'
+      };
+      return sectionMap[path] || 'Dashboard';
     };
 
     trackUsage();
@@ -195,6 +239,23 @@ export default function QuickActions() {
     generateSmartActions();
   }, [interactions, aiMetrics, dashboardMetrics]);
 
+  // Load recent navigation history
+  useEffect(() => {
+    const loadRecentNavigation = () => {
+      const recentNav = localStorage.getItem('recent_navigation');
+      if (recentNav) {
+        const navHistory = JSON.parse(recentNav);
+        setRecentNavigation(navHistory.slice(0, 5)); // Show last 5 navigations
+      }
+    };
+
+    loadRecentNavigation();
+    
+    // Update navigation history every 10 seconds
+    const interval = setInterval(loadRecentNavigation, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleActionClick = (action: UserAction) => {
     // Track the action usage
     const storedUsage = localStorage.getItem('quickActions_usage');
@@ -230,6 +291,31 @@ export default function QuickActions() {
     }
   };
 
+  const getNavigationIcon = (path: string) => {
+    const iconMap: { [key: string]: any } = {
+      '/': BarChart3,
+      '/analytics': TrendingUp,
+      '/customer-service': MessageSquare,
+      '/facebook-pages': Users,
+      '/ai-training': Target,
+      '/content-generator': Wand2,
+      '/optimize': Zap,
+      '/settings': Settings,
+      '/reports': FileText
+    };
+    return iconMap[path] || Navigation;
+  };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return 'today';
+  };
+
   return (
     <Card className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
       <CardHeader className="pb-3">
@@ -239,6 +325,38 @@ export default function QuickActions() {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
+        {/* Recent Admin Navigation */}
+        {recentNavigation.length > 0 && (
+          <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700/50">
+            <div className="flex items-center gap-2 mb-2">
+              <History className="w-4 h-4 text-blue-600" />
+              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">Recent Admin Surfing</h4>
+              <Badge variant="outline" className="text-xs text-blue-600 border-blue-300">
+                Premium
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {recentNavigation.map((nav, index) => {
+                const Icon = getNavigationIcon(nav.path);
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-600 min-w-fit hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    title={`${nav.section} • ${formatTimeAgo(nav.timestamp)}`}
+                  >
+                    <Icon className="w-3 h-3 text-gray-600 dark:text-gray-300" />
+                    <span className="text-xs text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                      {nav.section}
+                    </span>
+                    <span className="text-xs text-gray-400 ml-1">
+                      {formatTimeAgo(nav.timestamp)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <div className="space-y-3">
           {recentActions.map((action) => {
             const Icon = action.icon;

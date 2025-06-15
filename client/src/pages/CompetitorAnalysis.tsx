@@ -548,54 +548,8 @@ export default function CompetitorAnalysis() {
         </Tabs>
       </div>
     </div>
-a 
-                            href={post.permalink_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                          >
-                            View Post
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Competitor Strengths */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Competitor Strengths
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {analysisResult.analysis.strengths.map((strength, index) => (
-                    <Alert key={index}>
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>{strength}</AlertDescription>
-                    </Alert>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Instructions for first-time users */}
-        {!analysisResult && !analyzeCompetitorMutation.isPending && (
-          <Card>
-            <CardHeader>
-              <CardTitle>How to Use Competitor Analysis</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-medium">Step 1: Find a Facebook Page</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+  );
+}
                   Find a competitor's Facebook page you want to analyze. You can use either the page ID or the full URL.
                 </p>
               </div>

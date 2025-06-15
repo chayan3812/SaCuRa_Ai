@@ -630,6 +630,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: SaveAndTrackCompetitor
+  // Competitor tracking routes
+  app.post('/api/competitors/watch', isAuthenticated, async (req: any, res) => {
+    try {
+      const schema = z.object({
+        pageId: z.string(),
+        pageName: z.string(),
+        category: z.string().optional()
+      });
+
+      const { pageId, pageName, category } = schema.parse(req.body);
+      const userId = req.user.claims.sub;
+
+      // Check if already watching this competitor
+      const existing = await storage.getWatchedCompetitorByPageId(userId, pageId);
+      if (existing) {
+        return res.status(400).json({ message: 'Already watching this competitor' });
+      }
+
+      const competitor = await storage.addWatchedCompetitor({
+        userId,
+        pageId,
+        pageName,
+        category
+      });
+
+      res.json(competitor);
+    } catch (error) {
+      console.error('Error adding competitor:', error);
+      res.status(500).json({ message: 'Failed to add competitor' });
+    }
+  });
+
+  app.get('/api/competitors/watched', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const competitors = await storage.getWatchedCompetitorsByUser(userId);
+      res.json(competitors);
+    } catch (error) {
+      console.error('Error fetching watched competitors:', error);
+      res.status(500).json({ message: 'Failed to fetch competitors' });
+    }
+  });
+
+  app.delete('/api/competitors/:competitorId', isAuthenticated, async (req, res) => {
+    try {
+      const { competitorId } = req.params;
+      await storage.removeWatchedCompetitor(competitorId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error removing competitor:', error);
+      res.status(500).json({ message: 'Failed to remove competitor' });
+    }
+  });
+
+  app.get('/api/competitors/:pageId/snapshots', isAuthenticated, async (req, res) => {
+    try {
+      const { pageId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 30;
+      const snapshots = await storage.getCompetitorSnapshots(pageId, limit);
+      res.json(snapshots);
+    } catch (error) {
+      console.error('Error fetching competitor snapshots:', error);
+      res.status(500).json({ message: 'Failed to fetch snapshots' });
+    }
+  });
+
+  app.post('/api/competitors/:pageId/analyze-posts', isAuthenticated, async (req, res) => {
+    try {
+      const { pageId } = req.params;
+      
+      // Get user's Facebook access token
+      const userId = (req.user as any).claims.sub;
+      const userPages = await storage.getFacebookPagesByUser(userId);
+      
+      if (userPages.length === 0) {
+        return res.status(400).json({ message: 'No Facebook pages connected' });
+      }
+
+      const accessToken = userPages[0].accessToken;
+      const facebookAPI = new FacebookAPIService(accessToken);
+      
+      // Get top posts for the competitor
+      const topPosts = await facebookAPI.getTopPosts(pageId, 10);
+      const insights = await facebookAPI.getPageInsights(pageId);
+      
+      // Create snapshot
+      const snapshot = await storage.createCompetitorSnapshot({
+        pageId,
+        followerCount: insights.page_fans || 0,
+        engagementRate: 0, // Calculate from posts data
+        topPosts: JSON.stringify(topPosts),
+        insights: JSON.stringify(insights),
+        snapshotDate: new Date()
+      });
+
+      res.json({
+        snapshot,
+        topPosts,
+        insights
+      });
+    } catch (error) {
+      console.error('Error analyzing competitor posts:', error);
+      res.status(500).json({ message: 'Failed to analyze competitor posts' });
+    }
+  });
+
   // Ad Optimizer API Routes
   app.post('/api/ads/optimize', isAuthenticated, async (req, res) => {
     try {

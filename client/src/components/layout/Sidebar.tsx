@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import logoImage from "@/assets/logo.png";
 import { 
   Bot, 
   ChartLine, 
@@ -80,7 +81,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img 
-              src="@assets/SaCuRa_Ai_Logo_1750010758811.png" 
+              src={logoImage} 
               alt="SaCuRa AI Logo" 
               className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
             />

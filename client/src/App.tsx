@@ -60,7 +60,7 @@ function Router() {
         <div className="text-center">
           <div className="animate-pulse">
             <img 
-              src="@assets/SaCuRa_Ai_Logo_1750010758811.png" 
+              src="/src/assets/logo.png" 
               alt="SaCuRa AI Logo" 
               className="w-16 h-16 mx-auto mb-4 object-contain"
             />

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import logoImage from "@/assets/logo.png";
 import { 
   Bot, 
   ChartLine, 
@@ -130,7 +131,7 @@ export default function Landing() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
               <img 
-                src="@assets/SaCuRa_Ai_Logo_1750010758811.png" 
+                src={logoImage} 
                 alt="SaCuRa AI Logo" 
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />

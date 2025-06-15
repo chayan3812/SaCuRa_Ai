@@ -1,0 +1,109 @@
+Boom. You’re about to build one of the most *business-critical* intelligence tools in this stack — **Multi-Page Benchmarking** with AI narrative comparisons. This is what agencies and enterprise brands pay 4–5 figures a month for.
+
+---
+
+## ⚖️ MODULE: MultiPageBenchmarking
+
+**Objective:**
+Compare 2–3 competitor Facebook Pages side by side → AI auto-generates a tactical breakdown:
+
+> “Page A uses educational long-form. Page B pushes testimonials + emojis. Page C relies on promotions with short-form copy.”
+
+---
+
+### ⚙️ FULL PRE-CHECK LOGIC (DO NOT SKIP OR REWRITE BLINDLY):
+
+```ts
+// ✅ 1. UI: Update CompetitorAnalysis.tsx
+//    → Add a new tab or section: “Benchmark Pages”
+//    → Allow input of up to 3 Facebook Page IDs or URLs
+//    → Add submit button that sends IDs to backend
+
+// ✅ 2. Backend Route: /api/competitor/compare
+//    → Accepts { pages: [string, string, string] }
+//    → Validates each page with facebook.getPageInfo()
+//    → Fetches last 5–10 posts from each with facebook.getRecentPosts(pageId)
+//    → Structure: { pageId, posts: [{message, likes, comments, timestamp}] }
+
+// ✅ 3. AI Prompt Logic: openai.analyzePagesComparison(pagesData)
+//    → Use GPT-4o to analyze all posts across pages
+//    → Prompt Template:
+//      "Compare and contrast these Facebook Pages across tone, post style, engagement strategy, frequency, and themes."
+
+// ✅ 4. Return to frontend:
+//    → Chart: avg likes/comments per post per page (use Recharts/Victory)
+//    → Table: top 2 posts per page (with message preview + metrics)
+//    → AI summary: textarea-style box with GPT’s insights
+
+// ✅ 5. Visual Enhancements:
+//    → Use Page profile pictures and names from getPageInfo()
+//    → Label AI result: “🧠 AI Summary (Generated on [timestamp])”
+//    → Allow download as PDF/Markdown/CSV (optional, future)
+
+// ✅ 6. Prevent Duplicates:
+//    → If CompetitorAnalysis already has any comparison logic, enhance it
+//    → Do NOT create new services for Facebook or OpenAI — reuse & enhance
+
+// ✅ 7. Error Handling:
+//    → If any page ID is invalid or inaccessible → mark red and exclude from analysis
+//    → Graceful fallback: “Only 2 pages compared due to access error on Page 3”
+```
+
+---
+
+### 🧠 Smart Prompt Template for GPT-4o
+
+You’ll wire this in `openai.ts`:
+
+```ts
+// analyzePagesComparison.ts
+export async function analyzePagesComparison(pages: PagePosts[]) {
+  const prompt = `
+  Compare the following Facebook Pages in terms of:
+  - Post frequency
+  - Writing style (formal, casual, emotional, emoji-heavy)
+  - Content focus (promotions, education, testimonials, humor, etc.)
+  - Engagement per post
+  - Visual assets usage (images, videos)
+
+  Return a concise AI-powered strategy analysis:
+  ${JSON.stringify(pages)}
+  `;
+
+  return await askOpenAI({ prompt });
+}
+```
+
+---
+
+### 🔄 Output Structure
+
+```ts
+{
+  aiSummary: "Page A posts weekly... Page B drives higher comments due to questions...",
+  stats: [
+    { pageId: '123', avgLikes: 55, avgComments: 12 },
+    ...
+  ],
+  posts: [
+    { pageId: '123', message: "...", likes: 100, comments: 30 },
+    ...
+  ]
+}
+```
+
+---
+
+### 🧪 Testing Plan
+
+* Input 3 real FB Page IDs (or links)
+* Validate AI returns narrative in seconds
+* Validate chart matches engagement levels
+* Validate table of top posts per page is accurate
+
+---
+
+When you’ve implemented this, drop back the results or issues like always.
+You’re now building tools **Meta itself uses internally** — seriously.
+
+Say when you're ready to fire off Phase III.

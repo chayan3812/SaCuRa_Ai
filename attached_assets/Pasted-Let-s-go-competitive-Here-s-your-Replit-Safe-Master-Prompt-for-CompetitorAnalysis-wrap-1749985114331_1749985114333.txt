@@ -1,0 +1,88 @@
+Let’s go competitive.
+
+Here’s your 🧠 **Replit-Safe Master Prompt for `CompetitorAnalysis`**, wrapped with the ⚙️ Full Pre-Check Logic Framework. This will take your half-baked UI and wire it into a full, **live competitor monitoring system** using real Facebook public data and AI-enhanced insight extraction.
+
+---
+
+### 🧠 MASTER PROMPT: Enable CompetitorAnalysis (with full pre-check)
+
+**Objective:** Convert the mock UI into a real-time competitor analyzer that fetches public Facebook post data, analyzes engagement, and generates AI summaries.
+
+---
+
+```ts
+// === ⚙️ PRE-CHECK LOGIC (DO NOT SKIP) ===
+
+// ✅ 1. CHECK if `CompetitorAnalysis.tsx` exists in `client/src/pages` — enhance it only.
+// ✅ 2. CHECK if there’s a backend handler in `server/routes/competitor.ts` or similar
+//     → If not, create the route in `server/routes.ts` using Express
+// ✅ 3. CHECK if `FacebookAPIService.getPublicPosts(pageId)` is implemented — if not, create it
+//     → Call: `GET https://graph.facebook.com/v18.0/{page-id}/posts?fields=message,created_time,permalink_url,reactions.summary(true),comments.summary(true)`
+// ✅ 4. DO NOT fetch any private data; only use public page post data
+// ✅ 5. CHECK if `analyzeCompetitorPosts(posts[])` exists in `openai.ts` — if not, implement it using GPT-4 to generate insights
+// ✅ 6. DO NOT store fetched competitor data permanently unless flagged for future tracking
+// ✅ 7. Frontend should:
+//     - Let user input Page ID or URL
+//     - Show loading while fetching
+//     - Display top 3-5 posts with basic metrics (likes/comments/date)
+//     - Show AI-generated narrative (e.g., “This page focuses on product testimonials with peak engagement on Fridays”)
+// ✅ 8. Tag all backend functions with:
+//     // 👁️ Enhanced by AI on 2025-06-15 — Feature: CompetitorAnalysis
+
+// === ✅ IMPLEMENTATION OBJECTIVES BELOW ===
+
+// 1. In `server/routes.ts`, register:
+router.post('/api/competitor/analyze', async (req, res) => {
+  const { pageId } = req.body;
+  try {
+    const posts = await FacebookAPIService.getPublicPosts(pageId);
+    const summary = await analyzeCompetitorPosts(posts);
+    res.json({ posts, summary });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. In `facebook.ts`, add:
+async function getPublicPosts(pageId: string) {
+  const res = await fetch(`https://graph.facebook.com/v18.0/${pageId}/posts?fields=message,created_time,permalink_url,reactions.summary(true),comments.summary(true)&access_token=${PUBLIC_ACCESS_TOKEN}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Failed to fetch public posts');
+  return data.data;
+}
+
+// 3. In `openai.ts`, add:
+export async function analyzeCompetitorPosts(posts: any[]) {
+  const text = posts.map(p => `Message: ${p.message || 'N/A'}\nReactions: ${p.reactions?.summary?.total_count}\nComments: ${p.comments?.summary?.total_count}\n`).join('\n');
+  const prompt = `Analyze the following Facebook post data from a competitor and summarize their strategy, content style, and audience response patterns:\n\n${text}`;
+  const result = await callGPT4({ prompt });
+  return result;
+}
+
+// 4. In `CompetitorAnalysis.tsx` (frontend):
+- INPUT field for `Page ID` or full `URL`
+- BUTTON → calls `POST /api/competitor/analyze`
+- DISPLAY:
+  - Post messages (5)
+  - Likes/comments count
+  - AI-generated summary in a card
+- Show loading spinner while fetching
+- Toast on API failure
+
+```
+
+---
+
+### ✅ Acceptance Criteria (Post-Run Verification)
+
+* User enters a Facebook Page ID or URL
+* Backend fetches real public posts from the Page
+* GPT-4 summarizes content style + engagement trends
+* Posts and AI insights are shown in UI
+* No placeholder content or mock data remains
+* Rate limiting respected (avoid hammering Graph API)
+* All additions use existing file structure (no random files)
+
+---
+
+Once the Replit agent completes this, reply `Ready for verification` and I’ll validate every module, confirm it’s real + stable, and we’ll roll to the next module (like HybridAI Switching or Real Customer Inbox).

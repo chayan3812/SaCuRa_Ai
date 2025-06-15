@@ -1,30 +1,54 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import { 
-  Eye, 
+  Search, 
   TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Users, 
+  MessageSquare, 
+  Heart, 
+  Share, 
   AlertTriangle,
-  Plus,
   Target,
   BarChart3,
   Globe,
-  Calendar
+  Calendar,
+  Loader
 } from 'lucide-react';
 
+interface CompetitorPost {
+  id: string;
+  message: string;
+  created_time: string;
+  permalink_url: string;
+  reactions?: { summary: { total_count: number } };
+  comments?: { summary: { total_count: number } };
+  shares?: { count: number };
+}
+
+interface CompetitorAnalysisResult {
+  strategy: string;
+  contentStyle: string;
+  audienceEngagement: string;
+  postingFrequency: string;
+  keyInsights: string[];
+  recommendations: string[];
+  strengths: string[];
+  opportunities: string[];
+}
+
 export default function CompetitorAnalysis() {
-  const [newCompetitorUrl, setNewCompetitorUrl] = useState('');
-  const queryClient = useQueryClient();
+  const [pageIdInput, setPageIdInput] = useState('');
+  const [analysisResult, setAnalysisResult] = useState<{
+    posts: CompetitorPost[];
+    analysis: CompetitorAnalysisResult;
+  } | null>(null);
+  const { toast } = useToast();
 
   const { data: competitors, isLoading: competitorsLoading } = useQuery({
     queryKey: ['/api/competitors'],

@@ -279,6 +279,44 @@ export class FacebookAPIService {
     }
   }
 
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: CompetitorAnalysis
+  /**
+   * Get public posts from a Facebook page for competitor analysis
+   * Uses public data only - no private information accessed
+   */
+  async getPublicPosts(pageId: string): Promise<any[]> {
+    try {
+      // Use a public access token or app token for public data only
+      const publicAccessToken = process.env.FACEBOOK_ACCESS_TOKEN;
+      
+      if (!publicAccessToken) {
+        throw new Error('Facebook access token required for competitor analysis');
+      }
+
+      const response = await axios.get(
+        `https://graph.facebook.com/v19.0/${pageId}/posts`,
+        {
+          params: {
+            access_token: publicAccessToken,
+            fields: 'message,created_time,permalink_url,reactions.summary(true),comments.summary(true),shares',
+            limit: 10 // Get last 10 posts
+          }
+        }
+      );
+
+      return response.data.data || [];
+    } catch (error: any) {
+      console.error('Error fetching public posts:', error.response?.data || error.message);
+      if (error.response?.data?.error?.code === 190) {
+        throw new Error('Invalid access token for Facebook API');
+      }
+      if (error.response?.data?.error?.code === 100) {
+        throw new Error('Page not found or not publicly accessible');
+      }
+      throw new Error(`Failed to fetch public posts: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
   // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
   /**
    * Get comprehensive page information for health monitoring

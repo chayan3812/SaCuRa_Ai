@@ -13,7 +13,8 @@ import {
   generateAdOptimizationSuggestions,
   checkPolicyCompliance,
   generateAdCopy,
-  analyzeSentiment
+  analyzeSentiment,
+  analyzeCompetitorPosts
 } from "./openai";
 import { initializeWebSocket } from "./websocket";
 import { systemOptimizer } from "./systemOptimizer";
@@ -434,6 +435,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error saving response:', error);
       res.status(500).json({ message: 'Failed to save response' });
+    }
+  });
+
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: CompetitorAnalysis
+  app.post('/api/competitor/analyze', isAuthenticated, async (req, res) => {
+    try {
+      const schema = z.object({
+        pageId: z.string()
+      });
+
+      const { pageId } = schema.parse(req.body);
+
+      // Extract page ID from URL if full URL provided
+      let extractedPageId = pageId;
+      if (pageId.includes('facebook.com/')) {
+        const urlParts = pageId.split('/');
+        extractedPageId = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2];
+      }
+
+      // Get public posts from Facebook API
+      const facebookService = new FacebookAPIService(process.env.FACEBOOK_ACCESS_TOKEN || '');
+      const posts = await facebookService.getPublicPosts(extractedPageId);
+
+      // Generate AI analysis
+      const analysis = await analyzeCompetitorPosts(posts);
+
+      res.json({ 
+        posts: posts.slice(0, 5), // Return top 5 posts for display
+        analysis 
+      });
+    } catch (error: any) {
+      console.error('Error analyzing competitor:', error);
+      res.status(500).json({ 
+        error: error.message || 'Failed to analyze competitor' 
+      });
     }
   });
 

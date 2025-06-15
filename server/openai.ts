@@ -27,6 +27,17 @@ export interface PolicyComplianceCheck {
   suggestions: string[];
 }
 
+export interface CompetitorAnalysis {
+  strategy: string;
+  contentStyle: string;
+  audienceEngagement: string;
+  postingFrequency: string;
+  keyInsights: string[];
+  recommendations: string[];
+  strengths: string[];
+  opportunities: string[];
+}
+
 // Customer Service AI
 export async function generateCustomerServiceResponse(
   customerMessage: string,
@@ -229,6 +240,91 @@ export async function generateAdCopy(
       headlines: ['Quality Products'],
       descriptions: ['Discover our latest offerings'],
       ctaButtons: ['Shop Now']
+    };
+  }
+}
+
+// 👁️ Enhanced by AI on 2025-06-15 — Feature: CompetitorAnalysis
+export async function analyzeCompetitorPosts(posts: any[]): Promise<CompetitorAnalysis> {
+  try {
+    if (!posts || posts.length === 0) {
+      return {
+        strategy: 'No recent posts available for analysis',
+        contentStyle: 'Unable to determine content style',
+        audienceEngagement: 'No engagement data available',
+        postingFrequency: 'No posting pattern data',
+        keyInsights: ['No data available for analysis'],
+        recommendations: ['Gather more data to provide meaningful insights'],
+        strengths: ['Unable to identify strengths without data'],
+        opportunities: ['More data needed to identify opportunities']
+      };
+    }
+
+    // Prepare post data for AI analysis
+    const postAnalysisData = posts.map(post => ({
+      message: post.message || 'No message content',
+      reactions: post.reactions?.summary?.total_count || 0,
+      comments: post.comments?.summary?.total_count || 0,
+      shares: post.shares?.count || 0,
+      created_time: post.created_time,
+    }));
+
+    const analysisText = postAnalysisData.map(p => 
+      `Post: "${p.message.substring(0, 200)}"
+      Reactions: ${p.reactions}, Comments: ${p.comments}, Shares: ${p.shares}
+      Date: ${p.created_time}`
+    ).join('\n\n');
+
+    const systemPrompt = `You are a social media strategist and competitor analysis expert. Analyze Facebook post data to provide strategic insights about content strategy, audience engagement patterns, and marketing opportunities.`;
+
+    const userPrompt = `Analyze the following Facebook post data from a competitor page and provide comprehensive strategic insights:
+
+${analysisText}
+
+Provide analysis in JSON format with:
+- strategy: Overall content and marketing strategy (2-3 sentences)
+- contentStyle: Description of their content style and approach
+- audienceEngagement: Analysis of how their audience responds
+- postingFrequency: Assessment of their posting patterns
+- keyInsights: Array of 3-4 key strategic insights
+- recommendations: Array of 3-4 actionable recommendations for competing
+- strengths: Array of 2-3 competitor strengths identified
+- opportunities: Array of 2-3 opportunities to exploit`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+    });
+
+    const result = JSON.parse(completion.choices[0].message.content || '{}');
+
+    return {
+      strategy: result.strategy || 'Unable to determine strategy from available data',
+      contentStyle: result.contentStyle || 'Content style analysis unavailable',
+      audienceEngagement: result.audienceEngagement || 'Engagement pattern analysis unavailable',
+      postingFrequency: result.postingFrequency || 'Posting frequency analysis unavailable',
+      keyInsights: result.keyInsights || ['Analysis incomplete due to limited data'],
+      recommendations: result.recommendations || ['Gather more competitor data for better insights'],
+      strengths: result.strengths || ['Unable to identify competitor strengths'],
+      opportunities: result.opportunities || ['More data needed to identify opportunities']
+    };
+
+  } catch (error) {
+    console.error('Error analyzing competitor posts:', error);
+    return {
+      strategy: 'Analysis failed due to technical error',
+      contentStyle: 'Unable to analyze content style',
+      audienceEngagement: 'Engagement analysis unavailable',
+      postingFrequency: 'Posting frequency analysis failed',
+      keyInsights: ['Technical error prevented analysis'],
+      recommendations: ['Retry analysis with valid data'],
+      strengths: ['Analysis error occurred'],
+      opportunities: ['Technical issues prevented opportunity identification']
     };
   }
 }

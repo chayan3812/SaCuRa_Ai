@@ -31,6 +31,7 @@ import AdminAIDigest from "@/pages/AdminAIDigest";
 import FacebookAnalytics from "@/pages/FacebookAnalytics";
 import FacebookSetup from "@/pages/FacebookSetup";
 import FacebookConversions from "@/pages/FacebookConversions";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -70,6 +71,7 @@ function Router() {
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Landing} />
+          <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/login" component={() => { window.location.href = '/api/login'; return null; }} />
           <Route component={() => <Landing />} />
         </>
@@ -107,6 +109,7 @@ function Router() {
             <Route path="/ml-intelligence" component={MLIntelligence} />
             <Route path="/system-health" component={SystemHealth} />
             <Route path="/settings" component={Settings} />
+            <Route path="/privacy-policy" component={PrivacyPolicy} />
             <Route component={() => <Dashboard />} />
           </Switch>
         </AppLayout>

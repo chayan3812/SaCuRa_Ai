@@ -140,24 +140,24 @@ export default function FacebookSetup() {
                 <div className="flex items-center justify-center p-8">
                   <RefreshCw className="h-8 w-8 animate-spin" />
                 </div>
-              ) : credentialsStatus?.results ? (
+              ) : credentialsStatus && 'results' in credentialsStatus ? (
                 <div className="space-y-4">
                   {/* User Token Status */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(credentialsStatus.results.userToken.isValid)}
+                        {getStatusIcon((credentialsStatus as any)?.results?.userToken?.isValid || false)}
                         <span className="font-medium">User Access Token</span>
-                        {getStatusBadge(credentialsStatus.results.userToken.isValid)}
+                        {getStatusBadge((credentialsStatus as any)?.results?.userToken?.isValid || false)}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Type: {credentialsStatus.results.userToken.tokenType || 'Unknown'}
-                        {credentialsStatus.results.userToken.permissions?.length > 0 && 
-                          ` • ${credentialsStatus.results.userToken.permissions.length} permissions`
+                        Type: {(credentialsStatus as any)?.results?.userToken?.tokenType || 'Unknown'}
+                        {(credentialsStatus as any)?.results?.userToken?.permissions?.length > 0 && 
+                          ` • ${(credentialsStatus as any).results.userToken.permissions.length} permissions`
                         }
                       </p>
-                      {credentialsStatus.results.userToken.errorMessage && (
-                        <p className="text-sm text-red-600">{credentialsStatus.results.userToken.errorMessage}</p>
+                      {(credentialsStatus as any)?.results?.userToken?.errorMessage && (
+                        <p className="text-sm text-red-600">{(credentialsStatus as any).results.userToken.errorMessage}</p>
                       )}
                     </div>
                   </div>
@@ -166,15 +166,15 @@ export default function FacebookSetup() {
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(credentialsStatus.results.appToken.isValid)}
+                        {getStatusIcon((credentialsStatus as any)?.results?.appToken?.isValid || false)}
                         <span className="font-medium">App Access Token</span>
-                        {getStatusBadge(credentialsStatus.results.appToken.isValid)}
+                        {getStatusBadge((credentialsStatus as any)?.results?.appToken?.isValid || false)}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Type: {credentialsStatus.results.appToken.tokenType || 'Unknown'}
+                        Type: {(credentialsStatus as any)?.results?.appToken?.tokenType || 'Unknown'}
                       </p>
-                      {credentialsStatus.results.appToken.errorMessage && (
-                        <p className="text-sm text-red-600">{credentialsStatus.results.appToken.errorMessage}</p>
+                      {(credentialsStatus as any)?.results?.appToken?.errorMessage && (
+                        <p className="text-sm text-red-600">{(credentialsStatus as any).results.appToken.errorMessage}</p>
                       )}
                     </div>
                   </div>
@@ -272,11 +272,11 @@ export default function FacebookSetup() {
                 <CardDescription>Get a user access token with required permissions</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {authUrlData?.authUrl && (
+                {(authUrlData as any)?.authUrl && (
                   <div className="space-y-3">
                     <p className="text-sm">Click the button below to authenticate with Facebook:</p>
                     <Button asChild>
-                      <a href={authUrlData.authUrl} target="_blank" rel="noopener noreferrer">
+                      <a href={(authUrlData as any).authUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Authenticate with Facebook
                       </a>
@@ -372,9 +372,9 @@ export default function FacebookSetup() {
               </div>
             </CardHeader>
             <CardContent>
-              {userPages?.pages?.length > 0 ? (
+              {(userPages as any)?.pages?.length > 0 ? (
                 <div className="grid gap-4">
-                  {userPages.pages.map((page: any) => (
+                  {(userPages as any).pages.map((page: any) => (
                     <div key={page.id} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { initializeWebSocket } from "@/lib/websocket";
+import logoImage from "@/assets/logo.png";
 
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
@@ -60,7 +61,7 @@ function Router() {
         <div className="text-center">
           <div className="animate-pulse">
             <img 
-              src="/src/assets/logo.png" 
+              src={logoImage} 
               alt="SaCuRa AI Logo" 
               className="w-16 h-16 mx-auto mb-4 object-contain"
             />

@@ -550,42 +550,6 @@ export default function CompetitorAnalysis() {
     </div>
   );
 }
-                  <div>
-                    <h4 className="font-semibold mb-2">Audience Engagement</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {analysisResult.analysis.audienceEngagement}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Posting Frequency</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {analysisResult.analysis.postingFrequency}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <h4 className="font-semibold mb-3">Key Insights</h4>
-                    <div className="space-y-2">
-                      {analysisResult.analysis.keyInsights.map((insight, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <Target className="h-4 w-4 mt-0.5 text-blue-600 flex-shrink-0" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{insight}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-3">Recommendations</h4>
-                    <div className="space-y-2">
-                      {analysisResult.analysis.recommendations.map((rec, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <TrendingUp className="h-4 w-4 mt-0.5 text-green-600 flex-shrink-0" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{rec}</span>
-                        </div>
-                      ))}
                     </div>
                   </div>
                   

@@ -12,6 +12,7 @@ import AdvancedAnalyticsChart from "@/components/dashboard/AdvancedAnalyticsChar
 import FuturisticMetricsGrid from "@/components/dashboard/FuturisticMetricsGrid";
 import CircularProgressDashboard from "@/components/dashboard/CircularProgressDashboard";
 import RealTimeDataVisualizer from "@/components/dashboard/RealTimeDataVisualizer";
+import FloatingActionPanel from "@/components/dashboard/FloatingActionPanel";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -340,11 +341,14 @@ export default function Dashboard() {
           </div>
 
           {/* Bottom Section - Additional Modules */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 animate-in slide-in-from-bottom duration-600 delay-700">
             <CustomerServiceMonitor />
             <EmployeeMonitor />
             <PerformanceInsights />
           </div>
+
+          {/* Floating Action Panel */}
+          <FloatingActionPanel />
     </div>
   );
 }

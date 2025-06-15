@@ -1,0 +1,639 @@
+{
+  "summary": {
+    "total": 43,
+    "passed": 40,
+    "failed": 3,
+    "successRate": "93.02",
+    "timestamp": "2025-06-15T18:38:46.953Z"
+  },
+  "testResults": [
+    {
+      "name": "File Structure: package.json",
+      "status": "PASS",
+      "details": "4484 bytes",
+      "timestamp": "2025-06-15T18:38:40.034Z"
+    },
+    {
+      "name": "File Structure: server/index.ts",
+      "status": "PASS",
+      "details": "4401 bytes",
+      "timestamp": "2025-06-15T18:38:40.034Z"
+    },
+    {
+      "name": "File Structure: server/routes.ts",
+      "status": "PASS",
+      "details": "199002 bytes",
+      "timestamp": "2025-06-15T18:38:40.035Z"
+    },
+    {
+      "name": "File Structure: server/storage.ts",
+      "status": "PASS",
+      "details": "42546 bytes",
+      "timestamp": "2025-06-15T18:38:40.035Z"
+    },
+    {
+      "name": "File Structure: client/src/App.tsx",
+      "status": "PASS",
+      "details": "6207 bytes",
+      "timestamp": "2025-06-15T18:38:40.035Z"
+    },
+    {
+      "name": "File Structure: client/src/pages/Dashboard.tsx",
+      "status": "PASS",
+      "details": "9724 bytes",
+      "timestamp": "2025-06-15T18:38:40.036Z"
+    },
+    {
+      "name": "File Structure: shared/schema.ts",
+      "status": "PASS",
+      "details": "23895 bytes",
+      "timestamp": "2025-06-15T18:38:40.036Z"
+    },
+    {
+      "name": "Schema Table: users",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "Schema Table: facebookPages",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "Schema Table: customerInteractions",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "Schema Table: aiSuggestionFeedback",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "Schema Table: trainingPrompts",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "Schema Table: employees",
+      "status": "PASS",
+      "details": "Table definition found",
+      "timestamp": "2025-06-15T18:38:40.037Z"
+    },
+    {
+      "name": "API Endpoint: /api/auth/user",
+      "status": "PASS",
+      "details": "Route definition found",
+      "timestamp": "2025-06-15T18:38:40.039Z"
+    },
+    {
+      "name": "API Endpoint: /api/dashboard/metrics",
+      "status": "PASS",
+      "details": "Route definition found",
+      "timestamp": "2025-06-15T18:38:40.040Z"
+    },
+    {
+      "name": "API Endpoint: /api/ai/learning-metrics",
+      "status": "PASS",
+      "details": "Route definition found",
+      "timestamp": "2025-06-15T18:38:40.040Z"
+    },
+    {
+      "name": "API Endpoint: /api/facebook/pages",
+      "status": "FAIL",
+      "details": "Route definition missing",
+      "timestamp": "2025-06-15T18:38:40.040Z"
+    },
+    {
+      "name": "API Endpoint: /webhook/facebook",
+      "status": "PASS",
+      "details": "Route definition found",
+      "timestamp": "2025-06-15T18:38:40.040Z"
+    },
+    {
+      "name": "Component: MetricsCards.tsx",
+      "status": "PASS",
+      "details": "Component exists",
+      "timestamp": "2025-06-15T18:38:40.040Z"
+    },
+    {
+      "name": "Component: AILearningProgress.tsx",
+      "status": "PASS",
+      "details": "React hooks implemented",
+      "timestamp": "2025-06-15T18:38:40.041Z"
+    },
+    {
+      "name": "Component: CustomerServiceMonitor.tsx",
+      "status": "PASS",
+      "details": "React hooks implemented",
+      "timestamp": "2025-06-15T18:38:40.041Z"
+    },
+    {
+      "name": "Component: Dashboard.tsx",
+      "status": "PASS",
+      "details": "React hooks implemented",
+      "timestamp": "2025-06-15T18:38:40.041Z"
+    },
+    {
+      "name": "Environment: DATABASE_URL",
+      "status": "PASS",
+      "details": "Configured (postgresql...)",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "Environment: OPENAI_API_KEY",
+      "status": "PASS",
+      "details": "Configured (sk-proj-Lg...)",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "Environment: ANTHROPIC_API_KEY",
+      "status": "PASS",
+      "details": "Configured (sk-ant-api...)",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "Environment: FACEBOOK_APP_ID",
+      "status": "PASS",
+      "details": "Configured ( 402649993...)",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "Environment: FB_PAGE_ACCESS_TOKEN",
+      "status": "PASS",
+      "details": "Configured (EAA5OFJJFb...)",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "OpenAI Integration",
+      "status": "FAIL",
+      "details": "Service file missing",
+      "timestamp": "2025-06-15T18:38:40.042Z"
+    },
+    {
+      "name": "Claude AI Integration",
+      "status": "PASS",
+      "details": "Service implementation found",
+      "timestamp": "2025-06-15T18:38:40.043Z"
+    },
+    {
+      "name": "Facebook Webhook",
+      "status": "PASS",
+      "details": "Webhook handler implemented",
+      "timestamp": "2025-06-15T18:38:40.043Z"
+    },
+    {
+      "name": "Facebook Graph API",
+      "status": "FAIL",
+      "details": "API service file missing",
+      "timestamp": "2025-06-15T18:38:40.043Z"
+    },
+    {
+      "name": "Dependency: @anthropic-ai/sdk",
+      "status": "PASS",
+      "details": "v^0.37.0",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: openai",
+      "status": "PASS",
+      "details": "v^5.2.0",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: @neondatabase/serverless",
+      "status": "PASS",
+      "details": "v^0.10.4",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: drizzle-orm",
+      "status": "PASS",
+      "details": "v^0.39.1",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: express",
+      "status": "PASS",
+      "details": "v^4.21.2",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: react",
+      "status": "PASS",
+      "details": "v^18.3.1",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "Dependency: axios",
+      "status": "PASS",
+      "details": "v^1.9.0",
+      "timestamp": "2025-06-15T18:38:40.044Z"
+    },
+    {
+      "name": "TypeScript Config",
+      "status": "PASS",
+      "details": "tsconfig.json exists",
+      "timestamp": "2025-06-15T18:38:40.045Z"
+    },
+    {
+      "name": "Vite Config",
+      "status": "PASS",
+      "details": "vite.config.ts exists",
+      "timestamp": "2025-06-15T18:38:40.045Z"
+    },
+    {
+      "name": "Tailwind Config",
+      "status": "PASS",
+      "details": "tailwind.config.ts exists",
+      "timestamp": "2025-06-15T18:38:40.045Z"
+    },
+    {
+      "name": "TypeScript Usage",
+      "status": "PASS",
+      "details": "171 TypeScript files",
+      "timestamp": "2025-06-15T18:38:46.951Z"
+    },
+    {
+      "name": "Error Handling",
+      "status": "PASS",
+      "details": "Try-catch blocks found in routes",
+      "timestamp": "2025-06-15T18:38:46.953Z"
+    }
+  ],
+  "categories": {
+    "File Structure": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "File Structure: package.json",
+          "status": "PASS",
+          "details": "4484 bytes",
+          "timestamp": "2025-06-15T18:38:40.034Z"
+        },
+        {
+          "name": "File Structure: server/index.ts",
+          "status": "PASS",
+          "details": "4401 bytes",
+          "timestamp": "2025-06-15T18:38:40.034Z"
+        },
+        {
+          "name": "File Structure: server/routes.ts",
+          "status": "PASS",
+          "details": "199002 bytes",
+          "timestamp": "2025-06-15T18:38:40.035Z"
+        },
+        {
+          "name": "File Structure: server/storage.ts",
+          "status": "PASS",
+          "details": "42546 bytes",
+          "timestamp": "2025-06-15T18:38:40.035Z"
+        },
+        {
+          "name": "File Structure: client/src/App.tsx",
+          "status": "PASS",
+          "details": "6207 bytes",
+          "timestamp": "2025-06-15T18:38:40.035Z"
+        },
+        {
+          "name": "File Structure: client/src/pages/Dashboard.tsx",
+          "status": "PASS",
+          "details": "9724 bytes",
+          "timestamp": "2025-06-15T18:38:40.036Z"
+        },
+        {
+          "name": "File Structure: shared/schema.ts",
+          "status": "PASS",
+          "details": "23895 bytes",
+          "timestamp": "2025-06-15T18:38:40.036Z"
+        }
+      ],
+      "pass": null
+    },
+    "Schema Table": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Schema Table: users",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        },
+        {
+          "name": "Schema Table: facebookPages",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        },
+        {
+          "name": "Schema Table: customerInteractions",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        },
+        {
+          "name": "Schema Table: aiSuggestionFeedback",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        },
+        {
+          "name": "Schema Table: trainingPrompts",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        },
+        {
+          "name": "Schema Table: employees",
+          "status": "PASS",
+          "details": "Table definition found",
+          "timestamp": "2025-06-15T18:38:40.037Z"
+        }
+      ],
+      "pass": null
+    },
+    "API Endpoint": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "API Endpoint: /api/auth/user",
+          "status": "PASS",
+          "details": "Route definition found",
+          "timestamp": "2025-06-15T18:38:40.039Z"
+        },
+        {
+          "name": "API Endpoint: /api/dashboard/metrics",
+          "status": "PASS",
+          "details": "Route definition found",
+          "timestamp": "2025-06-15T18:38:40.040Z"
+        },
+        {
+          "name": "API Endpoint: /api/ai/learning-metrics",
+          "status": "PASS",
+          "details": "Route definition found",
+          "timestamp": "2025-06-15T18:38:40.040Z"
+        },
+        {
+          "name": "API Endpoint: /api/facebook/pages",
+          "status": "FAIL",
+          "details": "Route definition missing",
+          "timestamp": "2025-06-15T18:38:40.040Z"
+        },
+        {
+          "name": "API Endpoint: /webhook/facebook",
+          "status": "PASS",
+          "details": "Route definition found",
+          "timestamp": "2025-06-15T18:38:40.040Z"
+        }
+      ],
+      "pass": null,
+      "fail": null
+    },
+    "Component": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Component: MetricsCards.tsx",
+          "status": "PASS",
+          "details": "Component exists",
+          "timestamp": "2025-06-15T18:38:40.040Z"
+        },
+        {
+          "name": "Component: AILearningProgress.tsx",
+          "status": "PASS",
+          "details": "React hooks implemented",
+          "timestamp": "2025-06-15T18:38:40.041Z"
+        },
+        {
+          "name": "Component: CustomerServiceMonitor.tsx",
+          "status": "PASS",
+          "details": "React hooks implemented",
+          "timestamp": "2025-06-15T18:38:40.041Z"
+        },
+        {
+          "name": "Component: Dashboard.tsx",
+          "status": "PASS",
+          "details": "React hooks implemented",
+          "timestamp": "2025-06-15T18:38:40.041Z"
+        }
+      ],
+      "pass": null
+    },
+    "Environment": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Environment: DATABASE_URL",
+          "status": "PASS",
+          "details": "Configured (postgresql...)",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        },
+        {
+          "name": "Environment: OPENAI_API_KEY",
+          "status": "PASS",
+          "details": "Configured (sk-proj-Lg...)",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        },
+        {
+          "name": "Environment: ANTHROPIC_API_KEY",
+          "status": "PASS",
+          "details": "Configured (sk-ant-api...)",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        },
+        {
+          "name": "Environment: FACEBOOK_APP_ID",
+          "status": "PASS",
+          "details": "Configured ( 402649993...)",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        },
+        {
+          "name": "Environment: FB_PAGE_ACCESS_TOKEN",
+          "status": "PASS",
+          "details": "Configured (EAA5OFJJFb...)",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        }
+      ],
+      "pass": null
+    },
+    "OpenAI Integration": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "OpenAI Integration",
+          "status": "FAIL",
+          "details": "Service file missing",
+          "timestamp": "2025-06-15T18:38:40.042Z"
+        }
+      ],
+      "fail": null
+    },
+    "Claude AI Integration": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Claude AI Integration",
+          "status": "PASS",
+          "details": "Service implementation found",
+          "timestamp": "2025-06-15T18:38:40.043Z"
+        }
+      ],
+      "pass": null
+    },
+    "Facebook Webhook": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Facebook Webhook",
+          "status": "PASS",
+          "details": "Webhook handler implemented",
+          "timestamp": "2025-06-15T18:38:40.043Z"
+        }
+      ],
+      "pass": null
+    },
+    "Facebook Graph API": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Facebook Graph API",
+          "status": "FAIL",
+          "details": "API service file missing",
+          "timestamp": "2025-06-15T18:38:40.043Z"
+        }
+      ],
+      "fail": null
+    },
+    "Dependency": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Dependency: @anthropic-ai/sdk",
+          "status": "PASS",
+          "details": "v^0.37.0",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: openai",
+          "status": "PASS",
+          "details": "v^5.2.0",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: @neondatabase/serverless",
+          "status": "PASS",
+          "details": "v^0.10.4",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: drizzle-orm",
+          "status": "PASS",
+          "details": "v^0.39.1",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: express",
+          "status": "PASS",
+          "details": "v^4.21.2",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: react",
+          "status": "PASS",
+          "details": "v^18.3.1",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        },
+        {
+          "name": "Dependency: axios",
+          "status": "PASS",
+          "details": "v^1.9.0",
+          "timestamp": "2025-06-15T18:38:40.044Z"
+        }
+      ],
+      "pass": null
+    },
+    "TypeScript Config": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "TypeScript Config",
+          "status": "PASS",
+          "details": "tsconfig.json exists",
+          "timestamp": "2025-06-15T18:38:40.045Z"
+        }
+      ],
+      "pass": null
+    },
+    "Vite Config": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Vite Config",
+          "status": "PASS",
+          "details": "vite.config.ts exists",
+          "timestamp": "2025-06-15T18:38:40.045Z"
+        }
+      ],
+      "pass": null
+    },
+    "Tailwind Config": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Tailwind Config",
+          "status": "PASS",
+          "details": "tailwind.config.ts exists",
+          "timestamp": "2025-06-15T18:38:40.045Z"
+        }
+      ],
+      "pass": null
+    },
+    "TypeScript Usage": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "TypeScript Usage",
+          "status": "PASS",
+          "details": "171 TypeScript files",
+          "timestamp": "2025-06-15T18:38:46.951Z"
+        }
+      ],
+      "pass": null
+    },
+    "Error Handling": {
+      "passed": 0,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Error Handling",
+          "status": "PASS",
+          "details": "Try-catch blocks found in routes",
+          "timestamp": "2025-06-15T18:38:46.953Z"
+        }
+      ],
+      "pass": null
+    }
+  },
+  "recommendations": [
+    "Review failed tests and implement missing components",
+    "System is well-configured and ready for deployment"
+  ]
+}

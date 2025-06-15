@@ -40,6 +40,7 @@ import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
 import AutoPostAdmin from "@/pages/AutoPostAdmin";
+import FacebookAdsAdmin from "@/pages/FacebookAdsAdmin";
 import PageStatus from "@/pages/PageStatus";
 import ContentQueue from "@/pages/ContentQueue";
 import Analytics from "@/pages/Analytics";
@@ -92,6 +93,7 @@ function Router() {
             <Route path="/ads" component={AdOptimizer} />
             <Route path="/auto-poster" component={AutoPoster} />
             <Route path="/admin/auto-post-config" component={AutoPostAdmin} />
+            <Route path="/admin/facebook-ads" component={FacebookAdsAdmin} />
             <Route path="/content-queue" component={ContentQueue} />
             <Route path="/analytics" component={Analytics} />
             <Route path="/page-status" component={PageStatus} />

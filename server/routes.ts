@@ -29,6 +29,7 @@ import { customerInteractions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { enhancedPageFixer } from "./enhancedPageFixer";
 import { processFailedReplyFeedback, getFailureInsights } from "./aiSelfAwareness";
+import { advancedAISelfImprovement } from "./advancedAISelfImprovement";
 import { advancedAIEngine } from "./advancedAIEngine";
 import { sentimentAI } from "./sentimentAI";
 import { competitorAI } from "./competitorAI";

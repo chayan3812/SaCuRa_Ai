@@ -19,6 +19,7 @@ import AIInsights from "@/pages/AIInsights";
 import AIPerformance from "@/pages/AIPerformance";
 import FeedbackAnalytics from "@/pages/FeedbackAnalytics";
 import AITraining from "@/pages/AITraining";
+import AITestDashboard from "@/pages/AITestDashboard";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -75,6 +76,7 @@ function Router() {
             <Route path="/ai-performance" component={AIPerformance} />
             <Route path="/feedback-analytics" component={FeedbackAnalytics} />
             <Route path="/ai-training" component={AITraining} />
+            <Route path="/ai-test" component={AITestDashboard} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

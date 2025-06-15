@@ -116,9 +116,11 @@ export default function QuickActions() {
   ];
 
   // Sort actions by priority
-  const sortedActions = actions.sort((a, b) => {
-    const priorityOrder = { high: 3, medium: 2, low: 1 };
-    return priorityOrder[b.priority] - priorityOrder[a.priority];
+  const sortedActions = [...actions].sort((a, b) => {
+    const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+    const aPriority = priorityOrder[a.priority] ?? 1;
+    const bPriority = priorityOrder[b.priority] ?? 1;
+    return bPriority - aPriority;
   });
 
   const getPriorityBadge = (priority: string) => {

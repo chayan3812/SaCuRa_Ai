@@ -1,0 +1,55 @@
+{
+  "summary": {
+    "environment": "FAIL",
+    "facebookAPI": "FAIL",
+    "routing": "PASS",
+    "overallStatus": "NEEDS_CONFIGURATION"
+  },
+  "details": {
+    "environmentCheck": {
+      "FACEBOOK_APP_ID": {
+        "present": true,
+        "preview": "6228832806..."
+      },
+      "FACEBOOK_APP_SECRET": {
+        "present": true,
+        "preview": "3e48ce23f6..."
+      },
+      "FACEBOOK_ACCESS_TOKEN": {
+        "preview": "MISSING"
+      },
+      "FB_PAGE_ACCESS_TOKEN": {
+        "preview": "MISSING"
+      }
+    },
+    "routingCheck": {
+      "/api/facebook/pages": {
+        "status": 200,
+        "working": true
+      },
+      "/api/facebook/page-info": {
+        "status": 500,
+        "working": false,
+        "error": "Request failed with status code 500"
+      },
+      "/api/facebook/insights": {
+        "status": 500,
+        "working": false,
+        "error": "Request failed with status code 500"
+      },
+      "/admin/facebook-dashboard": {
+        "registered": true,
+        "note": "Frontend route - accessible via sidebar navigation"
+      }
+    },
+    "facebookAPICheck": {
+      "error": "Request failed with status code 400"
+    },
+    "overallStatus": "NEEDS_CONFIGURATION"
+  },
+  "recommendations": [
+    "Configure missing Facebook environment variables in Replit Secrets",
+    "Verify Facebook App credentials and permissions",
+    "Ensure Facebook App is in development or live mode"
+  ]
+}

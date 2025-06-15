@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
 import { 
   useFacebookDashboard, 
   usePublishPost, 
@@ -47,6 +48,13 @@ interface PostFormData {
   publishTime: string;
 }
 
+interface LinkPreview {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+}
+
 export default function FacebookDashboard() {
   const { toast } = useToast();
   const [postForm, setPostForm] = useState<PostFormData>({
@@ -57,6 +65,9 @@ export default function FacebookDashboard() {
   });
   const [mediaUrl, setMediaUrl] = useState("");
   const [mediaCaption, setMediaCaption] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [linkPreview, setLinkPreview] = useState<LinkPreview | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   // Facebook API hooks
   const facebookData = useFacebookDashboard();

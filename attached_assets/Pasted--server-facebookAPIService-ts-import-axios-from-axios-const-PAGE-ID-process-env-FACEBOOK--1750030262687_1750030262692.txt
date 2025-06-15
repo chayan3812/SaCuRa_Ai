@@ -1,0 +1,79 @@
+// server/facebookAPIService.ts
+import axios from "axios";
+
+const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+
+export const FacebookAPIService = {
+  async fetchPageInsights() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/insights/page_impressions,page_engaged_users?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  },
+
+  async publishPost(message: string) {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/feed`;
+    const response = await axios.post(url, {
+      message,
+      access_token: ACCESS_TOKEN
+    });
+    return response.data;
+  },
+
+  async getPosts() {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/posts?access_token=${ACCESS_TOKEN}`;
+    const response = await axios.get(url);
+    return response.data;
+  },
+
+  async uploadPhoto(fileBuffer: Buffer, mimeType: string, caption: string) {
+    const url = `https://graph.facebook.com/v17.0/${PAGE_ID}/photos`;
+    const form = new FormData();
+    form.append("access_token", ACCESS_TOKEN);
+    form.append("caption", caption);
+    form.append("source", fileBuffer, {
+      filename: "image.jpg",
+      contentType: mimeType
+    });
+    const response = await axios.post(url, form, {
+      headers: form.getHeaders()
+    });
+    return response.data;
+  },
+
+  async fetchLinkPreview(link: string) {
+    const { data } = await axios.get(link);
+    const title = data.match(/<title>(.*?)<\/title>/i)?.[1] || "No Title";
+    const descMatch = data.match(/<meta name="description" content="(.*?)"/i);
+    const desc = descMatch?.[1] || "";
+    const imageMatch = data.match(/<meta property="og:image" content="(.*?)"/i);
+    const image = imageMatch?.[1] || "";
+    return { title, description: desc, image };
+  }
+};
+
+// server/facebookAnalytics.ts (append routes)
+import multer from "multer";
+const upload = multer();
+
+router.post("/photo", upload.single("file"), async (req, res) => {
+  try {
+    const { caption } = req.body;
+    const buffer = req.file.buffer;
+    const mimeType = req.file.mimetype;
+    const result = await FacebookAPIService.uploadPhoto(buffer, mimeType, caption);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Image post failed" });
+  }
+});
+
+router.post("/link", async (req, res) => {
+  try {
+    const { link } = req.body;
+    const result = await FacebookAPIService.fetchLinkPreview(link);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Link preview fetch failed" });
+  }
+});

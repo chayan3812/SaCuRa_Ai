@@ -3,7 +3,8 @@
  * Tests live Facebook credentials and routing functionality
  */
 
-const axios = require('axios');
+import axios from 'axios';
+import fs from 'fs';
 
 class Phase1FacebookVerification {
   constructor() {
@@ -237,7 +238,6 @@ async function main() {
   const report = await verifier.runCompleteVerification();
   
   // Save report for reference
-  const fs = require('fs');
   fs.writeFileSync('phase1-verification-report.json', JSON.stringify(report, null, 2));
   
   console.log('\n📄 Full report saved to: phase1-verification-report.json');
@@ -245,8 +245,6 @@ async function main() {
   return report;
 }
 
-if (require.main === module) {
-  main().catch(console.error);
-}
+main().catch(console.error);
 
-module.exports = { Phase1FacebookVerification };
+export { Phase1FacebookVerification };

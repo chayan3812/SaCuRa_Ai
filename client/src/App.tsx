@@ -107,6 +107,7 @@ function Router() {
             <Route path="/sla-dashboard" component={SLADashboard} />
             <Route path="/admin/ai-replay" component={AdminAIReplay} />
             <Route path="/admin/ai-digest" component={AdminAIDigest} />
+            <Route path="/facebook" component={Facebook} />
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/facebook-setup" component={FacebookSetup} />
             <Route path="/facebook-conversions" component={FacebookConversions} />

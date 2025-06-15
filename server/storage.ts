@@ -29,6 +29,7 @@ import {
   postingSchedules,
   type PostingSchedule,
   type InsertPostingSchedule,
+  scheduledPosts,
   competitorData,
   aiLearningData,
   facebookAdAccounts,

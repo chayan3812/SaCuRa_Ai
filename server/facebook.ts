@@ -254,6 +254,30 @@ export class FacebookAPIService {
       throw new Error('Failed to create webhook subscription');
     }
   }
+
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: ContentScheduler
+  /**
+   * Publish a post to a Facebook page
+   */
+  async publishToPage(pageId: string, message: string, accessToken: string): Promise<any> {
+    try {
+      const response = await axios.post(
+        `https://graph.facebook.com/v19.0/${pageId}/feed`,
+        {
+          message,
+          access_token: accessToken
+        },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Error publishing post:', error.response?.data || error.message);
+      throw new Error(`Failed to publish post: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
 }
 
 // OAuth Helper Functions

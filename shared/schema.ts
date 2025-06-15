@@ -207,6 +207,22 @@ export const contentTemplates = pgTable("content_templates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Scheduled Posts Table (for actual posting)
+export const scheduledPosts = pgTable("scheduled_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  pageId: uuid("page_id").notNull().references(() => facebookPages.id),
+  title: varchar("title").notNull(),
+  content: text("content").notNull(),
+  scheduledTime: timestamp("scheduled_time").notNull(),
+  published: boolean("published").default(false),
+  publishedAt: timestamp("published_at"),
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: ContentScheduler
+  facebookPostId: varchar("facebook_post_id"), // Store the actual Facebook post ID
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const postingSchedules = pgTable("posting_schedules", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: varchar("user_id").notNull(),
@@ -295,3 +311,4 @@ export type ContentTemplate = typeof contentTemplates.$inferSelect;
 export type InsertContentTemplate = z.infer<typeof insertContentTemplateSchema>;
 export type PostingSchedule = typeof postingSchedules.$inferSelect;
 export type InsertPostingSchedule = z.infer<typeof insertPostingScheduleSchema>;
+export type ScheduledPost = typeof scheduledPosts.$inferSelect;

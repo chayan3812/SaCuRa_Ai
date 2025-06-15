@@ -36,6 +36,7 @@ const navigation = [
   { name: "Facebook Analytics", href: "/facebook-analytics", icon: BarChart3, badge: "PIXEL" },
   { name: "Facebook Setup", href: "/facebook-setup", icon: Settings, badge: "CONFIG" },
   { name: "Conversions API", href: "/facebook-conversions", icon: Target, badge: "LIVE" },
+  { name: "Marketing API", href: "/marketing-api", icon: Megaphone, badge: "ADVANCED" },
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "SmartInbox AI", href: "/smart-inbox", icon: Bot, badge: "AI" },

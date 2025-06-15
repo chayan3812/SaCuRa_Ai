@@ -4326,7 +4326,7 @@ Prioritize by impact and feasibility.`;
   });
 
   // Facebook Marketing API Routes
-  app.get('/api/marketing/ad-accounts', isAuthenticated, async (req, res) => {
+  app.get('/api/marketing/ad-accounts', async (req, res) => {
     try {
       const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
       const adAccounts = await facebookMarketingAPI.getAdAccounts();

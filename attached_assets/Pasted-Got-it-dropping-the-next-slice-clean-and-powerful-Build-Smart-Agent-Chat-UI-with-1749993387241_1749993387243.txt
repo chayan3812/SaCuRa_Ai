@@ -1,0 +1,97 @@
+Got it — dropping the next slice clean and powerful.
+
+---
+
+## `➤ Build Smart Agent Chat UI (with toggle + feedback)`
+
+> **📍Location:** `SmartInbox.tsx` or `CustomerServicePage.tsx`
+> 💡 Goal: Enhance message viewer with AI reply suggestions, one-click insert, and feedback tracking
+
+---
+
+### ✅ UI Component Enhancements
+
+**1. Add state:**
+
+```ts
+const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+const [aiReply, setAiReply] = useState<string>('');
+const [showAI, setShowAI] = useState<boolean>(false);
+const [feedback, setFeedback] = useState<'yes' | 'no' | null>(null);
+```
+
+---
+
+**2. Fetch AI reply on toggle:**
+
+```tsx
+const handleToggleAI = async (msg: Message) => {
+  setSelectedMessage(msg);
+  setShowAI(true);
+
+  const res = await fetch('/api/customer/ai-reply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messageId: msg.id, messageText: msg.body }),
+  });
+
+  const data = await res.json();
+  setAiReply(data.reply);
+};
+```
+
+---
+
+**3. Inject UI into chat panel (simplified JSX):**
+
+```tsx
+{selectedMessage && (
+  <div className="rounded-xl p-4 border mt-2 bg-muted">
+    <div className="flex justify-between items-center mb-2">
+      <h3 className="text-sm font-semibold">🤖 AI Suggestion</h3>
+      <button onClick={() => setShowAI(!showAI)}>
+        {showAI ? 'Hide' : 'Show'}
+      </button>
+    </div>
+
+    {showAI && (
+      <>
+        <p className="text-sm text-muted-foreground mb-2">{aiReply}</p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => insertReply(aiReply)}
+            className="px-3 py-1 text-sm rounded bg-primary text-white"
+          >
+            ➕ Use Reply
+          </button>
+          <span className="text-xs text-muted-foreground mt-1">Was this helpful?</span>
+          <button onClick={() => setFeedback('yes')} className="text-green-600">👍</button>
+          <button onClick={() => setFeedback('no')} className="text-red-600">👎</button>
+        </div>
+        {feedback && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Feedback recorded: {feedback === 'yes' ? 'Helpful' : 'Not Helpful'}
+          </p>
+        )}
+      </>
+    )}
+  </div>
+)}
+```
+
+---
+
+**4. Helper function:**
+
+```ts
+const insertReply = (reply: string) => {
+  // insert `reply` into your message input field, e.g.:
+  setMessageInput(reply);
+};
+```
+
+---
+
+✅ Done. You've now got a sleek, agent-assist interface like Intercom or Zendesk — powered by your own AI engine.
+
+---

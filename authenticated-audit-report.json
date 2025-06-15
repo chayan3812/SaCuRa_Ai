@@ -1,0 +1,76 @@
+{
+  "timestamp": "2025-06-15T17:59:10.050Z",
+  "summary": {
+    "total_tests": 44,
+    "passed": 40,
+    "warnings": 0,
+    "critical": 4,
+    "health": "CRITICAL"
+  },
+  "details": {
+    "authentication": [],
+    "database": [
+      "❌ Database connection issues detected",
+      "✅ Schema file shared/schema.ts exists",
+      "✅ Schema file server/db.ts exists",
+      "✅ Schema file server/storage.ts exists",
+      "✅ Schema file drizzle.config.ts exists"
+    ],
+    "api_endpoints": [],
+    "facebook_integration": [
+      "❌ Facebook webhook verification failed",
+      "❌ Facebook message processing failed",
+      "✅ Environment variable FB_PAGE_ACCESS_TOKEN configured",
+      "✅ Environment variable FB_VERIFY_TOKEN configured",
+      "✅ Environment variable FACEBOOK_APP_ID configured"
+    ],
+    "ai_systems": [
+      "✅ AI service server/openai.ts exists",
+      "✅ AI service server/advancedAIEngine.ts exists",
+      "✅ AI service server/competitorAI.ts exists",
+      "✅ AI service server/claudeAI.ts exists",
+      "✅ AI API key OPENAI_API_KEY configured",
+      "✅ AI API key ANTHROPIC_API_KEY configured"
+    ],
+    "frontend": [
+      "✅ Frontend component client/src/App.tsx exists",
+      "✅ Frontend component client/src/pages exists",
+      "✅ Frontend component client/src/components exists",
+      "✅ Frontend component client/src/lib exists",
+      "✅ Frontend component client/src/hooks exists",
+      "✅ Frontend component package.json exists",
+      "✅ Frontend component vite.config.ts exists",
+      "✅ Frontend component tailwind.config.ts exists",
+      "✅ Critical dependency react installed",
+      "✅ Critical dependency express installed",
+      "✅ Critical dependency drizzle-orm installed",
+      "✅ Critical dependency @anthropic-ai/sdk installed",
+      "✅ Critical dependency openai installed",
+      "✅ Critical dependency wouter installed",
+      "✅ Critical dependency @tanstack/react-query installed",
+      "✅ Critical dependency tailwindcss installed"
+    ],
+    "security": [
+      "✅ Critical secret DATABASE_URL configured",
+      "✅ Critical secret OPENAI_API_KEY configured",
+      "✅ Critical secret ANTHROPIC_API_KEY configured",
+      "✅ Critical secret FB_PAGE_ACCESS_TOKEN configured",
+      "✅ Critical secret FB_VERIFY_TOKEN configured",
+      "✅ Authentication middleware implemented",
+      "✅ Authentication setup configured"
+    ],
+    "performance": [
+      "✅ Performance system server/advancedAIEngine.ts active",
+      "✅ Performance system server/competitorAI.ts active",
+      "✅ Memory usage optimal (69.9%)"
+    ],
+    "synchronization": [
+      "❌ Pipeline synchronization issues detected",
+      "✅ Shared schema maintains consistency"
+    ]
+  },
+  "recommendations": [
+    "🚨 Address critical issues before production deployment",
+    "✅ Strong foundation with comprehensive feature implementation"
+  ]
+}

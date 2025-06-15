@@ -1,0 +1,71 @@
+{
+  "timestamp": "2025-06-15T17:57:58.558Z",
+  "summary": {
+    "total_tests": 39,
+    "critical_issues": 5,
+    "warnings": 8,
+    "passed_tests": 17,
+    "integration_status": 0,
+    "synchronization_status": 1
+  },
+  "details": {
+    "critical": [
+      "Database connectivity failed",
+      "Facebook webhook verification failed",
+      "Facebook webhook message processing failed",
+      "AI customer service integration failed",
+      "Dashboard synchronization failed"
+    ],
+    "warnings": [
+      "Authentication required for /api/dashboard/metrics",
+      "Authentication required for /api/dashboard/pages",
+      "Authentication required for /api/dashboard/recommendations",
+      "Authentication required for /api/notifications",
+      "Authentication required for /api/employees",
+      "Authentication required for /api/customer-service/interactions/all",
+      "Authentication required for /api/auth/user",
+      "Performance file server/memoryOptimization.ts missing"
+    ],
+    "passed": [
+      "Schema file shared/schema.ts exists",
+      "Schema file server/db.ts exists",
+      "Schema file server/storage.ts exists",
+      "AI service server/openai.ts exists",
+      "AI service server/advancedAIEngine.ts exists",
+      "AI service server/competitorAI.ts exists",
+      "AI service server/claudeAI.ts exists",
+      "Frontend component client/src/App.tsx exists",
+      "Frontend component client/src/pages exists",
+      "Frontend component client/src/components exists",
+      "Frontend component client/src/lib exists",
+      "Frontend component client/src/hooks exists",
+      "Dependency react installed",
+      "Dependency express installed",
+      "Dependency drizzle-orm installed",
+      "Dependency @anthropic-ai/sdk installed",
+      "Dependency openai installed"
+    ],
+    "integrations": [],
+    "synchronization": [
+      "Shared schema maintains frontend-backend consistency"
+    ],
+    "performance": [
+      "Performance optimization server/advancedAIEngine.ts exists",
+      "Memory usage within acceptable limits"
+    ],
+    "security": [
+      "Environment variable OPENAI_API_KEY configured",
+      "Environment variable ANTHROPIC_API_KEY configured",
+      "Environment variable FB_PAGE_ACCESS_TOKEN configured",
+      "Environment variable FB_VERIFY_TOKEN configured",
+      "Environment variable DATABASE_URL configured",
+      "Authentication middleware implemented"
+    ]
+  },
+  "recommendations": [
+    "🚨 CRITICAL: Address critical issues immediately for production stability",
+    "⚠️ WARNING: Multiple warnings detected - review and optimize",
+    "🔌 INTEGRATION: Verify external service integrations"
+  ],
+  "overall_health": "CRITICAL"
+}

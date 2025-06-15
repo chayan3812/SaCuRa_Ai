@@ -101,7 +101,7 @@ export default function SmartInbox() {
   // AgentAssistChat - GPT-powered reply suggestions
   const suggestReplyMutation = useMutation({
     mutationFn: async (messageId: string): Promise<AgentSuggestion> => {
-      return await apiRequest(`/api/agent-suggest-reply/${messageId}`, "POST");
+      return await apiRequest(`/api/agent-suggest-reply/${messageId}`, "POST", {});
     },
     onSuccess: (data) => {
       setAgentSuggestion(data);
@@ -264,9 +264,21 @@ export default function SmartInbox() {
             AI-powered customer message intelligence with automated classification and reply suggestions
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-purple-600" />
-          <span className="text-sm font-medium">AI Assistant Active</span>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => seedTestDataMutation.mutate()}
+            disabled={seedTestDataMutation.isPending}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            {seedTestDataMutation.isPending ? "Adding..." : "Add Test Messages"}
+          </Button>
+          <div className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-purple-600" />
+            <span className="text-sm font-medium">AI Assistant Active</span>
+          </div>
         </div>
       </div>
 
@@ -448,6 +460,95 @@ export default function SmartInbox() {
                     )}
                   </div>
                 )}
+
+                {/* AgentAssistChat - GPT-Powered Reply Suggestions */}
+                <div className="space-y-4">
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-amber-600" />
+                        AgentAssist Chat
+                      </h4>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleGenerateReply(selectedMessage.id)}
+                        disabled={loadingSuggestion || suggestReplyMutation.isPending}
+                        className="gap-2"
+                      >
+                        {loadingSuggestion || suggestReplyMutation.isPending ? (
+                          <RefreshCw className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-3 w-3" />
+                        )}
+                        {loadingSuggestion || suggestReplyMutation.isPending ? "Generating..." : "Generate Reply"}
+                      </Button>
+                    </div>
+
+                    {agentSuggestion && (
+                      <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-lg border border-purple-200 dark:border-purple-700">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4 text-purple-600" />
+                            <span className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                              GPT-4o Suggested Reply
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleCopyReply(agentSuggestion.suggestedReply)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-white dark:bg-gray-800 rounded border mb-3">
+                          <p className="text-sm">{agentSuggestion.suggestedReply}</p>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Button
+                            size="sm"
+                            onClick={() => handleUseReply(agentSuggestion.suggestedReply)}
+                            className="gap-2"
+                          >
+                            <CheckCircle className="h-3 w-3" />
+                            Use This Reply
+                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => feedbackMutation.mutate({
+                                messageId: selectedMessage.id,
+                                used: false,
+                                feedback: 'useful'
+                              })}
+                              className="gap-1"
+                            >
+                              <ThumbsUp className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => feedbackMutation.mutate({
+                                messageId: selectedMessage.id,
+                                used: false,
+                                feedback: 'not_useful'
+                              })}
+                              className="gap-1"
+                            >
+                              <ThumbsDown className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {/* Reply Interface */}
                 <div className="space-y-4">

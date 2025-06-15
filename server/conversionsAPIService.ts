@@ -8,6 +8,7 @@ import { storage } from './storage';
 import { customerInteractions } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
 import { db } from './db';
+import { buildUserDataWithAppUser, getConversionEventConfig } from './appUserConfig';
 
 export interface ConversionPixelConfig {
   pixelId: string;
@@ -96,13 +97,13 @@ export class ConversionsAPIService {
       // Determine event type based on interaction
       const eventName = this.determineEventType(interaction, additionalData?.eventName);
       
-      // Build user data from interaction
-      const userData: ConversionEvent['user_data'] = {
-        external_id: interaction.customerId || undefined,
-        email_address: interaction.customerEmail || undefined,
-        client_ip_address: interaction.customerIp || undefined,
-        client_user_agent: interaction.userAgent || undefined,
-      };
+      // Build user data from interaction with App User ID
+      const userData = buildUserDataWithAppUser({
+        external_id: interaction.customerId,
+        email_address: interaction.customerEmail,
+        client_ip_address: interaction.customerIp,
+        client_user_agent: interaction.userAgent,
+      });
 
       // Build custom data
       const customData: ConversionEvent['custom_data'] = {
@@ -154,10 +155,10 @@ export class ConversionsAPIService {
     orderId?: string;
   }): Promise<void> {
     try {
-      const userData: ConversionEvent['user_data'] = {
+      const userData = buildUserDataWithAppUser({
         external_id: data.userId,
         email_address: data.email,
-      };
+      });
 
       const customData: ConversionEvent['custom_data'] = {
         value: data.value,

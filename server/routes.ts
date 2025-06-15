@@ -47,6 +47,7 @@ import { slaMonitor } from "./slaMonitor";
 import { aiStressTestInjector } from "./aiStressTest";
 import { weeklySlackReporter } from "./weeklySlackReporter";
 import { facebookAnalytics } from "./facebookAnalytics";
+import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion } from "./conversionsAPIService";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4295,6 +4296,321 @@ Prioritize by impact and feasibility.`;
       res.json({
         message: 'Optimization recommendations generated successfully',
         recommendations
+      });
+    } catch (error) {
+      console.error('Error generating optimization recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate optimization recommendations' });
+    }
+  });
+
+  // Initialize Conversions API on startup
+  const PIXEL_ID = "1230928114675791"; // Extracted from your app token
+  const CONVERSIONS_ACCESS_TOKEN = "EAAd0l5qoAb0BOZC4pYeYQBiNgJTglZBFuOprwc57Poe6xGkqnKGoKR3zXykrRqwaHtrJScDpH6bLT5dveNycjfp8kZAxEnZBim3g7j965w4ZBvZBxfL37KOz965znapFZBBcOPBFA5ZBdnAQ5YSkw90ngo9rXpuDr4mojRArChu1Ka6I8bhvZAbr3DeYUIE4LsQZDZD";
+  
+  // Initialize Conversions API service
+  const conversionsService = initializeConversionsAPI({
+    pixelId: PIXEL_ID,
+    accessToken: CONVERSIONS_ACCESS_TOKEN,
+    testEventCode: "TEST12345" // You can change this for testing
+  });
+
+  // Facebook Conversions API Routes
+  app.post('/api/conversions/track-event', isAuthenticated, async (req: any, res) => {
+    try {
+      const { eventName, userData, customData, actionSource = 'website' } = req.body;
+      
+      if (!eventName || !userData) {
+        return res.status(400).json({ error: 'eventName and userData are required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.trackCustomEvent(eventName, userData, customData, actionSource);
+      
+      res.json({
+        message: 'Event tracked successfully',
+        eventName,
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking conversion event:', error);
+      res.status(500).json({ error: 'Failed to track conversion event' });
+    }
+  });
+
+  app.post('/api/conversions/track-purchase', isAuthenticated, async (req: any, res) => {
+    try {
+      const { userData, purchaseData } = req.body;
+      
+      if (!userData || !purchaseData?.value || !purchaseData?.currency) {
+        return res.status(400).json({ error: 'userData, value, and currency are required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.trackPurchase(userData, purchaseData);
+      
+      res.json({
+        message: 'Purchase tracked successfully',
+        value: purchaseData.value,
+        currency: purchaseData.currency,
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking purchase:', error);
+      res.status(500).json({ error: 'Failed to track purchase' });
+    }
+  });
+
+  app.post('/api/conversions/track-lead', isAuthenticated, async (req: any, res) => {
+    try {
+      const { userData, leadData } = req.body;
+      
+      if (!userData) {
+        return res.status(400).json({ error: 'userData is required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.trackLead(userData, leadData);
+      
+      res.json({
+        message: 'Lead tracked successfully',
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking lead:', error);
+      res.status(500).json({ error: 'Failed to track lead' });
+    }
+  });
+
+  app.post('/api/conversions/track-page-view', isAuthenticated, async (req: any, res) => {
+    try {
+      const { userData, customData } = req.body;
+      
+      if (!userData) {
+        return res.status(400).json({ error: 'userData is required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.trackPageView(userData, customData);
+      
+      res.json({
+        message: 'Page view tracked successfully',
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking page view:', error);
+      res.status(500).json({ error: 'Failed to track page view' });
+    }
+  });
+
+  app.post('/api/conversions/track-ecommerce', isAuthenticated, async (req: any, res) => {
+    try {
+      const { eventType, data } = req.body;
+      
+      if (!eventType || !data?.userId || !data?.value || !data?.currency) {
+        return res.status(400).json({ error: 'eventType, userId, value, and currency are required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.trackEcommerceEvent(eventType, data);
+      
+      res.json({
+        message: `${eventType} event tracked successfully`,
+        eventType,
+        value: data.value,
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking e-commerce event:', error);
+      res.status(500).json({ error: 'Failed to track e-commerce event' });
+    }
+  });
+
+  app.post('/api/conversions/batch-events', isAuthenticated, async (req: any, res) => {
+    try {
+      const { events } = req.body;
+      
+      if (!events || !Array.isArray(events) || events.length === 0) {
+        return res.status(400).json({ error: 'events array is required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const result = await service.batchTrackEvents(events);
+      
+      res.json({
+        message: `Batch of ${events.length} events tracked successfully`,
+        eventsCount: events.length,
+        result
+      });
+    } catch (error) {
+      console.error('Error tracking batch events:', error);
+      res.status(500).json({ error: 'Failed to track batch events' });
+    }
+  });
+
+  app.get('/api/conversions/metrics', isAuthenticated, async (req: any, res) => {
+    try {
+      const { start, end } = req.query;
+      const timeRange = {
+        start: start ? new Date(start as string) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        end: end ? new Date(end as string) : new Date()
+      };
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const metrics = await service.getConversionMetrics(timeRange);
+      
+      res.json({
+        message: 'Conversion metrics retrieved successfully',
+        timeRange,
+        metrics
+      });
+    } catch (error) {
+      console.error('Error getting conversion metrics:', error);
+      res.status(500).json({ error: 'Failed to get conversion metrics' });
+    }
+  });
+
+  app.post('/api/conversions/create-audience', isAuthenticated, async (req: any, res) => {
+    try {
+      const { name, description, events, timeWindow, minValue } = req.body;
+      
+      if (!name || !events || !Array.isArray(events) || !timeWindow) {
+        return res.status(400).json({ error: 'name, events array, and timeWindow are required' });
+      }
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const audience = await service.createCustomAudience({
+        name,
+        description,
+        events,
+        timeWindow,
+        minValue
+      });
+      
+      res.json({
+        message: 'Custom audience created successfully',
+        audience
+      });
+    } catch (error) {
+      console.error('Error creating custom audience:', error);
+      res.status(500).json({ error: 'Failed to create custom audience' });
+    }
+  });
+
+  app.get('/api/conversions/attribution-analysis', isAuthenticated, async (req: any, res) => {
+    try {
+      const { events, timeWindow } = req.query;
+      const conversionEvents = events ? (events as string).split(',') : ['Purchase', 'Lead', 'Contact'];
+      const window = timeWindow ? parseInt(timeWindow as string) : 30;
+
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const attribution = await service.analyzeAttribution(conversionEvents, window);
+      
+      res.json({
+        message: 'Attribution analysis completed',
+        events: conversionEvents,
+        timeWindow: window,
+        attribution
+      });
+    } catch (error) {
+      console.error('Error analyzing attribution:', error);
+      res.status(500).json({ error: 'Failed to analyze attribution' });
+    }
+  });
+
+  app.post('/api/conversions/optimize', isAuthenticated, async (req: any, res) => {
+    try {
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const optimization = await service.optimizeConversions();
+      
+      res.json({
+        message: 'Conversion optimization analysis completed',
+        optimization
+      });
+    } catch (error) {
+      console.error('Error optimizing conversions:', error);
+      res.status(500).json({ error: 'Failed to optimize conversions' });
+    }
+  });
+
+  app.post('/api/conversions/test-setup', isAuthenticated, async (req: any, res) => {
+    try {
+      const service = getConversionsAPIService();
+      if (!service) {
+        return res.status(500).json({ error: 'Conversions API not initialized' });
+      }
+
+      const testResults = await service.testConversionSetup();
+      
+      res.json({
+        message: 'Conversion setup test completed',
+        testResults
+      });
+    } catch (error) {
+      console.error('Error testing conversion setup:', error);
+      res.status(500).json({ error: 'Failed to test conversion setup' });
+    }
+  });
+
+  // Auto-track customer interactions as conversions
+  app.post('/api/conversions/auto-track-interaction', isAuthenticated, async (req: any, res) => {
+    try {
+      const { interactionId, conversionValue, currency, eventName } = req.body;
+      
+      if (!interactionId) {
+        return res.status(400).json({ error: 'interactionId is required' });
+      }
+
+      await autoTrackConversion(interactionId, {
+        value: conversionValue,
+        currency: currency || 'USD',
+        eventName
+      });
+      
+      res.json({
+        message: 'Customer interaction tracked as conversion',
+        interactionId,
+        conversionValue,
+        currency: currency || 'USD'
       });
     } catch (error) {
       console.error('Error generating optimization recommendations:', error);

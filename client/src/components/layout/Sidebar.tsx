@@ -19,7 +19,8 @@ import {
   X,
   TestTube,
   Activity,
-  Zap
+  Zap,
+  Target
 } from "lucide-react";
 
 interface SidebarProps {
@@ -34,6 +35,7 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: BarChart3, badge: "LIVE" },
   { name: "Facebook Analytics", href: "/facebook-analytics", icon: BarChart3, badge: "PIXEL" },
   { name: "Facebook Setup", href: "/facebook-setup", icon: Settings, badge: "CONFIG" },
+  { name: "Conversions API", href: "/facebook-conversions", icon: Target, badge: "LIVE" },
   { name: "Page Status", href: "/page-status", icon: Shield, badge: "LIVE" },
   { name: "Customer Service", href: "/customer-service", icon: Headphones, status: "Live" },
   { name: "SmartInbox AI", href: "/smart-inbox", icon: Bot, badge: "AI" },

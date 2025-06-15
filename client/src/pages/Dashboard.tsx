@@ -31,9 +31,9 @@ export default function Dashboard() {
           {/* Dashboard Header */}
           <div className="flex flex-col space-y-3 sm:space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">PagePilot AI Dashboard</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">SaCuRa AI Dashboard</h1>
               <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                AI-powered social media management overview
+                AI-powered Facebook marketing automation platform
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">

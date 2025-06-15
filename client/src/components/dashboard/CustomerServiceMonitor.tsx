@@ -16,12 +16,12 @@ export default function CustomerServiceMonitor() {
   const stats = useMemo(() => {
     const totalInteractions = interactions.length;
     const pending = interactions.filter(i => i.status === 'pending').length;
-    const resolved = interactions.filter(i => i.status === 'resolved').length;
+    const responded = interactions.filter(i => i.status === 'responded').length;
     const avgResponseTime = interactions.length > 0 
       ? interactions.reduce((sum, i) => sum + (i.responseTime || 0), 0) / interactions.length 
       : 0;
 
-    return { totalInteractions, pending, resolved, avgResponseTime };
+    return { totalInteractions, pending, responded, avgResponseTime };
   }, [interactions]);
 
   const recentInteractions = useMemo(() => 
@@ -116,8 +116,8 @@ export default function CustomerServiceMonitor() {
               <div className="text-xs sm:text-sm text-muted-foreground">Pending</div>
             </div>
             <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{stats.resolved}</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Resolved</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{stats.responded}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Responded</div>
             </div>
             <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
               <div className="text-lg sm:text-xl md:text-2xl font-bold">{Math.round(stats.avgResponseTime)}s</div>
@@ -157,7 +157,7 @@ export default function CustomerServiceMonitor() {
                     </div>
                     <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 flex-wrap">
                       <div className="flex items-center space-x-2">
-                        {interaction.aiGenerated && (
+                        {interaction.isAutoResponse && (
                           <Badge variant="outline" className="flex items-center gap-1 text-xs">
                             <Bot className="h-2 w-2 sm:h-3 sm:w-3" />
                             AI

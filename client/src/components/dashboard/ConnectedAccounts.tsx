@@ -7,7 +7,7 @@ import { FacebookPage } from "@/types";
 
 export default function ConnectedAccounts() {
   const { data: pages = [], isLoading } = useQuery<FacebookPage[]>({
-    queryKey: ['/api/dashboard/pages'],
+    queryKey: ['/api/facebook/pages'],
   });
 
   const formatFollowerCount = (count?: number) => {

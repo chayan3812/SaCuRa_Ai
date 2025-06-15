@@ -5,7 +5,7 @@ import { Employee } from "@/types";
 
 export default function EmployeeMonitor() {
   const { data: employees = [], isLoading } = useQuery<Employee[]>({
-    queryKey: ['/api/employees'],
+    queryKey: ['/api/dashboard/employees'],
   });
 
   const formatTime = (seconds?: number) => {

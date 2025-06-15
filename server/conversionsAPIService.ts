@@ -200,13 +200,13 @@ export class ConversionsAPIService {
     campaign?: string;
   }): Promise<void> {
     try {
-      const userData: ConversionEvent['user_data'] = {
+      const userData = buildUserDataWithAppUser({
         external_id: leadData.userId,
         email_address: leadData.email,
         phone_number: leadData.phone,
         first_name: leadData.firstName,
         last_name: leadData.lastName,
-      };
+      });
 
       const customData: ConversionEvent['custom_data'] = {
         value: leadData.leadValue || 0,

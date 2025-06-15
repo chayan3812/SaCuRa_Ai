@@ -164,7 +164,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-in zoom-in duration-500 delay-300">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
@@ -173,7 +173,7 @@ export default function Dashboard() {
                       {formatNumber(metrics?.totalResponses || 0)}
                     </p>
                   </div>
-                  <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-purple-200 flex-shrink-0" />
+                  <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-purple-200 flex-shrink-0 group-hover:animate-spin" />
                 </div>
                 <div className="mt-2">
                   <span className="text-xs text-purple-100">
@@ -184,7 +184,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group animate-in zoom-in duration-500 delay-[400ms]">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
@@ -193,7 +193,7 @@ export default function Dashboard() {
                       {metrics?.avgResponseTime || 0}s
                     </p>
                   </div>
-                  <Target className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-orange-200 flex-shrink-0" />
+                  <Target className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-orange-200 flex-shrink-0 group-hover:animate-ping" />
                 </div>
                 <div className="mt-2">
                   <span className="text-xs text-orange-100">
@@ -205,11 +205,11 @@ export default function Dashboard() {
           </div>
 
           {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 animate-in slide-in-from-bottom duration-700 delay-200">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6 animate-in slide-in-from-left duration-600 delay-300">
               {/* Performance Chart */}
-              <Card>
+              <Card className="hover:shadow-lg transition-shadow duration-300 animate-in zoom-in duration-500 delay-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-blue-600" />
@@ -306,7 +306,7 @@ export default function Dashboard() {
             </div>
 
             {/* Right Column - Sidebar Content */}
-            <div className="space-y-6">
+            <div className="space-y-6 animate-in slide-in-from-right duration-600 delay-400">
               {/* Live System Status */}
               <LiveSystemStatus />
               
@@ -325,7 +325,7 @@ export default function Dashboard() {
           </div>
 
           {/* Advanced Analytics Section */}
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in duration-800 delay-500">
             {/* Real-Time Data Visualizer */}
             <RealTimeDataVisualizer />
             

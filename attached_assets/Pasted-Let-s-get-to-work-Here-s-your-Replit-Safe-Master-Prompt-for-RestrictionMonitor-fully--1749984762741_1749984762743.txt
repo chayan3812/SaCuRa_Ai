@@ -1,0 +1,87 @@
+Let's get to work.
+
+Here’s your 🛡️ **Replit-Safe Master Prompt for `RestrictionMonitor`**, fully wrapped with the ⚙️ Full Pre-Check Logic Framework. This will convert the dummy alert viewer into a live monitoring module using real Facebook API checks + AI policy evaluation.
+
+---
+
+### 🧠 MASTER PROMPT: Enable Live RestrictionMonitor
+
+**Objective:** Replace simulated restriction alerts with real-time Facebook Page health checks and AI-powered policy flagging.
+
+---
+
+```ts
+// === ⚙️ PRE-CHECK LOGIC (DO NOT SKIP) ===
+
+// ✅ 1. CHECK if `PageWatcher` exists in `server/modules/PageWatcher.ts`
+//   → If yes, ENHANCE `runPageWatcher()` — do not replace.
+// ✅ 2. CHECK if `restrictionAlerts` table is defined in `shared/schema.ts` — if not, define it.
+// ✅ 3. CHECK if `getFacebookPagesByUser()` exists in `storage.ts` — use it to retrieve tokens/pageIds
+// ✅ 4. CHECK if `FacebookAPIService` includes a page health checker (e.g. `getPageInfo()`)
+//   → If missing, implement it to call: `GET https://graph.facebook.com/v18.0/{page-id}?fields=...`
+// ✅ 5. CHECK if `checkPolicyCompliance()` from `openai.ts` is imported — use it to scan page/post content
+// ✅ 6. FOR each connected Page:
+//   → Fetch basic health info (can post, has violations, latest posts)
+//   → If suspected issue, run `checkPolicyCompliance()` on recent posts
+// ✅ 7. IF AI flags risk:
+//   → INSERT record in `restrictionAlerts` table with { pageId, riskLevel, summary, content, createdAt }
+// ✅ 8. EMIT `socket.emit('restriction-alert', ...)` on detection
+// ✅ 9. ENSURE frontend `RestrictionMonitor.tsx` listens to this and updates UI
+// ✅ 10. Wrap all backend changes with:
+//     // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
+
+// === ✅ IMPLEMENTATION OBJECTIVES BELOW ===
+
+// 1. In `PageWatcher.ts`, enhance `runPageWatcher()`:
+- FOR each connected Facebook page:
+  - CALL `FacebookAPIService.getPageInfo(pageId, token)`
+  - IF page cannot publish, OR recent post contains policy-sensitive content:
+      - CALL `checkPolicyCompliance(post.message)`
+      - IF `riskLevel !== "Low"`:
+          - SAVE new alert in `restrictionAlerts` (skip duplicates)
+          - EMIT socket event with alert info
+          - LOG to console with summary
+
+// 2. In `facebook.ts`, implement:
+async function getPageInfo(pageId: string, token: string) {
+  const res = await fetch(`https://graph.facebook.com/v18.0/${pageId}?fields=can_post,name,about,posts.limit(3){message}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Failed to fetch page info');
+  return data;
+}
+
+// 3. In `storage.ts`, implement:
+export async function createRestrictionAlert(alert: {
+  pageId: string,
+  content: string,
+  summary: string,
+  riskLevel: string,
+  createdAt: Date
+}) {
+  return db.insert(restrictionAlerts).values(alert);
+}
+
+// 4. In `RestrictionMonitor.tsx` (frontend):
+- LISTEN to `socket.on('restriction-alert', handler)`
+- DISPLAY new alerts live
+- ALLOW admin to mark alert as reviewed (via API)
+
+```
+
+---
+
+### ✅ Acceptance Criteria (Post-Run Check)
+
+* `runPageWatcher()` calls real Facebook API for page status
+* AI policy scanner flags real posts if risky
+* Alerts are saved in `restrictionAlerts` table
+* Socket emits live events (`restriction-alert`)
+* Frontend updates live with new alerts
+* No duplication, mock alerts removed
+* Pre-check standards fully followed
+
+---
+
+Say `Ready for verification` once Replit completes it, and I’ll scan results + prep the next module (like `CompetitorAnalysis` or `HybridAI Switching`). Let’s keep leveling this platform up.

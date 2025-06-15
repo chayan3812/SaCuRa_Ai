@@ -111,6 +111,10 @@ export interface IStorage {
   createScheduledPost(postData: any): Promise<any>;
   deleteScheduledPost(id: string): Promise<void>;
   
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
+  getAllFacebookPages(): Promise<FacebookPage[]>;
+  getAdAccountsByUser(userId: string): Promise<any[]>;
+  
   // Dashboard Analytics
   getDashboardMetrics(userId: string): Promise<{
     totalSpend: number;
@@ -587,6 +591,15 @@ export class DatabaseStorage implements IStorage {
 
   async deletePostingSchedule(scheduleId: string): Promise<void> {
     await db.delete(postingSchedules).where(eq(postingSchedules.id, scheduleId));
+  }
+
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
+  async getAllFacebookPages(): Promise<FacebookPage[]> {
+    return await db.select().from(facebookPages);
+  }
+
+  async getAdAccountsByUser(userId: string): Promise<any[]> {
+    return await db.select().from(facebookAdAccounts).where(eq(facebookAdAccounts.userId, userId));
   }
 
   // Dashboard Analytics

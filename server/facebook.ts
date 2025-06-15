@@ -278,6 +278,78 @@ export class FacebookAPIService {
       throw new Error(`Failed to publish post: ${error.response?.data?.error?.message || error.message}`);
     }
   }
+
+  // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
+  /**
+   * Get comprehensive page information for health monitoring
+   */
+  async getPageInfo(pageId: string, accessToken: string): Promise<{
+    id: string;
+    name: string;
+    about?: string;
+    can_post: boolean;
+    posts?: any[];
+    category?: string;
+    restrictions?: any[];
+  }> {
+    try {
+      const response = await axios.get(
+        `https://graph.facebook.com/v19.0/${pageId}`,
+        {
+          params: {
+            access_token: accessToken,
+            fields: 'id,name,about,can_post,category,posts.limit(5){id,message,created_time,story}'
+          }
+        }
+      );
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching page info:', error.response?.data || error.message);
+      throw new Error(`Failed to fetch page info: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
+  /**
+   * Check if page has posting restrictions
+   */
+  async checkPageRestrictions(pageId: string, accessToken: string): Promise<{
+    hasRestrictions: boolean;
+    restrictions: any[];
+    canPost: boolean;
+  }> {
+    try {
+      const pageInfo = await this.getPageInfo(pageId, accessToken);
+      
+      // Check for obvious restrictions
+      const hasRestrictions = !pageInfo.can_post;
+      const restrictions = [];
+      
+      if (!pageInfo.can_post) {
+        restrictions.push({
+          type: 'posting_disabled',
+          severity: 'critical',
+          message: 'Page posting is currently disabled'
+        });
+      }
+      
+      return {
+        hasRestrictions,
+        restrictions,
+        canPost: pageInfo.can_post
+      };
+    } catch (error: any) {
+      return {
+        hasRestrictions: true,
+        restrictions: [{
+          type: 'api_error',
+          severity: 'high',
+          message: error.message
+        }],
+        canPost: false
+      };
+    }
+  }
 }
 
 // OAuth Helper Functions

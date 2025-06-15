@@ -182,4 +182,23 @@ async function sendMessage(recipientId: string, messageText: string) {
   }
 }
 
+// Main webhook event handler function for external use
+export async function handleWebhookEvent(body: any) {
+  try {
+    if (body.object === "page") {
+      body.entry?.forEach((entry: any) => {
+        entry.messaging?.forEach(async (event: any) => {
+          if (event.message) {
+            await handleMessage(event);
+          } else if (event.postback) {
+            await handlePostback(event);
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.error("Error processing webhook event:", error);
+  }
+}
+
 export default router;

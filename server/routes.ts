@@ -77,20 +77,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const body = req.body;
 
-      // Process incoming messages
+      // Process incoming messages using webhook module
       if (body.object === "page") {
-        body.entry?.forEach((entry: any) => {
-          entry.messaging?.forEach(async (event: any) => {
-            if (event.message) {
-              const senderId = event.sender.id;
-              const messageText = event.message.text;
-              
-              console.log(`Message from ${senderId}: ${messageText}`);
-              
-              // Message processing is handled by the webhook module
-            }
-          });
-        });
+        const { handleWebhookEvent } = await import('./webhooks/facebook');
+        await handleWebhookEvent(body);
       }
 
       // Always respond with 200 to acknowledge receipt

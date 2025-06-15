@@ -43,6 +43,8 @@ const navigation = [
   { name: "AI Version Manager", href: "/ai-version-manager", icon: Brain, badge: "FEEDBACK LOOP" },
   { name: "AI Model Dashboard", href: "/ai-model", icon: TestTube, badge: "A/B TEST" },
   { name: "Weekly AI Intelligence", href: "/weekly-ai-intelligence", icon: Calendar, badge: "REPORTS" },
+  { name: "Agent Co-Pilot", href: "/agent-copilot", icon: Zap, badge: "ELITE" },
+  { name: "SLA Dashboard", href: "/sla-dashboard", icon: Activity, badge: "MONITOR" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

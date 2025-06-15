@@ -26,7 +26,7 @@ interface PageInfo {
 export class FacebookTokenManager {
   private appId: string;
   private appSecret: string;
-  private baseUrl = 'https://graph.facebook.com/v18.0';
+  private baseUrl = 'https://graph.facebook.com/v21.0';
 
   constructor() {
     this.appId = process.env.FACEBOOK_APP_ID || '';
@@ -39,11 +39,32 @@ export class FacebookTokenManager {
 
   generateLoginUrl(redirectUri: string): string {
     const scopes = [
+      // Core Page Management (Standard Access)
       'pages_manage_metadata',
       'pages_read_engagement',
       'pages_manage_posts',
       'pages_read_user_content',
-      'business_management'
+      'pages_show_list',
+      
+      // Messaging & Customer Service (Standard Access)
+      'pages_messaging',
+      'pages_messaging_subscriptions',
+      
+      // Business Management (Standard Access)
+      'business_management',
+      
+      // Marketing & Ads (Advanced Access Required)
+      'ads_management',
+      'ads_read',
+      
+      // Instagram Integration (Standard Access)
+      'instagram_basic',
+      'instagram_manage_comments',
+      'instagram_manage_insights',
+      
+      // Analytics & Insights (Standard Access)
+      'read_insights',
+      'pages_read_user_content'
     ].join(',');
 
     const params = new URLSearchParams({
@@ -54,7 +75,7 @@ export class FacebookTokenManager {
       state: Math.random().toString(36).substring(7)
     });
 
-    return `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`;
+    return `https://www.facebook.com/v21.0/dialog/oauth?${params.toString()}`;
   }
 
   async exchangeCodeForToken(code: string, redirectUri: string): Promise<TokenResult> {

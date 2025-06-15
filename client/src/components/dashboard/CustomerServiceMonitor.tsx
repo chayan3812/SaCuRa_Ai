@@ -42,7 +42,7 @@ export default function CustomerServiceMonitor() {
   const getStatusBadge = useCallback((status: string) => {
     const variants = {
       pending: { variant: "secondary" as const, icon: Clock },
-      resolved: { variant: "default" as const, icon: CheckCircle },
+      responded: { variant: "default" as const, icon: CheckCircle },
       escalated: { variant: "destructive" as const, icon: Activity }
     };
     

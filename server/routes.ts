@@ -425,6 +425,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/dashboard/employees', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const employees = await storage.getEmployeesByUser(userId);
+      res.json(employees);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      res.status(500).json({ message: 'Failed to fetch employees' });
+    }
+  });
+
   // Customer service routes
   app.get('/api/customer-service/interactions/:pageId', isAuthenticated, async (req, res) => {
     try {

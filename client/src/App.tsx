@@ -29,6 +29,7 @@ import SLADashboard from "@/pages/SLADashboard";
 import AdminAIReplay from "@/pages/AdminAIReplay";
 import AdminAIDigest from "@/pages/AdminAIDigest";
 import FacebookAnalytics from "@/pages/FacebookAnalytics";
+import FacebookSetup from "@/pages/FacebookSetup";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
 import AutoPoster from "@/pages/AutoPoster";
@@ -95,6 +96,7 @@ function Router() {
             <Route path="/admin/ai-replay" component={AdminAIReplay} />
             <Route path="/admin/ai-digest" component={AdminAIDigest} />
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
+            <Route path="/facebook-setup" component={FacebookSetup} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

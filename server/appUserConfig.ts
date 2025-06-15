@@ -12,11 +12,11 @@ export interface AppUserConfiguration {
 }
 
 export const APP_USER_CONFIG: AppUserConfiguration = {
-  appUserId: '1493601725381462',
+  appUserId: '4026499934285415',
   pixelId: '1230928114675791',
   accessToken: process.env.FACEBOOK_ACCESS_TOKEN || '',
   conversionsToken: process.env.FACEBOOK_CONVERSIONS_TOKEN || '',
-  appId: process.env.FACEBOOK_APP_ID || '1230928114675791',
+  appId: '4026499934285415',
 };
 
 /**

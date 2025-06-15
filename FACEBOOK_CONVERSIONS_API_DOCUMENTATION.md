@@ -18,14 +18,14 @@ The Facebook Conversions API integration provides advanced server-side conversio
 ## Live Credentials Configuration
 
 ### Facebook App Configuration
-- **App ID**: 1230928114675791
+- **App ID**: 4026499934285415 (Primary Facebook App)
 - **Pixel ID**: 1230928114675791 (extracted from app token)
-- **App User ID**: 1493601725381462 (Primary attribution identifier for all conversion events)
+- **App User ID**: 4026499934285415 (Primary attribution identifier for all conversion events)
 - **Access Token**: EAARfhckE8E8BO3W2RgbpfkL4LcxBf3QMiPXB7qKVTm21u32wFdpAyxd3FjWd9BcGVxbmrBU2OcmcSxqcyTAS3cwB5fYSKZCVpNvEISloN5JmzFDXwZBU42OQE6pvkWZCPiITm9r9SQrzExZBwNC06EboHxb0q8sUMZChjhIiJCxMFvoSSCRou2G5I87qOxOIjGhl2OywZD
 - **Conversions API Token**: EAAd0l5qoAb0BOZC4pYeYQBiNgJTglZBFuOprwc57Poe6xGkqnKGoKR3zXykrRqwaHtrJScDpH6bLT5dveNycjfp8kZAxEnZBim3g7j965w4ZBvZBxfL37KOz965znapFZBBcOPBFA5ZBdnAQ5YSkw90ngo9rXpuDr4mojRArChu1Ka6I8bhvZAbr3DeYUIE4LsQZDZD
 
 ### Attribution Configuration
-All conversion events automatically include the App User ID `1493601725381462` in the `fb_login_id` field for consistent attribution across your Facebook advertising ecosystem. This ensures proper conversion tracking and attribution to your specific Facebook app user account.
+All conversion events automatically include the App User ID `4026499934285415` in the `fb_login_id` field for consistent attribution across your Facebook advertising ecosystem. This ensures proper conversion tracking and attribution to your specific Facebook app user account.
 
 ### Environment Variables
 ```env

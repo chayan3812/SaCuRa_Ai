@@ -3,7 +3,7 @@
  * Verifies that all Facebook Conversions API events include the correct App User ID
  */
 
-const APP_USER_ID = '1493601725381462';
+const APP_USER_ID = '4026499934285415';
 
 class AppUserAttributionTester {
   constructor() {

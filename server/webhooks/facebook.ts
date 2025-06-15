@@ -17,13 +17,19 @@ router.get("/", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  console.log("Verification params:", { mode, token, challenge });
+  console.log("Facebook webhook verification:", { mode, token, challenge });
+  console.log("Expected token:", VERIFY_TOKEN);
 
   if (mode === "subscribe" && token === VERIFY_TOKEN) {
     console.log("Webhook verification successful");
     return res.status(200).send(challenge);
   } else {
-    console.log("Webhook verification failed - invalid token");
+    console.log("Webhook verification failed:", {
+      modeMatch: mode === "subscribe",
+      tokenMatch: token === VERIFY_TOKEN,
+      receivedToken: token,
+      expectedToken: VERIFY_TOKEN
+    });
     return res.sendStatus(403);
   }
 });

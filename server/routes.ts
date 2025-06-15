@@ -51,45 +51,9 @@ import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Facebook webhook verification (must be before auth middleware)
-  app.get('/webhook/facebook', (req, res) => {
-    const VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || "sacura_ai_webhook_token_2025";
-    
-    const mode = req.query["hub.mode"];
-    const token = req.query["hub.verify_token"];
-    const challenge = req.query["hub.challenge"];
-
-    console.log("Facebook webhook verification:", { mode, token, challenge });
-
-    if (mode === "subscribe" && token === VERIFY_TOKEN) {
-      console.log("Webhook verification successful");
-      return res.status(200).send(challenge);
-    } else {
-      console.log("Webhook verification failed - invalid token");
-      return res.sendStatus(403);
-    }
-  });
-
-  // Facebook webhook events (must be before auth middleware)
-  app.post('/webhook/facebook', async (req, res) => {
-    console.log("Facebook webhook event received:", JSON.stringify(req.body, null, 2));
-    
-    try {
-      const body = req.body;
-
-      // Process incoming messages using webhook module
-      if (body.object === "page") {
-        const { handleWebhookEvent } = await import('./webhooks/facebook');
-        await handleWebhookEvent(body);
-      }
-
-      // Always respond with 200 to acknowledge receipt
-      res.status(200).send("EVENT_RECEIVED");
-    } catch (error) {
-      console.error("Error processing webhook event:", error);
-      res.status(500).send("Error processing event");
-    }
-  });
+  // Facebook webhook routes (must be before auth middleware)
+  const facebookWebhookRouter = await import('./webhooks/facebook');
+  app.use('/webhook/facebook', facebookWebhookRouter.default);
 
   // Auth middleware
   await setupAuth(app);

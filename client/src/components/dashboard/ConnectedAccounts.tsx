@@ -1,13 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Facebook, Plus, ExternalLink } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Facebook, Plus, ExternalLink, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { FacebookPage } from "@/types";
+import { useState } from "react";
 
 export default function ConnectedAccounts() {
-  const { data: pages = [], isLoading } = useQuery<FacebookPage[]>({
+  const [isConnecting, setIsConnecting] = useState(false);
+  const { data: pages = [], isLoading, error } = useQuery<FacebookPage[]>({
     queryKey: ['/api/facebook/pages'],
+    retry: false,
   });
 
   const formatFollowerCount = (count?: number) => {
@@ -17,8 +21,25 @@ export default function ConnectedAccounts() {
     return count.toString();
   };
 
-  const handleConnectPage = () => {
-    window.location.href = '/api/facebook/auth';
+  const handleConnectPage = async () => {
+    try {
+      setIsConnecting(true);
+      // First check if Facebook credentials are properly configured
+      const response = await fetch('/api/facebook/verify-credentials');
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to verify Facebook configuration');
+      }
+      
+      // If credentials are valid, proceed with authentication
+      window.location.href = '/api/facebook/auth';
+    } catch (error) {
+      console.error('Facebook connection error:', error);
+      setIsConnecting(false);
+      // Show error to user
+      alert('Facebook connection failed. Please check your Facebook app configuration.');
+    }
   };
 
   if (isLoading) {
@@ -64,7 +85,16 @@ export default function ConnectedAccounts() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {pages.length === 0 ? (
+          {error && (
+            <Alert className="border-red-200 bg-red-50">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                Unable to load Facebook pages. Please check your Facebook app configuration and ensure valid access tokens are provided.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {pages.length === 0 && !error ? (
             <div className="text-center py-8 text-muted-foreground">
               <Facebook className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p className="mb-2">No Facebook pages connected</p>
@@ -99,10 +129,20 @@ export default function ConnectedAccounts() {
           
           <Button 
             onClick={handleConnectPage}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isConnecting}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Connect New Page
+            {isConnecting ? (
+              <>
+                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                Connecting...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Connect New Page
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

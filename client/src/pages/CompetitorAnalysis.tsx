@@ -83,7 +83,8 @@ export default function CompetitorAnalysis() {
 
   // Keyword Extraction State
   const [keywordPages, setKeywordPages] = useState(['']);
-  const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
+  const [extractedKeywords, setExtractedKeywords] = useState<Record<string, number>>({});
+  const [contentThemes, setContentThemes] = useState<string[]>([]);
   const [analysisResult, setAnalysisResult] = useState<{
     posts: CompetitorPost[];
     analysis: CompetitorAnalysisResult;
@@ -214,11 +215,17 @@ export default function CompetitorAnalysis() {
       });
     },
     onSuccess: (data) => {
-      setExtractedKeywords(data.keywords || []);
+      setExtractedKeywords(data.keywordCounts || {});
       toast({
         title: "Keywords Extracted",
-        description: `Found ${data.keywords?.length || 0} keywords from ${data.postsAnalyzed} posts`,
+        description: `Found ${Object.keys(data.keywordCounts || {}).length} keywords from ${data.postsAnalyzed} posts`,
       });
+      
+      // Automatically generate content themes
+      const keywords = Object.keys(data.keywordCounts || {});
+      if (keywords.length > 0) {
+        contentThemesMutation.mutate(keywords);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -226,6 +233,23 @@ export default function CompetitorAnalysis() {
         description: error.message || "Failed to extract keywords",
         variant: "destructive",
       });
+    }
+  });
+
+  // Content Themes Generation Mutation
+  const contentThemesMutation = useMutation({
+    mutationFn: async (keywords: string[]) => {
+      return apiRequest('/api/competitor/content-themes', {
+        method: 'POST',
+        body: JSON.stringify({ keywords }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: (data) => {
+      setContentThemes(data.themes || []);
+    },
+    onError: (error: any) => {
+      console.error('Content themes generation failed:', error);
     }
   });
 
@@ -828,60 +852,144 @@ export default function CompetitorAnalysis() {
               </CardContent>
             </Card>
 
-            {/* Keyword Heatmap Results */}
-            {extractedKeywords.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-purple-600" />
-                    Keyword Heatmap ({extractedKeywords.length} keywords found)
-                  </CardTitle>
-                  <CardDescription>
-                    Trending keywords, hashtags, and phrases extracted from competitor posts
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                    {extractedKeywords.map((keyword, index) => (
-                      <div
-                        key={index}
-                        className="group relative"
-                      >
-                        <span
-                          className="inline-block text-xs sm:text-sm px-3 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900 dark:to-purple-900 dark:text-blue-200 hover:from-blue-200 hover:to-purple-200 dark:hover:from-blue-800 dark:hover:to-purple-800 transition-all duration-200 cursor-pointer border border-blue-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transform hover:scale-105"
-                          title={`Keyword: ${keyword}`}
-                        >
-                          #{keyword.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')}
-                        </span>
-                        {/* Tooltip */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                          {keyword}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6 flex justify-between items-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Click keywords to copy • Hover for full text
+            {/* Weighted Keyword Heatmap Results */}
+            {Object.keys(extractedKeywords).length > 0 && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="h-5 w-5 text-purple-600" />
+                      Weighted Keyword Heatmap ({Object.keys(extractedKeywords).length} keywords found)
+                    </CardTitle>
+                    <CardDescription>
+                      Trending keywords sized by frequency - larger keywords appear more often in competitor posts
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {Object.entries(extractedKeywords)
+                        .sort(([,a], [,b]) => b - a) // Sort by frequency
+                        .map(([keyword, frequency], index) => {
+                          const maxFreq = Math.max(...Object.values(extractedKeywords));
+                          const minFreq = Math.min(...Object.values(extractedKeywords));
+                          const normalizedSize = minFreq === maxFreq ? 1 : (frequency - minFreq) / (maxFreq - minFreq);
+                          
+                          // Calculate dynamic font size (0.75rem to 2rem)
+                          const fontSize = 0.75 + (normalizedSize * 1.25);
+                          // Calculate color intensity (higher frequency = more intense)
+                          const intensity = Math.round(50 + (normalizedSize * 50));
+                          
+                          return (
+                            <div
+                              key={keyword}
+                              className="group relative"
+                            >
+                              <span
+                                className="inline-block px-3 py-2 rounded-full bg-gradient-to-r cursor-pointer transition-all duration-200 hover:shadow-lg transform hover:scale-105 border"
+                                style={{
+                                  fontSize: `${fontSize}rem`,
+                                  background: `linear-gradient(135deg, 
+                                    hsl(220, ${intensity}%, ${95 - normalizedSize * 20}%), 
+                                    hsl(280, ${intensity}%, ${90 - normalizedSize * 15}%))`,
+                                  color: `hsl(220, ${intensity + 20}%, ${30 - normalizedSize * 10}%)`,
+                                  borderColor: `hsl(220, ${intensity}%, ${80 - normalizedSize * 20}%)`
+                                }}
+                                title={`Keyword: ${keyword} (appears ${frequency} times)`}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(keyword);
+                                  toast({
+                                    title: "Copied!",
+                                    description: `"${keyword}" copied to clipboard`,
+                                  });
+                                }}
+                              >
+                                #{keyword.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')}
+                              </span>
+                              {/* Enhanced Tooltip with Frequency */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                                <div className="font-semibold">{keyword}</div>
+                                <div className="text-gray-300">Frequency: {frequency}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const keywordText = extractedKeywords.join(', ');
-                        navigator.clipboard.writeText(keywordText);
-                        toast({
-                          title: "Copied!",
-                          description: "All keywords copied to clipboard",
-                        });
-                      }}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Export Keywords
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="mt-6 flex justify-between items-center">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Keywords sized by frequency • Click to copy • Hover for details
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const keywordText = Object.keys(extractedKeywords).join(', ');
+                          navigator.clipboard.writeText(keywordText);
+                          toast({
+                            title: "Copied!",
+                            description: "All keywords copied to clipboard",
+                          });
+                        }}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Export Keywords
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* AI Content Theme Suggestions */}
+                {contentThemes.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-green-600" />
+                        AI Content Suggestions ({contentThemes.length} themes)
+                      </CardTitle>
+                      <CardDescription>
+                        Content themes and post ideas generated from your keyword analysis
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {contentThemes.map((theme, index) => (
+                          <div
+                            key={index}
+                            className="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200 dark:border-green-700 hover:shadow-md transition-all duration-200"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                  {theme}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 text-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const themesText = contentThemes.map((theme, i) => `${i + 1}. ${theme}`).join('\n');
+                            navigator.clipboard.writeText(themesText);
+                            toast({
+                              title: "Copied!",
+                              description: "Content themes copied to clipboard",
+                            });
+                          }}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Export Content Ideas
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
           </TabsContent>
 

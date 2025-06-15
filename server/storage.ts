@@ -800,6 +800,21 @@ export class DatabaseStorage implements IStorage {
       .delete(contentQueue)
       .where(eq(contentQueue.id, id));
   }
+
+  // Keyword Snapshot operations
+  async createCompetitorKeywordSnapshot(snapshot: InsertCompetitorKeywordSnapshot): Promise<CompetitorKeywordSnapshot> {
+    const [result] = await db.insert(competitorKeywordSnapshots).values(snapshot).returning();
+    return result;
+  }
+
+  async getCompetitorKeywordSnapshots(userId: string): Promise<CompetitorKeywordSnapshot[]> {
+    return await db
+      .select()
+      .from(competitorKeywordSnapshots)
+      .where(eq(competitorKeywordSnapshots.userId, userId))
+      .orderBy(desc(competitorKeywordSnapshots.capturedAt))
+      .limit(50);
+  }
 }
 
 export const storage = new DatabaseStorage();

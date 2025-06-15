@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import multer from "multer";
 import { runAutoFacebookPost, getAutoPostStatus, triggerManualAutoPost } from "./facebookAutoPost";
 import { advancedAdOptimizer } from "./advancedAdOptimizer";
+import { adCampaignService } from "./meta/adCampaignService";
 import { 
   FacebookAPIService, 
   getFacebookOAuthUrl, 
@@ -1549,6 +1550,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error analyzing competitor posts:', error);
       res.status(500).json({ message: 'Failed to analyze competitor posts' });
+    }
+  });
+
+  // Meta Ads API Routes - Phase 4.1 Facebook Advertising
+  app.post('/api/facebook/boost-post', isAuthenticated, async (req, res) => {
+    try {
+      const { pagePostId, budget, days, targeting } = req.body;
+      
+      if (!pagePostId || !budget || !days) {
+        return res.status(400).json({ 
+          error: 'Missing required parameters: pagePostId, budget, and days are required' 
+        });
+      }
+
+      const result = await adCampaignService.boostExistingPost({
+        pagePostId,
+        dailyBudget: budget,
+        durationDays: days,
+        targeting
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Boost Post Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to boost post',
+        details: error.message 
+      });
+    }
+  });
+
+  app.get('/api/facebook/campaign-status/:id', isAuthenticated, async (req, res) => {
+    try {
+      const campaignId = req.params.id;
+      
+      if (!campaignId) {
+        return res.status(400).json({ error: 'Campaign ID is required' });
+      }
+
+      const result = await adCampaignService.getCampaignStatus(campaignId);
+      res.json(result);
+    } catch (error) {
+      console.error('Get Campaign Status Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get campaign status',
+        details: error.message 
+      });
+    }
+  });
+
+  app.post('/api/facebook/campaign/:id/activate', isAuthenticated, async (req, res) => {
+    try {
+      const campaignId = req.params.id;
+      
+      if (!campaignId) {
+        return res.status(400).json({ error: 'Campaign ID is required' });
+      }
+
+      const result = await adCampaignService.activateCampaign(campaignId);
+      res.json(result);
+    } catch (error) {
+      console.error('Campaign Activation Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to activate campaign',
+        details: error.message 
+      });
+    }
+  });
+
+  app.post('/api/facebook/campaign/:id/pause', isAuthenticated, async (req, res) => {
+    try {
+      const campaignId = req.params.id;
+      
+      if (!campaignId) {
+        return res.status(400).json({ error: 'Campaign ID is required' });
+      }
+
+      const result = await adCampaignService.pauseCampaign(campaignId);
+      res.json(result);
+    } catch (error) {
+      console.error('Campaign Pause Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to pause campaign',
+        details: error.message 
+      });
     }
   });
 

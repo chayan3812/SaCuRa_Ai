@@ -1,0 +1,85 @@
+// client/src/components/BoostPostPanel.tsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+export const BoostPostPanel: React.FC = () => {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [selectedPostId, setSelectedPostId] = useState("");
+  const [budget, setBudget] = useState(10);
+  const [days, setDays] = useState(3);
+  const [boosted, setBoosted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const { data } = await axios.get("/api/facebook/posts");
+      setPosts(data?.data || []);
+    };
+    fetchPosts();
+  }, []);
+
+  const boost = async () => {
+    if (!selectedPostId) return alert("Pick a post!");
+    setLoading(true);
+    try {
+      await axios.post("/api/facebook/boost-post", {
+        pagePostId: selectedPostId,
+        budget,
+        days,
+      });
+      setBoosted(true);
+    } catch (e) {
+      alert("Failed to boost post");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="p-4 max-w-xl mx-auto space-y-6">
+      <h2 className="text-2xl font-bold">🚀 Boost a Facebook Post</h2>
+
+      <select
+        className="w-full p-2 border rounded"
+        onChange={(e) => setSelectedPostId(e.target.value)}
+        value={selectedPostId}
+      >
+        <option value="">Select a post to boost</option>
+        {posts.map((post) => (
+          <option key={post.id} value={post.id.split("_")[1]}>
+            {post.message?.slice(0, 60) || "Untitled Post"}
+          </option>
+        ))}
+      </select>
+
+      <div>
+        <label>Daily Budget ($)</label>
+        <input
+          type="number"
+          className="w-full p-2 border rounded"
+          value={budget}
+          onChange={(e) => setBudget(Number(e.target.value))}
+        />
+      </div>
+
+      <div>
+        <label>Duration (Days)</label>
+        <input
+          type="number"
+          className="w-full p-2 border rounded"
+          value={days}
+          onChange={(e) => setDays(Number(e.target.value))}
+        />
+      </div>
+
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        onClick={boost}
+        disabled={loading}
+      >
+        {loading ? "Boosting..." : "Boost Now"}
+      </button>
+
+      {boosted && <p className="text-green-600">✅ Post successfully boosted!</p>}
+    </div>
+  );
+};

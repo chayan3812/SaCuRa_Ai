@@ -1,0 +1,132 @@
+// client/src/components/FacebookDashboard.tsx
+import React, { useState } from "react";
+import { useFacebookPublisher } from "../hooks/useFacebookPublisher";
+import { useFacebookInsights } from "../hooks/useFacebookInsights";
+import { useFacebookPosts } from "../hooks/useFacebookPosts";
+import axios from "axios";
+
+export const FacebookDashboard: React.FC = () => {
+  const [message, setMessage] = useState("");
+  const [media, setMedia] = useState<File | null>(null);
+  const [link, setLink] = useState("");
+  const [preview, setPreview] = useState<any>(null);
+
+  const publisher = useFacebookPublisher();
+  const { data: insights, isLoading: insightsLoading } = useFacebookInsights();
+  const { data: posts, isLoading: postsLoading } = useFacebookPosts();
+
+  const handlePost = () => {
+    if (message.trim()) {
+      publisher.mutate(message);
+      setMessage("");
+    }
+  };
+
+  const handleMediaUpload = async () => {
+    if (!media) return;
+    const form = new FormData();
+    form.append("file", media);
+    form.append("caption", message);
+    await axios.post("/api/facebook/photo", form);
+    setMedia(null);
+    setMessage("");
+  };
+
+  const handleLinkPreview = async () => {
+    if (!link) return;
+    const { data } = await axios.post("/api/facebook/link", { link });
+    setPreview(data);
+  };
+
+  return (
+    <div className="p-4 max-w-3xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold">📘 Facebook Dashboard</h1>
+
+      <div className="space-y-2">
+        <textarea
+          className="w-full p-2 border rounded"
+          rows={4}
+          placeholder="Write a post..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        ></textarea>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={handlePost}
+        >
+          Post to Facebook
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setMedia(e.target.files?.[0] || null)}
+        />
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={handleMediaUpload}
+        >
+          Upload Image Post
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        <input
+          type="text"
+          className="w-full border p-2 rounded"
+          placeholder="Enter a link for preview..."
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+        />
+        <button
+          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+          onClick={handleLinkPreview}
+        >
+          Fetch Link Preview
+        </button>
+        {preview && (
+          <div className="bg-gray-100 p-3 rounded">
+            <h3 className="font-bold">{preview.title}</h3>
+            <p>{preview.description}</p>
+            <img src={preview.image} alt="Preview" className="mt-2 max-w-full rounded" />
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold">📊 Page Insights</h2>
+        {insightsLoading ? (
+          <p>Loading insights...</p>
+        ) : (
+          <pre className="bg-gray-100 p-3 rounded overflow-x-auto text-sm">
+            {JSON.stringify(insights, null, 2)}
+          </pre>
+        )}
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold">📝 Recent Posts</h2>
+        {postsLoading ? (
+          <p>Loading posts...</p>
+        ) : (
+          <ul className="space-y-2">
+            {posts?.data?.map((post: any) => (
+              <li key={post.id} className="border-b pb-2">
+                <a
+                  href={`https://www.facebook.com/${post.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  View Post
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};

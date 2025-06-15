@@ -108,6 +108,7 @@ function Router() {
             <Route path="/admin/ai-replay" component={AdminAIReplay} />
             <Route path="/admin/ai-digest" component={AdminAIDigest} />
             <Route path="/facebook" component={Facebook} />
+            <Route path="/admin/facebook-dashboard" component={Facebook} />
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/facebook-setup" component={FacebookSetup} />
             <Route path="/facebook-conversions" component={FacebookConversions} />

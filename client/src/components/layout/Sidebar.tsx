@@ -21,7 +21,8 @@ import {
   TestTube,
   Activity,
   Zap,
-  Target
+  Target,
+  Globe
 } from "lucide-react";
 
 interface SidebarProps {
@@ -53,6 +54,7 @@ const navigation = [
   { name: "SLA Dashboard", href: "/sla-dashboard", icon: Activity, badge: "MONITOR" },
   { name: "AI Replay Tool", href: "/admin/ai-replay", icon: TestTube, badge: "ADMIN" },
   { name: "AI Digest", href: "/admin/ai-digest", icon: Brain, badge: "ADMIN" },
+  { name: "Facebook Dashboard", href: "/admin/facebook-dashboard", icon: Globe, badge: "ADMIN" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

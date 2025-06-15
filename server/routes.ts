@@ -3478,6 +3478,124 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Elite-Tier AI Orchestration Endpoints
+  
+  // Stress Testing API
+  app.post('/api/ai/stress-test/launch', isAuthenticated, async (req: any, res) => {
+    try {
+      const { batchSize, timeframeDays, includeRealQueries } = req.body;
+      
+      const results = await stressTestEngine.launchStressTestBatch({
+        batchSize: batchSize || 50,
+        timeframeDays: timeframeDays || 30,
+        includeRealQueries: includeRealQueries !== false
+      });
+      
+      res.json({
+        message: "Stress test completed successfully",
+        results,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.error("Stress test error:", error);
+      res.status(500).json({ 
+        message: "Stress test failed",
+        error: error.message 
+      });
+    }
+  });
+
+  app.get('/api/ai/stress-test/results', isAuthenticated, async (req: any, res) => {
+    try {
+      const results = stressTestEngine.getResults();
+      const report = await stressTestEngine.exportResultsReport();
+      
+      res.json({
+        results,
+        report,
+        summary: {
+          totalTests: results.length,
+          avgImprovement: results.reduce((sum, r) => sum + r.improvement, 0) / results.length,
+          lowConfidenceCount: results.filter(r => r.confidenceScore < 0.3).length
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching stress test results:", error);
+      res.status(500).json({ message: "Failed to fetch results" });
+    }
+  });
+
+  // Explainable AI API
+  app.post('/api/ai/explain-reply', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, reply, context } = req.body;
+      
+      const explanation = await explainableAI.explainReply({
+        message,
+        reply,
+        context
+      });
+      
+      res.json({
+        message: "Reply explanation generated",
+        explanation
+      });
+    } catch (error) {
+      console.error("Reply explanation error:", error);
+      res.status(500).json({ 
+        message: "Failed to explain reply",
+        error: error.message 
+      });
+    }
+  });
+
+  app.post('/api/ai/confidence-check', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, reply, context } = req.body;
+      
+      const confidenceAnalysis = await explainableAI.calculateConfidenceScore({
+        message,
+        reply,
+        context
+      });
+      
+      res.json({
+        message: "Confidence analysis completed",
+        analysis: confidenceAnalysis
+      });
+    } catch (error) {
+      console.error("Confidence check error:", error);
+      res.status(500).json({ 
+        message: "Failed to check confidence",
+        error: error.message 
+      });
+    }
+  });
+
+  app.post('/api/ai/improve-reply', isAuthenticated, async (req: any, res) => {
+    try {
+      const { message, originalReply, issues, context } = req.body;
+      
+      const improvement = await explainableAI.generateImprovedReply({
+        message,
+        originalReply,
+        issues: issues || [],
+        context
+      });
+      
+      res.json({
+        message: "Reply improvement generated",
+        improvement
+      });
+    } catch (error) {
+      console.error("Reply improvement error:", error);
+      res.status(500).json({ 
+        message: "Failed to improve reply",
+        error: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

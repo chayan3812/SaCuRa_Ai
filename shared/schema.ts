@@ -521,7 +521,7 @@ export const aiStressTestLog = pgTable("ai_stress_test_log", {
   improvedReply: text("improved_reply").notNull(),
   evalScore: integer("eval_score").notNull(),
   improvement: integer("improvement").notNull(),
-  confidenceScore: real("confidence_score").notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 5, scale: 3 }).notNull(),
   categories: jsonb("categories"), // empathy, clarity, completeness, etc.
   comments: text("comments"),
   processingTime: integer("processing_time"), // milliseconds

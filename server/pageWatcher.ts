@@ -254,7 +254,7 @@ export class PageWatcherEngine {
       const insights = await api.getPageInsights(
         page.pageId, 
         page.accessToken, 
-        ['page_impressions', 'page_reach'], 
+        'page_impressions,page_reach', 
         'day'
       );
       

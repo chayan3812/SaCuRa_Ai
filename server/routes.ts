@@ -42,6 +42,8 @@ import { explainableAI } from "./explainableAI";
 import { aiModelManager } from "./aiModelManager";
 import { WeeklyAIReporter } from "./weeklyAIReporter";
 import { scheduledJobsManager } from "./scheduledJobs";
+import { agentCoPilot } from "./agentCoPilot";
+import { slaMonitor } from "./slaMonitor";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {

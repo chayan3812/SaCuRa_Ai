@@ -4325,6 +4325,207 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Facebook Marketing API Routes
+  app.get('/api/marketing/ad-accounts', isAuthenticated, async (req, res) => {
+    try {
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      const adAccounts = await facebookMarketingAPI.getAdAccounts();
+      
+      res.json({
+        success: true,
+        adAccounts,
+        count: adAccounts.length
+      });
+    } catch (error) {
+      console.error('Error fetching ad accounts:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch ad accounts',
+        details: error.message
+      });
+    }
+  });
+
+  app.get('/api/marketing/campaigns/:adAccountId', isAuthenticated, async (req, res) => {
+    try {
+      const { adAccountId } = req.params;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      const campaigns = await facebookMarketingAPI.getCampaigns(adAccountId);
+      
+      res.json({
+        success: true,
+        campaigns,
+        count: campaigns.length
+      });
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch campaigns',
+        details: error.message
+      });
+    }
+  });
+
+  app.get('/api/marketing/campaign-report/:adAccountId', isAuthenticated, async (req, res) => {
+    try {
+      const { adAccountId } = req.params;
+      const { since, until } = req.query;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      
+      const dateRange = since && until ? { since: since as string, until: until as string } : undefined;
+      const report = await facebookMarketingAPI.generateCampaignReport(adAccountId, dateRange);
+      
+      res.json({
+        success: true,
+        report
+      });
+    } catch (error) {
+      console.error('Error generating campaign report:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate campaign report',
+        details: error.message
+      });
+    }
+  });
+
+  app.post('/api/marketing/create-campaign/:adAccountId', isAuthenticated, async (req, res) => {
+    try {
+      const { adAccountId } = req.params;
+      const { name, objective, status, special_ad_categories } = req.body;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      
+      if (!name || !objective) {
+        return res.status(400).json({
+          success: false,
+          error: 'Campaign name and objective are required'
+        });
+      }
+      
+      const campaign = await facebookMarketingAPI.createCampaign(adAccountId, {
+        name,
+        objective,
+        status,
+        special_ad_categories
+      });
+      
+      res.json({
+        success: true,
+        campaign
+      });
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create campaign',
+        details: error.message
+      });
+    }
+  });
+
+  app.put('/api/marketing/campaign-status/:campaignId', isAuthenticated, async (req, res) => {
+    try {
+      const { campaignId } = req.params;
+      const { status } = req.body;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      
+      if (!status || !['ACTIVE', 'PAUSED', 'DELETED'].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Valid status (ACTIVE, PAUSED, DELETED) is required'
+        });
+      }
+      
+      const success = await facebookMarketingAPI.updateCampaignStatus(campaignId, status);
+      
+      res.json({
+        success,
+        message: success ? 'Campaign status updated successfully' : 'Failed to update campaign status'
+      });
+    } catch (error) {
+      console.error('Error updating campaign status:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update campaign status',
+        details: error.message
+      });
+    }
+  });
+
+  app.get('/api/marketing/audience-insights/:adAccountId', isAuthenticated, async (req, res) => {
+    try {
+      const { adAccountId } = req.params;
+      const { targeting } = req.body;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      
+      const insights = await facebookMarketingAPI.getAudienceInsights(adAccountId, targeting || {});
+      
+      res.json({
+        success: true,
+        insights
+      });
+    } catch (error) {
+      console.error('Error fetching audience insights:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch audience insights',
+        details: error.message
+      });
+    }
+  });
+
+  app.get('/api/marketing/interest-suggestions', isAuthenticated, async (req, res) => {
+    try {
+      const { query, limit } = req.query;
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      
+      if (!query) {
+        return res.status(400).json({
+          success: false,
+          error: 'Query parameter is required'
+        });
+      }
+      
+      const suggestions = await facebookMarketingAPI.getInterestSuggestions(
+        query as string, 
+        limit ? parseInt(limit as string) : 25
+      );
+      
+      res.json({
+        success: true,
+        suggestions,
+        count: suggestions.length
+      });
+    } catch (error) {
+      console.error('Error fetching interest suggestions:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch interest suggestions',
+        details: error.message
+      });
+    }
+  });
+
+  app.get('/api/marketing/validate-token', isAuthenticated, async (req, res) => {
+    try {
+      const { facebookMarketingAPI } = await import('./facebookMarketingAPI');
+      const validation = await facebookMarketingAPI.validateMarketingAPIToken();
+      
+      res.json({
+        success: true,
+        validation
+      });
+    } catch (error) {
+      console.error('Error validating Marketing API token:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to validate Marketing API token',
+        details: error.message
+      });
+    }
+  });
+
   // Initialize Conversions API on startup
   const PIXEL_ID = "1230928114675791"; // Extracted from your app token
   const CONVERSIONS_ACCESS_TOKEN = "EAAd0l5qoAb0BOZC4pYeYQBiNgJTglZBFuOprwc57Poe6xGkqnKGoKR3zXykrRqwaHtrJScDpH6bLT5dveNycjfp8kZAxEnZBim3g7j965w4ZBvZBxfL37KOz965znapFZBBcOPBFA5ZBdnAQ5YSkw90ngo9rXpuDr4mojRArChu1Ka6I8bhvZAbr3DeYUIE4LsQZDZD";

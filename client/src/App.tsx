@@ -31,6 +31,7 @@ import AdminAIDigest from "@/pages/AdminAIDigest";
 import FacebookAnalytics from "@/pages/FacebookAnalytics";
 import FacebookSetup from "@/pages/FacebookSetup";
 import FacebookConversions from "@/pages/FacebookConversions";
+import MarketingAPI from "@/pages/MarketingAPI";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HybridAI from "@/pages/HybridAI";
 import MLIntelligence from "@/pages/MLIntelligence";
@@ -101,6 +102,7 @@ function Router() {
             <Route path="/facebook-analytics" component={FacebookAnalytics} />
             <Route path="/facebook-setup" component={FacebookSetup} />
             <Route path="/facebook-conversions" component={FacebookConversions} />
+            <Route path="/marketing-api" component={MarketingAPI} />
             <Route path="/restrictions" component={RestrictionMonitor} />
             <Route path="/employees" component={EmployeeMonitor} />
             <Route path="/competitors" component={CompetitorAnalysis} />

@@ -1,0 +1,69 @@
+// server/advancedAdOptimizer.ts
+import axios from "axios";
+import { FacebookAPIService } from "./facebookAPIService";
+
+export const advancedAdOptimizer = {
+  async fetchPerformanceScores() {
+    const posts = await FacebookAPIService.getPosts();
+    const scores = await Promise.all(
+      posts.data.slice(0, 5).map(async (post: any) => {
+        const insightUrl = `https://graph.facebook.com/v17.0/${post.id}/insights/post_impressions,post_engaged_users?access_token=${process.env.FACEBOOK_ACCESS_TOKEN}`;
+        const { data } = await axios.get(insightUrl);
+        const impressions = data?.data?.find((d: any) => d.name === 'post_impressions')?.values[0]?.value || 1;
+        const engaged = data?.data?.find((d: any) => d.name === 'post_engaged_users')?.values[0]?.value || 0;
+        const score = (engaged / impressions) * 100;
+        return { id: post.id, message: post.message, score: score.toFixed(2) };
+      })
+    );
+    return scores;
+  },
+
+  async generatePost(topic = "growth marketing") {
+    const prompt = `Generate an engaging Facebook post for a business page about: ${topic}. Include emoji, CTA, and hashtags.`;
+    const { data } = await axios.post("https://api.openai.com/v1/completions", {
+      model: "text-davinci-003",
+      prompt,
+      max_tokens: 100,
+      temperature: 0.7
+    }, {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      }
+    });
+    return data.choices[0].text.trim();
+  }
+};
+
+// server/facebookAutoPost.ts
+import { FacebookAPIService } from "./facebookAPIService";
+import { advancedAdOptimizer } from "./advancedAdOptimizer";
+
+const AUTO_POST_ENABLED = process.env.AUTO_POST_ENABLED === "true";
+const MIN_SCORE_THRESHOLD = parseFloat(process.env.MIN_SCORE_THRESHOLD || "50");
+
+export async function runAutoFacebookPost() {
+  if (!AUTO_POST_ENABLED) return;
+  const scores = await advancedAdOptimizer.fetchPerformanceScores();
+  const lowScore = scores.find((s) => parseFloat(s.score) < MIN_SCORE_THRESHOLD);
+
+  if (lowScore) {
+    const aiPost = await advancedAdOptimizer.generatePost("ad performance improvement");
+    await FacebookAPIService.publishPost(aiPost);
+    console.log("✅ Auto-posted due to low performance");
+  } else {
+    console.log("📈 All posts above threshold");
+  }
+}
+
+// cronAutoPost.ts
+import { runAutoFacebookPost } from "./server/facebookAutoPost";
+(async () => {
+  await runAutoFacebookPost();
+})();
+
+// ✅ Add to .env.template
+// AUTO_POST_ENABLED=true
+// MIN_SCORE_THRESHOLD=50
+// OPENAI_API_KEY=
+
+// 🚀 Run via cron or schedule in Replit: node cronAutoPost.ts

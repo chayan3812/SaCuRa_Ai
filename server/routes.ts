@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import multer from "multer";
+import { runAutoFacebookPost, getAutoPostStatus, triggerManualAutoPost } from "./facebookAutoPost";
+import { advancedAdOptimizer } from "./advancedAdOptimizer";
 import { 
   FacebookAPIService, 
   getFacebookOAuthUrl, 
@@ -5279,6 +5281,58 @@ Prioritize by impact and feasibility.`;
     } catch (error) {
       console.error('Error fetching link preview:', error);
       res.status(500).json({ error: 'Failed to fetch link preview' });
+    }
+  });
+
+  // Phase 3: AI Auto-Post Engine Endpoints
+  app.get('/api/facebook/auto-post/status', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const status = await getAutoPostStatus();
+      res.json(status);
+    } catch (error) {
+      console.error('Error getting auto-post status:', error);
+      res.status(500).json({ error: 'Failed to get auto-post status' });
+    }
+  });
+
+  app.post('/api/facebook/auto-post/trigger', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const result = await triggerManualAutoPost();
+      res.json(result);
+    } catch (error) {
+      console.error('Error triggering auto-post:', error);
+      res.status(500).json({ error: 'Failed to trigger auto-post' });
+    }
+  });
+
+  app.get('/api/facebook/performance-scores', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const scores = await advancedAdOptimizer.fetchPerformanceScores();
+      res.json(scores);
+    } catch (error) {
+      console.error('Error fetching performance scores:', error);
+      res.status(500).json({ error: 'Failed to fetch performance scores' });
+    }
+  });
+
+  app.get('/api/facebook/content-trends', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const trends = await advancedAdOptimizer.analyzeContentTrends();
+      res.json(trends);
+    } catch (error) {
+      console.error('Error analyzing content trends:', error);
+      res.status(500).json({ error: 'Failed to analyze content trends' });
+    }
+  });
+
+  app.post('/api/facebook/generate-content', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { topic } = req.body;
+      const content = await advancedAdOptimizer.generatePost(topic || 'engagement');
+      res.json({ content, topic: topic || 'engagement' });
+    } catch (error) {
+      console.error('Error generating content:', error);
+      res.status(500).json({ error: 'Failed to generate content' });
     }
   });
 

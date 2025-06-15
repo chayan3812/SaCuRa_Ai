@@ -1,0 +1,79 @@
+// client/src/components/AutoPostConfig.tsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+export const AutoPostConfig: React.FC = () => {
+  const [enabled, setEnabled] = useState(false);
+  const [threshold, setThreshold] = useState(50);
+  const [preview, setPreview] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await axios.get("/api/facebook/autopost-config");
+      setEnabled(data.enabled);
+      setThreshold(data.threshold);
+    };
+    fetchConfig();
+  }, []);
+
+  const saveConfig = async () => {
+    await axios.post("/api/facebook/autopost-config", { enabled, threshold });
+    alert("Config saved");
+  };
+
+  const generatePreview = async () => {
+    setLoading(true);
+    const { data } = await axios.get("/api/facebook/autopost-preview");
+    setPreview(data.text);
+    setLoading(false);
+  };
+
+  return (
+    <div className="p-4 max-w-xl mx-auto space-y-6">
+      <h2 className="text-2xl font-bold">🤖 Auto-Post Configuration</h2>
+
+      <label className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => setEnabled(e.target.checked)}
+        />
+        <span>Enable Auto-Posting</span>
+      </label>
+
+      <div>
+        <label>Minimum Performance Score Threshold: {threshold}%</label>
+        <input
+          type="range"
+          min={10}
+          max={100}
+          value={threshold}
+          onChange={(e) => setThreshold(parseInt(e.target.value))}
+          className="w-full"
+        />
+      </div>
+
+      <button
+        onClick={saveConfig}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Save Configuration
+      </button>
+
+      <button
+        onClick={generatePreview}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Generate AI Preview
+      </button>
+
+      {loading && <p>Loading preview...</p>}
+      {preview && (
+        <div className="bg-gray-100 p-3 rounded mt-4">
+          <p>{preview}</p>
+        </div>
+      )}
+    </div>
+  );
+};

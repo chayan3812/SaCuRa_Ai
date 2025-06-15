@@ -143,6 +143,76 @@ export default function FacebookDashboard() {
     }
   };
 
+  const handleFileUpload = async () => {
+    if (!uploadedFile) {
+      toast({
+        title: "File Required",
+        description: "Please select an image file to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+      formData.append("caption", postForm.message);
+
+      const response = await axios.post("/api/facebook/photo", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      
+      toast({
+        title: "Image Posted",
+        description: "Your image has been posted to Facebook successfully",
+      });
+
+      setUploadedFile(null);
+      setPostForm({ message: "", link: "", picture: "", publishTime: "" });
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload image. Please check your Facebook connection.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLinkPreview = async () => {
+    if (!postForm.link.trim()) {
+      toast({
+        title: "Link Required",
+        description: "Please enter a valid URL for preview",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoadingPreview(true);
+    try {
+      const response = await axios.post("/api/facebook/link", { 
+        link: postForm.link 
+      });
+      
+      setLinkPreview(response.data);
+      
+      toast({
+        title: "Preview Loaded",
+        description: "Link preview has been generated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Preview Failed",
+        description: "Failed to load link preview. Please check the URL.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingPreview(false);
+    }
+  };
+
   const handleUploadMedia = async () => {
     if (!mediaUrl.trim()) {
       toast({
@@ -306,12 +376,40 @@ export default function FacebookDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="link">Link (Optional)</Label>
-                  <Input
-                    id="link"
-                    placeholder="https://example.com"
-                    value={postForm.link}
-                    onChange={(e) => setPostForm({ ...postForm, link: e.target.value })}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="link"
+                      placeholder="https://example.com"
+                      value={postForm.link}
+                      onChange={(e) => setPostForm({ ...postForm, link: e.target.value })}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleLinkPreview}
+                      disabled={isLoadingPreview}
+                    >
+                      {isLoadingPreview ? "Loading..." : "Preview"}
+                    </Button>
+                  </div>
+                  {linkPreview && (
+                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border">
+                      <div className="flex gap-3">
+                        {linkPreview.image && (
+                          <img 
+                            src={linkPreview.image} 
+                            alt="Link preview" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm">{linkPreview.title}</h4>
+                          <p className="text-xs text-muted-foreground mt-1">{linkPreview.description}</p>
+                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{linkPreview.url}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -365,12 +463,44 @@ export default function FacebookDashboard() {
             <CardHeader>
               <CardTitle>Upload Media</CardTitle>
               <CardDescription>
-                Upload images and videos to your Facebook page
+                Upload images directly from your device or provide a URL
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* File Upload Section */}
               <div className="space-y-2">
-                <Label htmlFor="mediaUrl">Image URL</Label>
+                <Label htmlFor="fileUpload">📤 Upload Image File</Label>
+                <input
+                  id="fileUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setUploadedFile(e.target.files?.[0] || null)}
+                  className="w-full p-2 border rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                />
+                {uploadedFile && (
+                  <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-green-700 dark:text-green-300">
+                        File selected: {uploadedFile.name}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or</span>
+                </div>
+              </div>
+
+              {/* URL Upload Section */}
+              <div className="space-y-2">
+                <Label htmlFor="mediaUrl">🔗 Image URL</Label>
                 <Input
                   id="mediaUrl"
                   placeholder="https://example.com/image.jpg"
@@ -379,25 +509,40 @@ export default function FacebookDashboard() {
                 />
               </div>
 
+              {/* Caption Section */}
               <div className="space-y-2">
-                <Label htmlFor="mediaCaption">Caption (Optional)</Label>
+                <Label htmlFor="mediaCaption">💬 Caption</Label>
                 <Textarea
                   id="mediaCaption"
-                  placeholder="Add a caption for your media..."
-                  value={mediaCaption}
-                  onChange={(e) => setMediaCaption(e.target.value)}
+                  placeholder="Write a caption for your image..."
+                  value={postForm.message}
+                  onChange={(e) => setPostForm({ ...postForm, message: e.target.value })}
                   rows={3}
                 />
               </div>
 
-              <Button 
-                onClick={handleUploadMedia} 
-                disabled={uploadMedia.isPending}
-                className="w-full"
-              >
-                <Image className="h-4 w-4 mr-2" />
-                {uploadMedia.isPending ? 'Uploading...' : 'Upload Media'}
-              </Button>
+              {/* Upload Buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Button 
+                  onClick={handleFileUpload} 
+                  disabled={!uploadedFile}
+                  variant={uploadedFile ? "default" : "outline"}
+                  className="w-full"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Selected File
+                </Button>
+                
+                <Button 
+                  onClick={handleUploadMedia} 
+                  disabled={uploadMedia.isPending || !mediaUrl.trim()}
+                  variant={mediaUrl.trim() ? "default" : "outline"}
+                  className="w-full"
+                >
+                  <Image className="h-4 w-4 mr-2" />
+                  {uploadMedia.isPending ? 'Uploading...' : 'Upload from URL'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

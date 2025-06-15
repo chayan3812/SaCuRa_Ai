@@ -5245,6 +5245,36 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  app.post('/api/facebook/photo', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const formData = req.body;
+      const { caption } = formData;
+      
+      // Handle multipart form data for file upload
+      const result = await facebookAPI.uploadPhotoPost(req.file || req.files, caption);
+      res.json(result);
+    } catch (error) {
+      console.error('Error uploading photo to Facebook:', error);
+      res.status(500).json({ error: 'Failed to upload photo' });
+    }
+  });
+
+  app.post('/api/facebook/link', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const { link } = req.body;
+      
+      if (!link) {
+        return res.status(400).json({ error: 'Link is required' });
+      }
+
+      const preview = await facebookAPI.getLinkPreview(link);
+      res.json(preview);
+    } catch (error) {
+      console.error('Error fetching link preview:', error);
+      res.status(500).json({ error: 'Failed to fetch link preview' });
+    }
+  });
+
   app.post('/api/facebook/schedule-post', devAuthMiddleware, async (req: any, res) => {
     try {
       const { message, link, picture, publishTime } = req.body;

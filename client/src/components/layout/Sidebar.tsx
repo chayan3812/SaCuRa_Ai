@@ -37,6 +37,7 @@ const navigation = [
   { name: "Feedback Analytics", href: "/feedback-analytics", icon: BarChart3, badge: "LEARNING" },
   { name: "AI Training Pipeline", href: "/ai-training", icon: Bot, badge: "GPT OPS" },
   { name: "AI Test Dashboard", href: "/ai-test", icon: Brain, badge: "TESTING" },
+  { name: "AI Self-Optimizer", href: "/ai-optimizer", icon: Bot, badge: "GOD MODE" },
   { name: "Restriction Monitor", href: "/restrictions", icon: Shield },
   { name: "Employee Monitor", href: "/employees", icon: Users, badge: "3" },
   { name: "Competitor Analysis", href: "/competitors", icon: Search },

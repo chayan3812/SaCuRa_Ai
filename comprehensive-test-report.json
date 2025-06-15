@@ -1,11 +1,11 @@
 {
   "summary": {
     "totalTests": 28,
-    "passed": 0,
-    "failed": 25,
-    "skipped": 3,
-    "successRate": "0.00",
-    "timestamp": "2025-06-15T18:36:58.375Z"
+    "passed": 25,
+    "failed": 1,
+    "skipped": 2,
+    "successRate": "96.15",
+    "timestamp": "2025-06-15T21:49:39.846Z"
   },
   "categories": {
     "Authentication": {
@@ -17,21 +17,21 @@
           "name": "Unauthenticated Access Protection",
           "category": "Authentication",
           "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.273Z"
+          "details": "Expected 401, got 200",
+          "duration": 61,
+          "timestamp": "2025-06-15T21:49:37.745Z"
         },
         {
           "name": "Login Endpoint Availability",
           "category": "Authentication",
-          "status": "SKIP",
-          "details": "Login requires external OAuth",
+          "status": "PASS",
+          "details": "Login endpoint is accessible",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.276Z"
+          "timestamp": "2025-06-15T21:49:37.756Z"
         }
       ],
       "fail": null,
-      "skip": null
+      "pass": null
     },
     "Database": {
       "passed": 0,
@@ -41,13 +41,13 @@
         {
           "name": "Database Connection",
           "category": "Database",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Database queries are functional",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.279Z"
+          "timestamp": "2025-06-15T21:49:37.851Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "API": {
       "passed": 0,
@@ -57,69 +57,69 @@
         {
           "name": "User Info API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.283Z"
+          "status": "PASS",
+          "details": "Response time: 23ms",
+          "duration": 23,
+          "timestamp": "2025-06-15T21:49:37.874Z"
         },
         {
           "name": "Dashboard Metrics API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.286Z"
+          "status": "PASS",
+          "details": "Response time: 85ms",
+          "duration": 85,
+          "timestamp": "2025-06-15T21:49:37.960Z"
         },
         {
           "name": "AI Learning Metrics API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.289Z"
+          "status": "PASS",
+          "details": "Response time: 66ms",
+          "duration": 66,
+          "timestamp": "2025-06-15T21:49:38.026Z"
         },
         {
           "name": "Facebook Pages API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.291Z"
+          "status": "PASS",
+          "details": "Response time: 23ms",
+          "duration": 23,
+          "timestamp": "2025-06-15T21:49:38.049Z"
         },
         {
           "name": "Customer Interactions API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.293Z"
+          "status": "PASS",
+          "details": "Response time: 25ms",
+          "duration": 25,
+          "timestamp": "2025-06-15T21:49:38.074Z"
         },
         {
           "name": "Employees API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.296Z"
+          "status": "PASS",
+          "details": "Response time: 25ms",
+          "duration": 25,
+          "timestamp": "2025-06-15T21:49:38.099Z"
         },
         {
           "name": "AI Recommendations API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.298Z"
+          "status": "PASS",
+          "details": "Response time: 23ms",
+          "duration": 23,
+          "timestamp": "2025-06-15T21:49:38.122Z"
         },
         {
           "name": "Notifications API",
           "category": "API",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
-          "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.301Z"
+          "status": "PASS",
+          "details": "Response time: 2ms",
+          "duration": 2,
+          "timestamp": "2025-06-15T21:49:38.125Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "Facebook": {
       "passed": 0,
@@ -129,21 +129,21 @@
         {
           "name": "Facebook Pages Integration",
           "category": "Facebook",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Retrieved 0 pages",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.303Z"
+          "timestamp": "2025-06-15T21:49:38.149Z"
         },
         {
           "name": "Facebook Webhook Processing",
           "category": "Facebook",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Webhook processes messages correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.306Z"
+          "timestamp": "2025-06-15T21:49:38.177Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "AI": {
       "passed": 0,
@@ -153,21 +153,21 @@
         {
           "name": "AI Learning Metrics Structure",
           "category": "AI",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "All required metrics fields present",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.308Z"
+          "timestamp": "2025-06-15T21:49:38.317Z"
         },
         {
           "name": "AI Feedback System",
           "category": "AI",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "AI feedback is properly recorded",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.311Z"
+          "timestamp": "2025-06-15T21:49:38.323Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "Frontend": {
       "passed": 0,
@@ -177,29 +177,29 @@
         {
           "name": "Frontend Application Load",
           "category": "Frontend",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Main application loads successfully",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.313Z"
+          "timestamp": "2025-06-15T21:49:38.330Z"
         },
         {
           "name": "Static Asset: /vite.svg",
           "category": "Frontend",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Asset loads correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.315Z"
+          "timestamp": "2025-06-15T21:49:38.341Z"
         },
         {
           "name": "Static Asset: /favicon.ico",
           "category": "Frontend",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Asset loads correctly",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.317Z"
+          "timestamp": "2025-06-15T21:49:38.348Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "Performance": {
       "passed": 0,
@@ -209,29 +209,29 @@
         {
           "name": "Performance: /api/dashboard/metrics",
           "category": "Performance",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Avg: 89.40ms, Max: 96ms",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.320Z"
+          "timestamp": "2025-06-15T21:49:38.796Z"
         },
         {
           "name": "Performance: /api/ai/learning-metrics",
           "category": "Performance",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Avg: 65.00ms, Max: 66ms",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.322Z"
+          "timestamp": "2025-06-15T21:49:39.122Z"
         },
         {
           "name": "Performance: /api/customer-service/interactions/all",
           "category": "Performance",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "Avg: 22.80ms, Max: 24ms",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.325Z"
+          "timestamp": "2025-06-15T21:49:39.237Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "Security": {
       "passed": 0,
@@ -242,17 +242,17 @@
           "name": "CORS Configuration",
           "category": "Security",
           "status": "SKIP",
-          "details": "Unable to test CORS",
+          "details": "CORS headers not detected",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.327Z"
+          "timestamp": "2025-06-15T21:49:39.323Z"
         },
         {
           "name": "SQL Injection Protection",
           "category": "Security",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "System handles malicious SQL input safely",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.329Z"
+          "timestamp": "2025-06-15T21:49:39.328Z"
         },
         {
           "name": "Rate Limiting",
@@ -260,11 +260,11 @@
           "status": "SKIP",
           "details": "Rate limiting not detected or high threshold",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.357Z"
+          "timestamp": "2025-06-15T21:49:39.596Z"
         }
       ],
       "skip": null,
-      "fail": null
+      "pass": null
     },
     "Load": {
       "passed": 0,
@@ -274,13 +274,13 @@
         {
           "name": "Concurrent Load Test",
           "category": "Load",
-          "status": "FAIL",
-          "details": "Only 0/10 requests succeeded",
+          "status": "PASS",
+          "details": "10/10 requests succeeded in 97ms",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.368Z"
+          "timestamp": "2025-06-15T21:49:39.696Z"
         }
       ],
-      "fail": null
+      "pass": null
     },
     "Environment": {
       "passed": 0,
@@ -290,29 +290,29 @@
         {
           "name": "Environment: Database URL",
           "category": "Environment",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "database queries work",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.371Z"
+          "timestamp": "2025-06-15T21:49:39.792Z"
         },
         {
           "name": "Environment: Facebook Integration",
           "category": "Environment",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "facebook endpoints respond",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.373Z"
+          "timestamp": "2025-06-15T21:49:39.818Z"
         },
         {
           "name": "Environment: Session Configuration",
           "category": "Environment",
-          "status": "FAIL",
-          "details": "connect ECONNREFUSED 127.0.0.1:5173",
+          "status": "PASS",
+          "details": "auth endpoints work",
           "duration": 0,
-          "timestamp": "2025-06-15T18:36:58.375Z"
+          "timestamp": "2025-06-15T21:49:39.845Z"
         }
       ],
-      "fail": null
+      "pass": null
     }
   },
   "failedTests": [
@@ -320,206 +320,13 @@
       "name": "Unauthenticated Access Protection",
       "category": "Authentication",
       "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.273Z"
-    },
-    {
-      "name": "Database Connection",
-      "category": "Database",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.279Z"
-    },
-    {
-      "name": "User Info API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.283Z"
-    },
-    {
-      "name": "Dashboard Metrics API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.286Z"
-    },
-    {
-      "name": "AI Learning Metrics API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.289Z"
-    },
-    {
-      "name": "Facebook Pages API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.291Z"
-    },
-    {
-      "name": "Customer Interactions API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.293Z"
-    },
-    {
-      "name": "Employees API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.296Z"
-    },
-    {
-      "name": "AI Recommendations API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.298Z"
-    },
-    {
-      "name": "Notifications API",
-      "category": "API",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.301Z"
-    },
-    {
-      "name": "Facebook Pages Integration",
-      "category": "Facebook",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.303Z"
-    },
-    {
-      "name": "Facebook Webhook Processing",
-      "category": "Facebook",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.306Z"
-    },
-    {
-      "name": "AI Learning Metrics Structure",
-      "category": "AI",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.308Z"
-    },
-    {
-      "name": "AI Feedback System",
-      "category": "AI",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.311Z"
-    },
-    {
-      "name": "Frontend Application Load",
-      "category": "Frontend",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.313Z"
-    },
-    {
-      "name": "Static Asset: /vite.svg",
-      "category": "Frontend",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.315Z"
-    },
-    {
-      "name": "Static Asset: /favicon.ico",
-      "category": "Frontend",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.317Z"
-    },
-    {
-      "name": "Performance: /api/dashboard/metrics",
-      "category": "Performance",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.320Z"
-    },
-    {
-      "name": "Performance: /api/ai/learning-metrics",
-      "category": "Performance",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.322Z"
-    },
-    {
-      "name": "Performance: /api/customer-service/interactions/all",
-      "category": "Performance",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.325Z"
-    },
-    {
-      "name": "SQL Injection Protection",
-      "category": "Security",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.329Z"
-    },
-    {
-      "name": "Concurrent Load Test",
-      "category": "Load",
-      "status": "FAIL",
-      "details": "Only 0/10 requests succeeded",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.368Z"
-    },
-    {
-      "name": "Environment: Database URL",
-      "category": "Environment",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.371Z"
-    },
-    {
-      "name": "Environment: Facebook Integration",
-      "category": "Environment",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.373Z"
-    },
-    {
-      "name": "Environment: Session Configuration",
-      "category": "Environment",
-      "status": "FAIL",
-      "details": "connect ECONNREFUSED 127.0.0.1:5173",
-      "duration": 0,
-      "timestamp": "2025-06-15T18:36:58.375Z"
+      "details": "Expected 401, got 200",
+      "duration": 61,
+      "timestamp": "2025-06-15T21:49:37.745Z"
     }
   ],
   "performanceMetrics": [],
   "recommendations": [
-    "Address failed tests to improve system reliability",
-    "Many tests were skipped - consider implementing authentication for full test coverage"
+    "Address failed tests to improve system reliability"
   ]
 }

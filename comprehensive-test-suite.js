@@ -10,7 +10,7 @@ import path from 'path';
 
 class ComprehensiveTestSuite {
   constructor() {
-    this.baseURL = 'http://localhost:5173';
+    this.baseURL = 'http://localhost:5000';
     this.testResults = {
       passed: 0,
       failed: 0,

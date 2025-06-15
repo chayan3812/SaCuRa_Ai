@@ -165,6 +165,36 @@ export default function CompetitorAnalysis() {
     }
   });
 
+  // Multi-Page Benchmarking Mutation
+  const benchmarkPagesMutation = useMutation({
+    mutationFn: async (pages: string[]) => {
+      const validPages = pages.filter(page => page.trim() !== '');
+      if (validPages.length < 2) {
+        throw new Error('Please provide at least 2 Facebook Page IDs or URLs');
+      }
+      
+      return apiRequest('/api/competitor/compare', {
+        method: 'POST',
+        body: JSON.stringify({ pages: validPages }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: (data) => {
+      setBenchmarkResults(data);
+      toast({
+        title: "Analysis Complete",
+        description: `Successfully compared ${data.validPagesCount} pages`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Failed to analyze pages",
+        variant: "destructive",
+      });
+    }
+  });
+
   const analyzeCompetitorMutation = useMutation({
     mutationFn: async (pageId: string) => {
       return apiRequest('/api/competitor/analyze', {
@@ -234,7 +264,7 @@ export default function CompetitorAnalysis() {
         </div>
 
         <Tabs defaultValue="track" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="track" className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
               Track Competitors
@@ -242,6 +272,10 @@ export default function CompetitorAnalysis() {
             <TabsTrigger value="analyze" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
               Quick Analysis
+            </TabsTrigger>
+            <TabsTrigger value="benchmark" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Benchmark Pages
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -516,6 +550,172 @@ export default function CompetitorAnalysis() {
                               <span>{post.shares?.count || 0}</span>
                             </div>
                             <span className="ml-auto">{formatDate(post.created_time)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Multi-Page Benchmarking Tab */}
+          <TabsContent value="benchmark" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  Multi-Page Benchmarking
+                </CardTitle>
+                <CardDescription>
+                  Compare 2-3 Facebook Pages side by side with AI-powered strategic analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {benchmarkPages.map((page, index) => (
+                      <Input
+                        key={index}
+                        placeholder={`Facebook Page ${index + 1} ID/URL`}
+                        value={page}
+                        onChange={(e) => {
+                          const newPages = [...benchmarkPages];
+                          newPages[index] = e.target.value;
+                          setBenchmarkPages(newPages);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => benchmarkPagesMutation.mutate(benchmarkPages)}
+                    disabled={benchmarkPagesMutation.isPending}
+                    className="w-full"
+                  >
+                    {benchmarkPagesMutation.isPending ? (
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Zap className="mr-2 h-4 w-4" />
+                    )}
+                    {benchmarkPagesMutation.isPending ? "Analyzing..." : "Compare Pages"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Benchmarking Results */}
+            {benchmarkResults && (
+              <div className="space-y-6">
+                {/* AI Summary */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="h-5 w-5 text-purple-600" />
+                      🧠 AI Summary (Generated on {new Date(benchmarkResults.analysis.generatedAt).toLocaleString()})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={benchmarkResults.analysis.aiSummary}
+                      readOnly
+                      className="min-h-[200px] text-sm leading-relaxed"
+                    />
+                    <div className="mt-4 flex justify-end">
+                      <Button variant="outline" size="sm">
+                        <Download className="mr-2 h-4 w-4" />
+                        Export Analysis
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Engagement Statistics Chart */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Page Performance Comparison</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={benchmarkResults.analysis.stats}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="pageName" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="avgLikes" fill="#3b82f6" name="Avg Likes" />
+                        <Bar dataKey="avgComments" fill="#10b981" name="Avg Comments" />
+                        <Bar dataKey="avgShares" fill="#f59e0b" name="Avg Shares" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Page Statistics Table */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Detailed Performance Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Page Name</TableHead>
+                          <TableHead>Avg Likes</TableHead>
+                          <TableHead>Avg Comments</TableHead>
+                          <TableHead>Avg Shares</TableHead>
+                          <TableHead>Engagement Rate</TableHead>
+                          <TableHead>Post Frequency</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {benchmarkResults.analysis.stats.map((stat: any) => (
+                          <TableRow key={stat.pageId}>
+                            <TableCell className="font-medium">{stat.pageName}</TableCell>
+                            <TableCell>{stat.avgLikes}</TableCell>
+                            <TableCell>{stat.avgComments}</TableCell>
+                            <TableCell>{stat.avgShares}</TableCell>
+                            <TableCell>{stat.engagementRate}</TableCell>
+                            <TableCell>
+                              <Badge variant={stat.postFrequency === 'Daily+' ? 'default' : 'secondary'}>
+                                {stat.postFrequency}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+
+                {/* Top Posts Analysis */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Top Performing Posts</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {benchmarkResults.analysis.topPosts.map((post: any, index: number) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="outline">{post.pageName}</Badge>
+                            <div className="text-sm text-gray-500">
+                              {new Date(post.timestamp).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <p className="text-sm mb-2">{post.message}</p>
+                          <div className="flex gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Heart className="h-4 w-4" />
+                              {post.likes}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MessageSquare className="h-4 w-4" />
+                              {post.comments}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Share className="h-4 w-4" />
+                              {post.shares}
+                            </div>
                           </div>
                         </div>
                       ))}

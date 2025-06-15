@@ -6,6 +6,8 @@ import EmployeeMonitor from "@/components/dashboard/EmployeeMonitor";
 import ConnectedAccounts from "@/components/dashboard/ConnectedAccounts";
 import AILearningProgress from "@/components/dashboard/AILearningProgress";
 import QuickActions from "@/components/dashboard/QuickActions";
+import LiveSystemStatus from "@/components/dashboard/LiveSystemStatus";
+import PerformanceInsights from "@/components/dashboard/PerformanceInsights";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -301,6 +303,9 @@ export default function Dashboard() {
 
             {/* Right Column - Sidebar Content */}
             <div className="space-y-6">
+              {/* Live System Status */}
+              <LiveSystemStatus />
+              
               {/* AI Recommendations */}
               <AIRecommendations />
               
@@ -316,9 +321,10 @@ export default function Dashboard() {
           </div>
 
           {/* Bottom Section - Additional Modules */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             <CustomerServiceMonitor />
             <EmployeeMonitor />
+            <PerformanceInsights />
           </div>
     </div>
   );

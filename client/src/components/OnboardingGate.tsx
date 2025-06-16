@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import OnboardingWizard from "./OnboardingWizard";
+import { OnboardingWizard } from "./OnboardingWizard";
 import { Loader2 } from "lucide-react";
 
 export const OnboardingGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {

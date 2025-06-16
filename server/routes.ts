@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import multer from "multer";
 import { runAutoFacebookPost, getAutoPostStatus, triggerManualAutoPost } from "./facebookAutoPost";
-import { advancedAdOptimizer } from "./advancedAdOptimizer";
+import { advancedAdOptimizer, generateAdContent } from "./advancedAdOptimizer";
 import { adCampaignService } from "./meta/adCampaignService";
 import { 
   FacebookAPIService, 
@@ -7042,10 +7042,149 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  // AI Content Generation Route for AutoContentRunner
-  app.get("/api/ai/content-optimizer/generate", isAuthenticated, async (req, res) => {
+  // Phase 7: Plan-based AI Training System
+  // Middleware to inject user plan context
+  const withPlanContext = async (req: any, res: any, next: any) => {
     try {
       const userId = req.user?.claims?.sub;
+      if (userId) {
+        const user = await storage.getUser(userId);
+        req.userPlan = user?.subscriptionPlan || 'free'; // Default to free tier
+        req.userId = userId;
+      }
+      next();
+    } catch (error) {
+      console.error("Error setting plan context:", error);
+      req.userPlan = 'free';
+      next();
+    }
+  };
+
+  // Plan-based AI Content Generation
+  app.post("/api/ai/generate-content", isAuthenticated, withPlanContext, async (req, res) => {
+    try {
+      const { topic } = req.body;
+      const userId = req.userId;
+      const plan = req.userPlan;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Generate content using plan-specific AI training
+      const result = await generateAdContent(userId, plan, topic);
+
+      res.json({
+        success: true,
+        content: result.text,
+        strategy: result.strategy,
+        plan,
+        trainingExamples: result.trainingExamples || 0,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating plan-based content:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to generate content",
+        strategy: 'error_fallback'
+      });
+    }
+  });
+
+  // AI Training Analytics by Plan
+  app.get("/api/ai/training-analytics", isAuthenticated, withPlanContext, async (req, res) => {
+    try {
+      const userId = req.userId;
+      const plan = req.userPlan;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get user's post history for training analysis
+      const posts = await storage.getPostsByUserId(userId);
+      const highPerformingPosts = posts.filter(post => 
+        post.performanceScore && post.performanceScore >= 7
+      );
+
+      const analytics = {
+        plan,
+        totalPosts: posts.length,
+        highPerformingPosts: highPerformingPosts.length,
+        trainingDataAvailable: highPerformingPosts.length > 0,
+        aiStrategy: plan === 'free' ? 'Generic templates' : 
+                   plan === 'pro' ? 'Smart optimization + CTA focus' : 
+                   'Fine-tuned from past performance',
+        capabilities: {
+          free: ['Basic post generation', 'Generic templates'],
+          pro: ['Smart rewriting', 'CTA optimization', 'Engagement focus', 'Urgency triggers'],
+          enterprise: ['Performance-based fine-tuning', 'Historical pattern analysis', 'Custom optimization', 'Advanced personalization']
+        }[plan] || ['Basic functionality'],
+        trainingMetrics: plan === 'enterprise' ? {
+          avgPerformanceScore: highPerformingPosts.length > 0 ? 
+            highPerformingPosts.reduce((sum, post) => sum + (post.performanceScore || 0), 0) / highPerformingPosts.length : 0,
+          bestPost: highPerformingPosts.length > 0 ? 
+            highPerformingPosts.sort((a, b) => (b.performanceScore || 0) - (a.performanceScore || 0))[0] : null
+        } : null
+      };
+
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching training analytics:", error);
+      res.status(500).json({ message: "Failed to fetch training analytics" });
+    }
+  });
+
+  // Content Performance Tracking
+  app.post("/api/ai/track-performance", isAuthenticated, withPlanContext, async (req, res) => {
+    try {
+      const { contentId, performanceScore, engagement } = req.body;
+      const userId = req.userId;
+      const plan = req.userPlan;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Store performance data for future AI training (Enterprise tier)
+      if (plan === 'enterprise' && performanceScore >= 7) {
+        console.log(`🎯 Enterprise AI Learning: High-performing content (${performanceScore}) stored for user ${userId}`);
+        
+        // This data will be used by the fine-tuning system
+        await storage.logAutoContentExecution(userId, {
+          type: 'performance_tracking',
+          contentId,
+          performanceScore,
+          engagement,
+          plan,
+          timestamp: new Date(),
+          eligibleForTraining: true
+        });
+      }
+
+      res.json({
+        success: true,
+        message: plan === 'enterprise' ? 
+          'Performance tracked and added to AI training data' :
+          plan === 'pro' ? 
+          'Performance tracked for analytics' :
+          'Performance logged',
+        plan,
+        trainingEligible: plan === 'enterprise' && performanceScore >= 7
+      });
+    } catch (error) {
+      console.error("Error tracking performance:", error);
+      res.status(500).json({ message: "Failed to track performance" });
+    }
+  });
+
+  // AI Content Generation Route for AutoContentRunner (Enhanced with Plan Context)
+  app.get("/api/ai/content-optimizer/generate", isAuthenticated, withPlanContext, async (req, res) => {
+    try {
+      const userId = req.userId;
+      const plan = req.userPlan;
+
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -7055,17 +7194,18 @@ Prioritize by impact and feasibility.`;
       const goal = user?.campaignGoal || 'engagement';
       const audience = user?.targetAudience || 'general audience';
 
-      // Generate AI-optimized content based on user goals
-      const contentPrompt = `Create engaging ${goal}-focused social media content for ${audience}. Include relevant hashtags and make it compelling for Facebook.`;
-      
-      const aiContent = await aiService.generateContent(contentPrompt);
+      // Generate plan-specific AI content
+      const topic = `${goal}-focused content for ${audience}`;
+      const result = await generateAdContent(userId, plan, topic);
 
       res.json({
         content: {
-          text: aiContent,
+          text: result.text,
           hashtags: ['#Business', '#Growth', '#Innovation'],
           recommendedBudget: user?.dailyBudget || 20,
-          type: 'ai_generated'
+          type: 'ai_generated',
+          strategy: result.strategy,
+          plan: plan
         }
       });
     } catch (error) {

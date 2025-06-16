@@ -228,6 +228,15 @@ export interface IStorage {
   // AI Self-Awareness System
   storeFailureExplanation(data: InsertAiReplyFailure): Promise<AiReplyFailure>;
   getFailureExplanations(): Promise<AiReplyFailure[]>;
+  
+  // Post Performance Analytics for Plan-based AI Training
+  getPostsByUserId(userId: string): Promise<{
+    id: string;
+    message: string;
+    performanceScore?: number;
+    totalEngagement?: number;
+    createdAt: Date;
+  }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1314,6 +1323,52 @@ export class DatabaseStorage implements IStorage {
       .update(scheduledBoosts)
       .set({ status })
       .where(eq(scheduledBoosts.id, boostId));
+  }
+
+  // Post Performance Analytics for Plan-based AI Training
+  async getPostsByUserId(userId: string): Promise<{
+    id: string;
+    message: string;
+    performanceScore?: number;
+    totalEngagement?: number;
+    createdAt: Date;
+  }[]> {
+    try {
+      // Query Facebook pages for this user first
+      const userPages = await db
+        .select()
+        .from(facebookPages)
+        .where(eq(facebookPages.userId, userId));
+
+      if (userPages.length === 0) {
+        return [];
+      }
+
+      // Fetch content queue entries (scheduled/posted content) for performance analysis
+      const posts = await db
+        .select({
+          id: contentQueue.id,
+          message: contentQueue.content,
+          performanceScore: contentQueue.performanceScore,
+          totalEngagement: contentQueue.totalEngagement,
+          createdAt: contentQueue.createdAt,
+        })
+        .from(contentQueue)
+        .where(eq(contentQueue.userId, userId))
+        .orderBy(desc(contentQueue.createdAt))
+        .limit(50);
+
+      return posts.map(post => ({
+        id: post.id,
+        message: post.message || '',
+        performanceScore: post.performanceScore || undefined,
+        totalEngagement: post.totalEngagement || undefined,
+        createdAt: post.createdAt || new Date(),
+      }));
+    } catch (error) {
+      console.error('Error fetching posts by user ID:', error);
+      return [];
+    }
   }
 }
 

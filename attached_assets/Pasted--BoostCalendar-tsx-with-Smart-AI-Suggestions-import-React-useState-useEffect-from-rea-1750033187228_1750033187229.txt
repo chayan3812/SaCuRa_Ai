@@ -1,0 +1,96 @@
+// 📅 BoostCalendar.tsx — with Smart AI Suggestions
+import React, { useState, useEffect } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import axios from "axios";
+
+const localizer = momentLocalizer(moment);
+
+export const BoostCalendar: React.FC = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios.get("/api/facebook/scheduled-boosts").then((res) => {
+      setEvents(
+        res.data.map((boost: any) => ({
+          title: `Boost: ${boost.postId}`,
+          start: new Date(boost.date),
+          end: new Date(boost.date),
+          ...boost,
+        }))
+      );
+    });
+
+    axios.get("/api/facebook/recommend-time-slots").then((res) => {
+      setSuggestions(
+        res.data.map((slot: any, i: number) => ({
+          title: `🔥 AI Suggestion #${i + 1}`,
+          start: new Date(slot.date),
+          end: new Date(slot.date),
+          allDay: false,
+          bgColor: "#d1fae5",
+        }))
+      );
+    });
+  }, []);
+
+  const handleSelect = async ({ start }: any) => {
+    const postId = prompt("Enter Post ID to schedule boost:");
+    if (!postId) return;
+    await axios.post("/api/facebook/scheduled-boosts", {
+      postId,
+      date: start,
+    });
+    alert("Scheduled boost added!");
+    location.reload();
+  };
+
+  return (
+    <div className="p-4 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">📅 Scheduled Boost Calendar + AI Suggestions</h2>
+      <Calendar
+        localizer={localizer}
+        events={[...events, ...suggestions]}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: 600 }}
+        selectable
+        onSelectSlot={handleSelect}
+      />
+    </div>
+  );
+};
+
+// 🧪 test/testFakeInsightGenerator.ts
+import fs from "fs";
+
+const fake = () => {
+  const mock = {};
+  for (let d = 0; d < 7; d++) {
+    for (let h = 0; h < 24; h += 2) {
+      const key = `${d}_${h}`;
+      mock[key] = Math.floor(Math.random() * 300);
+    }
+  }
+  const result = {
+    data: [
+      {
+        name: "page_impressions_by_day_time_band",
+        period: "lifetime",
+        values: [
+          {
+            end_time: new Date().toISOString(),
+            value: mock,
+          },
+        ],
+      },
+    ],
+  };
+
+  fs.writeFileSync("./test/fakeInsights.json", JSON.stringify(result, null, 2));
+  console.log("🧪 Fake insight generated: ./test/fakeInsights.json");
+};
+
+fake();

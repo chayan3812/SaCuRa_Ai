@@ -1,14 +1,19 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Facebook, Target, Bot, Rocket } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { CheckCircle, Facebook, Target, Zap, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useLocation } from 'wouter';
 
 interface OnboardingData {
   pageId: string;
@@ -18,154 +23,168 @@ interface OnboardingData {
   targetAudience: string;
 }
 
+const CAMPAIGN_GOALS = [
+  { value: 'engagement', label: 'Increase Engagement', icon: '👥', description: 'Boost likes, comments, and shares' },
+  { value: 'traffic', label: 'Drive Website Traffic', icon: '🌐', description: 'Get more visitors to your website' },
+  { value: 'leads', label: 'Generate Leads', icon: '📧', description: 'Collect contact information' },
+  { value: 'sales', label: 'Increase Sales', icon: '💰', description: 'Drive direct purchases' },
+  { value: 'awareness', label: 'Brand Awareness', icon: '🎯', description: 'Reach more potential customers' },
+  { value: 'app_installs', label: 'App Installs', icon: '📱', description: 'Get more app downloads' }
+];
+
 export const OnboardingWizard: React.FC = () => {
-  const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<OnboardingData>({
-    pageId: "",
-    goal: "",
-    autopilot: true,
+    pageId: '',
+    goal: '',
+    autopilot: false,
     budget: 50,
-    targetAudience: ""
+    targetAudience: ''
   });
 
-  const totalSteps = 4;
-  const progress = (step / totalSteps) * 100;
+  // Check onboarding status
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ['/api/onboarding/status'],
+    retry: false
+  });
 
-  const handleNext = () => {
-    if (validateCurrentStep()) {
-      setStep(step + 1);
-    }
-  };
+  // Fetch Facebook pages
+  const { data: facebookPages, isLoading: pagesLoading } = useQuery({
+    queryKey: ['/api/facebook/pages'],
+    retry: false
+  });
 
-  const handlePrevious = () => {
-    setStep(step - 1);
-  };
-
-  const validateCurrentStep = (): boolean => {
-    switch (step) {
-      case 1:
-        if (!formData.pageId.trim()) {
-          toast({
-            title: "Page ID Required",
-            description: "Please enter your Facebook Page ID to continue.",
-            variant: "destructive"
-          });
-          return false;
-        }
-        return true;
-      case 2:
-        if (!formData.goal) {
-          toast({
-            title: "Campaign Goal Required",
-            description: "Please select your primary campaign goal.",
-            variant: "destructive"
-          });
-          return false;
-        }
-        return true;
-      case 3:
-        if (formData.budget < 10) {
-          toast({
-            title: "Minimum Budget Required",
-            description: "Daily budget must be at least $10.",
-            variant: "destructive"
-          });
-          return false;
-        }
-        return true;
-      default:
-        return true;
-    }
-  };
-
-  const handleFinish = async () => {
-    setIsLoading(true);
-    
-    try {
-      await apiRequest("/api/onboarding/save", {
-        method: "POST",
-        body: JSON.stringify({
-          pageId: formData.pageId,
-          goal: formData.goal,
-          autopilot: formData.autopilot,
-          budget: formData.budget,
-          targetAudience: formData.targetAudience,
-          setupComplete: true
-        })
-      });
-
-      // Initialize automation if autopilot is enabled
-      if (formData.autopilot) {
-        await apiRequest("/api/automation/initialize", {
-          method: "POST",
-          body: JSON.stringify({
-            pageId: formData.pageId,
-            enableAutoPosting: true,
-            enableAutoBoosting: true
-          })
-        });
-      }
-
-      setIsComplete(true);
-      
+  // Save onboarding configuration
+  const saveOnboardingMutation = useMutation({
+    mutationFn: async (data: OnboardingData & { setupComplete: boolean }) => {
+      return await apiRequest('/api/onboarding/save', 'POST', data);
+    },
+    onSuccess: () => {
       toast({
         title: "Setup Complete!",
-        description: "Your Facebook marketing automation is now active.",
-        variant: "default"
+        description: "Your AI automation is now active and ready to optimize your campaigns.",
       });
-
-    } catch (error) {
-      console.error("Onboarding failed:", error);
+      queryClient.invalidateQueries({ queryKey: ['/api/onboarding/status'] });
+      setTimeout(() => setLocation('/'), 1500);
+    },
+    onError: (error) => {
       toast({
         title: "Setup Failed",
-        description: "There was an error completing your setup. Please try again.",
-        variant: "destructive"
+        description: "There was an issue saving your configuration. Please try again.",
+        variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      console.error('Onboarding save error:', error);
     }
-  };
+  });
 
-  const updateFormData = (field: keyof OnboardingData, value: any) => {
+  // Initialize automation
+  const initializeAutomationMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/automation/initialize', 'POST', {
+        pageId: formData.pageId,
+        enableAutoPosting: formData.autopilot,
+        enableAutoBoosting: formData.autopilot
+      });
+    },
+    onSuccess: () => {
+      // Proceed to save final configuration
+      saveOnboardingMutation.mutate({
+        ...formData,
+        setupComplete: true
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Automation Setup Failed",
+        description: "Failed to initialize automation systems. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Automation initialization error:', error);
+      setIsSubmitting(false);
+    }
+  });
+
+  // If already completed, redirect to dashboard
+  useEffect(() => {
+    if (onboardingStatus?.setupComplete) {
+      toast({
+        title: "Already Configured",
+        description: "Your automation is already set up. Redirecting to dashboard...",
+      });
+      setTimeout(() => setLocation('/'), 1500);
+    }
+  }, [onboardingStatus, setLocation, toast]);
+
+  const handleInputChange = (field: keyof OnboardingData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (isComplete) {
+  const nextStep = () => {
+    if (currentStep < 4) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.pageId || !formData.goal) {
+      toast({
+        title: "Missing Information",
+        description: "Please complete all required fields before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Initialize automation systems first
+      await initializeAutomationMutation.mutateAsync();
+    } catch (error) {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isStepValid = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return formData.pageId !== '';
+      case 2:
+        return formData.goal !== '';
+      case 3:
+        return formData.targetAudience.trim().length > 0;
+      case 4:
+        return formData.budget > 0;
+      default:
+        return false;
+    }
+  };
+
+  const getStepProgress = () => (currentStep / 4) * 100;
+
+  if (onboardingStatus?.setupComplete) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card className="text-center">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <Card className="w-full max-w-md">
           <CardContent className="pt-6">
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="h-16 w-16 text-green-500" />
+            <div className="text-center">
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Already Configured</h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                Your automation is already set up and running.
+              </p>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Welcome to SaCuRa AI!</h2>
-            <p className="text-gray-600 mb-6">
-              Your Facebook marketing automation is now live and ready to boost your business.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <Bot className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h3 className="font-semibold">AI Content</h3>
-                <p className="text-sm text-gray-600">Automated content generation</p>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg">
-                <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Smart Targeting</h3>
-                <p className="text-sm text-gray-600">Optimal audience reach</p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <Rocket className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Auto Boosting</h3>
-                <p className="text-sm text-gray-600">Performance-based promotion</p>
-              </div>
-            </div>
-            <Button onClick={() => window.location.href = "/dashboard"} className="w-full">
-              Go to Dashboard
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -173,179 +192,319 @@ export const OnboardingWizard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Facebook className="h-6 w-6 text-blue-600" />
-            Facebook Marketing Setup
-          </CardTitle>
-          <Progress value={progress} className="w-full" />
-          <p className="text-sm text-gray-600">Step {step} of {totalSteps}</p>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          {step === 1 && (
-            <div className="space-y-4">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">Connect Your Facebook Page</h3>
-                <p className="text-gray-600">Enter your Facebook Page ID to get started</p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="pageId">Facebook Page ID</Label>
-                <Input
-                  id="pageId"
-                  placeholder="Enter your Facebook Page ID"
-                  value={formData.pageId}
-                  onChange={(e) => updateFormData('pageId', e.target.value)}
-                />
-                <p className="text-xs text-gray-500">
-                  You can find your Page ID in your Facebook Page settings or URL
-                </p>
-              </div>
-              
-              <div className="flex justify-end">
-                <Button onClick={handleNext}>Next Step</Button>
-              </div>
-            </div>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Welcome to SaCuRa AI
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300">
+            Let's set up your AI-powered marketing automation in 4 simple steps
+          </p>
+        </div>
 
-          {step === 2 && (
-            <div className="space-y-4">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">Choose Your Campaign Goal</h3>
-                <p className="text-gray-600">What's your primary marketing objective?</p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="goal">Campaign Goal</Label>
-                <Select value={formData.goal} onValueChange={(value) => updateFormData('goal', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your primary goal" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="awareness">Brand Awareness</SelectItem>
-                    <SelectItem value="engagement">Engagement & Likes</SelectItem>
-                    <SelectItem value="traffic">Website Traffic</SelectItem>
-                    <SelectItem value="leads">Lead Generation</SelectItem>
-                    <SelectItem value="conversions">Sales & Conversions</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Progress */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Step {currentStep} of 4
+            </span>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {Math.round(getStepProgress())}% Complete
+            </span>
+          </div>
+          <Progress value={getStepProgress()} className="h-2" />
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="audience">Target Audience</Label>
-                <Input
-                  id="audience"
-                  placeholder="e.g., Business owners, Tech enthusiasts, Local customers"
-                  value={formData.targetAudience}
-                  onChange={(e) => updateFormData('targetAudience', e.target.value)}
-                />
-              </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={handlePrevious}>Previous</Button>
-                <Button onClick={handleNext}>Next Step</Button>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">Set Your Budget</h3>
-                <p className="text-gray-600">Configure your daily advertising budget</p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="budget">Daily Budget (USD)</Label>
-                <Input
-                  id="budget"
-                  type="number"
-                  min="10"
-                  max="1000"
-                  value={formData.budget}
-                  onChange={(e) => updateFormData('budget', parseInt(e.target.value) || 10)}
-                />
-                <p className="text-xs text-gray-500">
-                  Minimum $10/day recommended for effective reach
-                </p>
-              </div>
-
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-800 mb-2">Budget Recommendations</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• $10-25/day: Local businesses, small audience</li>
-                  <li>• $25-50/day: Regional reach, medium audience</li>
-                  <li>• $50+/day: National reach, large audience</li>
-                </ul>
-              </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={handlePrevious}>Previous</Button>
-                <Button onClick={handleNext}>Next Step</Button>
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-4">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">Enable AI Autopilot</h3>
-                <p className="text-gray-600">Let AI handle your content and advertising automatically</p>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="autopilot"
-                    checked={formData.autopilot}
-                    onCheckedChange={(checked) => updateFormData('autopilot', checked)}
-                  />
-                  <Label htmlFor="autopilot" className="text-base">
-                    Enable AI Autopilot (Recommended)
-                  </Label>
+        {/* Step Content */}
+        <Card className="mb-8">
+          <CardContent className="p-8">
+            {currentStep === 1 && (
+              <div>
+                <div className="flex items-center mb-6">
+                  <Facebook className="h-8 w-8 text-blue-600 mr-3" />
+                  <div>
+                    <CardTitle className="text-2xl">Connect Your Facebook Page</CardTitle>
+                    <CardDescription className="text-lg">
+                      Select the Facebook page you want to manage with AI
+                    </CardDescription>
+                  </div>
                 </div>
 
-                {formData.autopilot && (
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-green-800 mb-2">AI Autopilot Features:</h4>
-                    <ul className="text-sm text-green-700 space-y-1">
-                      <li>• Automated content generation and posting</li>
-                      <li>• Smart timing based on audience insights</li>
-                      <li>• Performance-based budget optimization</li>
-                      <li>• Intelligent audience targeting</li>
-                      <li>• Real-time campaign adjustments</li>
-                    </ul>
-                  </div>
-                )}
+                <div className="space-y-4">
+                  <Label htmlFor="pageId" className="text-base font-medium">
+                    Facebook Page *
+                  </Label>
+                  {pagesLoading ? (
+                    <div className="p-4 border rounded-lg">
+                      <p className="text-gray-500">Loading your Facebook pages...</p>
+                    </div>
+                  ) : !facebookPages || facebookPages.length === 0 ? (
+                    <div className="p-4 border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                      <p className="text-yellow-800 dark:text-yellow-200 font-medium mb-2">
+                        No Facebook pages found
+                      </p>
+                      <p className="text-yellow-700 dark:text-yellow-300 text-sm">
+                        Please connect your Facebook account first in the Facebook Setup page.
+                      </p>
+                      <Button 
+                        onClick={() => setLocation('/facebook-setup')} 
+                        className="mt-3"
+                        variant="outline"
+                      >
+                        Go to Facebook Setup
+                      </Button>
+                    </div>
+                  ) : (
+                    <Select value={formData.pageId} onValueChange={(value) => handleInputChange('pageId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose your Facebook page" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {facebookPages.map((page: any) => (
+                          <SelectItem key={page.id} value={page.id}>
+                            <div className="flex items-center">
+                              <span className="font-medium">{page.name}</span>
+                              {page.category && (
+                                <Badge variant="secondary" className="ml-2 text-xs">
+                                  {page.category}
+                                </Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+            )}
 
-                {!formData.autopilot && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-gray-800 mb-2">Manual Control:</h4>
-                    <p className="text-sm text-gray-700">
-                      You'll create and manage content manually through the dashboard.
-                      AI insights and recommendations will still be available.
+            {currentStep === 2 && (
+              <div>
+                <div className="flex items-center mb-6">
+                  <Target className="h-8 w-8 text-green-600 mr-3" />
+                  <div>
+                    <CardTitle className="text-2xl">Choose Your Campaign Goal</CardTitle>
+                    <CardDescription className="text-lg">
+                      What's your primary marketing objective?
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {CAMPAIGN_GOALS.map((goal) => (
+                    <Card 
+                      key={goal.value}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        formData.goal === goal.value 
+                          ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                          : 'hover:shadow-lg'
+                      }`}
+                      onClick={() => handleInputChange('goal', goal.value)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-3">
+                          <span className="text-2xl">{goal.icon}</span>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{goal.label}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                              {goal.description}
+                            </p>
+                          </div>
+                          {formData.goal === goal.value && (
+                            <CheckCircle className="h-5 w-5 text-blue-500" />
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div>
+                <div className="flex items-center mb-6">
+                  <Users className="h-8 w-8 text-purple-600 mr-3" />
+                  <div>
+                    <CardTitle className="text-2xl">Define Your Target Audience</CardTitle>
+                    <CardDescription className="text-lg">
+                      Describe your ideal customers for better AI targeting
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="targetAudience" className="text-base font-medium">
+                      Target Audience Description *
+                    </Label>
+                    <Textarea
+                      id="targetAudience"
+                      placeholder="e.g., Small business owners aged 25-45 interested in digital marketing tools, entrepreneurs looking to grow their online presence..."
+                      value={formData.targetAudience}
+                      onChange={(e) => handleInputChange('targetAudience', e.target.value)}
+                      rows={4}
+                      className="mt-2"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">
+                      Be specific about demographics, interests, and behaviors for better AI optimization
                     </p>
                   </div>
-                )}
+
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                    <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                      💡 Pro Tips for Better Targeting:
+                    </h4>
+                    <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                      <li>• Include age ranges and demographics</li>
+                      <li>• Mention specific interests or industries</li>
+                      <li>• Describe their pain points or goals</li>
+                      <li>• Add behavioral characteristics</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-              
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={handlePrevious}>Previous</Button>
-                <Button 
-                  onClick={handleFinish} 
-                  disabled={isLoading}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {isLoading ? "Setting up..." : "Launch Marketing Engine"}
-                </Button>
+            )}
+
+            {currentStep === 4 && (
+              <div>
+                <div className="flex items-center mb-6">
+                  <DollarSign className="h-8 w-8 text-green-600 mr-3" />
+                  <div>
+                    <CardTitle className="text-2xl">Set Your Budget & Automation</CardTitle>
+                    <CardDescription className="text-lg">
+                      Configure your daily budget and AI automation preferences
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="budget" className="text-base font-medium">
+                      Daily Budget (USD) *
+                    </Label>
+                    <div className="mt-2">
+                      <Input
+                        id="budget"
+                        type="number"
+                        min="1"
+                        max="1000"
+                        value={formData.budget}
+                        onChange={(e) => handleInputChange('budget', parseInt(e.target.value) || 0)}
+                        className="text-lg"
+                        placeholder="50"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">
+                        Recommended: $20-$100 per day for optimal results
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <Zap className="h-5 w-5 text-yellow-500 mr-2" />
+                          <Label htmlFor="autopilot" className="text-base font-medium">
+                            Enable AI Autopilot
+                          </Label>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          Let AI automatically create, post, and optimize your content
+                        </p>
+                      </div>
+                      <Switch
+                        id="autopilot"
+                        checked={formData.autopilot}
+                        onCheckedChange={(checked) => handleInputChange('autopilot', checked)}
+                      />
+                    </div>
+
+                    {formData.autopilot && (
+                      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 rounded-lg border">
+                        <h4 className="font-medium text-green-900 dark:text-green-100 mb-2 flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2" />
+                          AI Autopilot Features:
+                        </h4>
+                        <ul className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                          <li>• ✨ Automatic content generation based on your goals</li>
+                          <li>• 📅 Smart scheduling for optimal engagement times</li>
+                          <li>• 🚀 Intelligent boost scheduling for high-performing posts</li>
+                          <li>• 📊 Continuous performance optimization</li>
+                          <li>• 🎯 Real-time audience targeting adjustments</li>
+                        </ul>
+                      </div>
+                    )}
+
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        <strong>Note:</strong> You can modify these settings anytime from your dashboard. 
+                        AI will continuously learn and improve based on your page's performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between items-center">
+          <Button
+            onClick={prevStep}
+            disabled={currentStep === 1}
+            variant="outline"
+          >
+            Previous
+          </Button>
+
+          <div className="flex space-x-2">
+            {[1, 2, 3, 4].map((step) => (
+              <div
+                key={step}
+                className={`w-3 h-3 rounded-full ${
+                  step === currentStep
+                    ? 'bg-blue-600'
+                    : step < currentStep
+                    ? 'bg-green-500'
+                    : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+
+          {currentStep < 4 ? (
+            <Button
+              onClick={nextStep}
+              disabled={!isStepValid(currentStep)}
+              className="px-8"
+            >
+              Next
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={!isStepValid(currentStep) || isSubmitting}
+              className="px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                  Setting up automation...
+                </div>
+              ) : (
+                'Launch AI Automation'
+              )}
+            </Button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

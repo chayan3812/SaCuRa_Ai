@@ -121,6 +121,28 @@ app.use((req, res, next) => {
     log("Failed to start Content Scheduler: " + error);
   }
 
+  // Initialize AutoContentRunner - AI content generation and posting
+  try {
+    const { autoContentRunnerWithRetry } = await import('./cron/autoContentRunner');
+    
+    // Run every 4 hours for users with autopilot enabled
+    cron.schedule('0 */4 * * *', async () => {
+      log("🤖 AutoContentRunner executing AI content generation...");
+      try {
+        await autoContentRunnerWithRetry(3);
+        log("✅ AutoContentRunner completed successfully");
+      } catch (error) {
+        log("❌ AutoContentRunner failed: " + error);
+      }
+    }, {
+      scheduled: true,
+      timezone: "America/New_York"
+    });
+    log("🚀 AutoContentRunner scheduled for execution every 4 hours");
+  } catch (error) {
+    log("Failed to initialize AutoContentRunner: " + error);
+  }
+
   // Initialize Automated Boost Runner - Daily execution at 9am
   try {
     cron.schedule('0 9 * * *', async () => {

@@ -36,6 +36,16 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Onboarding and automation configuration
+  facebookPageId: varchar("facebook_page_id"),
+  campaignGoal: varchar("campaign_goal"),
+  autopilotEnabled: boolean("autopilot_enabled").default(false),
+  dailyBudget: integer("daily_budget").default(50),
+  targetAudience: text("target_audience"),
+  onboardingComplete: boolean("onboarding_complete").default(false),
+  autoPostingEnabled: boolean("auto_posting_enabled").default(false),
+  autoBoostingEnabled: boolean("auto_boosting_enabled").default(false),
+  automationActive: boolean("automation_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

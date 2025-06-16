@@ -48,6 +48,7 @@ import Settings from "@/pages/Settings";
 import SystemHealth from "@/pages/SystemHealth";
 import NotFound from "@/pages/not-found";
 import AppLayout from "@/components/layout/AppLayout";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -90,6 +91,7 @@ function Router() {
         <AppLayout>
           <Switch>
             <Route path="/" component={Dashboard} />
+            <Route path="/onboarding" component={OnboardingWizard} />
             <Route path="/ads" component={AdOptimizer} />
             <Route path="/auto-poster" component={AutoPoster} />
             <Route path="/admin/auto-post-config" component={AutoPostAdmin} />

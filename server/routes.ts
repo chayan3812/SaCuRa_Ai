@@ -1107,23 +1107,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Facebook OAuth Routes
+  app.get('/api/facebook/auth', devAuthMiddleware, (req: any, res) => {
+    const appId = process.env.FACEBOOK_APP_ID;
+    const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+    const scopes = 'pages_manage_posts,pages_read_engagement,pages_show_list,business_management';
+    
+    const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
+      `client_id=${appId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `scope=${encodeURIComponent(scopes)}&` +
+      `response_type=code&` +
+      `state=${req.user.claims.sub}`;
+    
+    res.redirect(authUrl);
+  });
+
+  app.get('/api/facebook/callback', async (req: any, res) => {
+    try {
+      const { code, state: userId } = req.query;
+      
+      if (!code) {
+        return res.redirect('/?error=facebook_auth_failed');
+      }
+
+      const appId = process.env.FACEBOOK_APP_ID;
+      const appSecret = process.env.FACEBOOK_APP_SECRET;
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+
+      // Exchange code for access token
+      const tokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+        params: {
+          client_id: appId,
+          client_secret: appSecret,
+          redirect_uri: redirectUri,
+          code
+        }
+      });
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Store the access token for the user
+      await storage.upsertUser({
+        id: userId,
+        facebookAccessToken: accessToken
+      });
+
+      // Fetch and store user's pages
+      const facebookAPI = new FacebookAPIService(accessToken);
+      const pages = await facebookAPI.getPages();
+
+      for (const page of pages) {
+        await storage.upsertFacebookPage({
+          userId,
+          pageId: page.id,
+          pageName: page.name,
+          accessToken: page.access_token,
+          category: page.category || 'Unknown',
+          followerCount: page.follower_count || 0,
+          isActive: true
+        });
+      }
+
+      res.redirect('/?facebook_connected=true');
+    } catch (error) {
+      console.error('Facebook OAuth callback error:', error);
+      res.redirect('/?error=facebook_auth_failed');
+    }
+  });
+
   // Facebook Pages API route
   app.get('/api/facebook/pages', devAuthMiddleware, async (req: any, res) => {
     try {
-      // Use production user system
-      const userId = '00000000-0000-0000-0000-000000000001';
-      const userPages = await storage.getFacebookPagesByUser(userId);
+      const userId = req.user.claims.sub;
       
-      // Return stored pages from database (live Facebook pages only)
-      const formattedPages = userPages.map(page => ({
-        id: page.pageId,
-        pageName: page.pageName,
-        category: page.category,
-        followerCount: page.followerCount || 0,
-        isActive: page.isActive
-      }));
+      // Check if user has Facebook access token stored
+      const user = await storage.getUser(userId);
+      if (!user?.facebookAccessToken) {
+        // No Facebook connection yet - return empty array with guidance
+        return res.json([]);
+      }
       
-      res.json(formattedPages);
+      // Try to fetch pages from Facebook API
+      try {
+        const facebookAPI = new FacebookAPIService(user.facebookAccessToken);
+        const facebookPages = await facebookAPI.getPages();
+        
+        // Store/update pages in database
+        for (const page of facebookPages) {
+          await storage.upsertFacebookPage({
+            userId,
+            pageId: page.id,
+            pageName: page.name,
+            accessToken: page.access_token,
+            category: page.category || 'Unknown',
+            followerCount: page.follower_count || 0,
+            isActive: true
+          });
+        }
+        
+        // Return formatted pages
+        const formattedPages = facebookPages.map(page => ({
+          id: page.id,
+          pageName: page.name,
+          category: page.category || 'Unknown',
+          followerCount: page.follower_count || 0,
+          isActive: true
+        }));
+        
+        res.json(formattedPages);
+      } catch (fbError) {
+        console.error('Facebook API error:', fbError);
+        // Fall back to stored pages if API fails
+        const userPages = await storage.getFacebookPagesByUser(userId);
+        const formattedPages = userPages.map(page => ({
+          id: page.pageId,
+          pageName: page.pageName,
+          category: page.category,
+          followerCount: page.followerCount || 0,
+          isActive: page.isActive
+        }));
+        
+        res.json(formattedPages);
+      }
     } catch (error) {
       console.error('Error fetching Facebook pages:', error);
       res.status(500).json({ message: 'Failed to fetch Facebook pages' });

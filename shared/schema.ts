@@ -38,6 +38,7 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   // Onboarding and automation configuration
   facebookPageId: varchar("facebook_page_id"),
+  facebookAccessToken: text("facebook_access_token"),
   campaignGoal: varchar("campaign_goal"),
   autopilotEnabled: boolean("autopilot_enabled").default(false),
   dailyBudget: integer("daily_budget").default(50),

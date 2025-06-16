@@ -6128,6 +6128,80 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // 🧠 Intelligent Time Slot Recommendations
+  app.get('/api/facebook/recommend-time-slots', isAuthenticated, async (req: any, res) => {
+    try {
+      const pageId = process.env.FACEBOOK_PAGE_ID;
+      const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
+      
+      if (!pageId || !accessToken) {
+        return res.status(400).json({ 
+          error: "Facebook credentials not configured",
+          message: "Please configure FACEBOOK_PAGE_ID and FACEBOOK_ACCESS_TOKEN in your environment"
+        });
+      }
+
+      const insightsURL = `https://graph.facebook.com/v17.0/${pageId}/insights/page_impressions_by_day_time_band?access_token=${accessToken}`;
+      const response = await fetch(insightsURL);
+      
+      if (!response.ok) {
+        throw new Error(`Facebook API error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const bands = data?.data?.[0]?.values?.[0]?.value || {};
+      
+      // Transform time bands into recommended slots
+      const entries = Object.entries(bands).map(([band, impressions]) => {
+        const [day, hour] = band.split("_").map(Number);
+        const now = new Date();
+        const slotDate = new Date(now);
+        
+        // Calculate next occurrence of this day/hour
+        slotDate.setDate(now.getDate() + ((day + 7 - now.getDay()) % 7));
+        slotDate.setHours(hour);
+        slotDate.setMinutes(0);
+        slotDate.setSeconds(0);
+        
+        return {
+          date: slotDate.toISOString(),
+          score: Number(impressions) || 0,
+          dayOfWeek: day,
+          hour: hour,
+          dayName: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day],
+          timeLabel: `${hour}:00`
+        };
+      });
+
+      // Sort by score and return top 5
+      const topSlots = entries
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5)
+        .map((slot, index) => ({
+          ...slot,
+          rank: index + 1,
+          confidence: slot.score > 0 ? Math.min(100, Math.round((slot.score / Math.max(...entries.map(e => e.score))) * 100)) : 0
+        }));
+
+      res.json({
+        recommendedSlots: topSlots,
+        analysis: {
+          totalDataPoints: entries.length,
+          highestScore: Math.max(...entries.map(e => e.score)),
+          averageScore: entries.reduce((sum, e) => sum + e.score, 0) / entries.length,
+          generatedAt: new Date().toISOString()
+        }
+      });
+      
+    } catch (error: any) {
+      console.error("TimeSlot Recommendation Error:", error);
+      res.status(500).json({ 
+        error: "Unable to generate time slot recommendations",
+        message: error.message
+      });
+    }
+  });
+
   app.get('/api/facebook/post-engagement/:postId', devAuthMiddleware, async (req: any, res) => {
     try {
       const { postId } = req.params;

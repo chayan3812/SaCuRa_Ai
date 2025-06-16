@@ -5,6 +5,8 @@ import { initializePageWatcher } from "./pageWatcher";
 import { initializeContentScheduler } from "./contentScheduler";
 import { productionOptimizer } from "./productionOptimizer";
 import { systemOptimizer } from "./systemOptimizer";
+import cron from "node-cron";
+import { autoBoostRunnerWithRetry } from "./cron/autoBoostRunner";
 
 const app = express();
 
@@ -117,6 +119,25 @@ app.use((req, res, next) => {
     log("Content Scheduler started successfully");
   } catch (error) {
     log("Failed to start Content Scheduler: " + error);
+  }
+
+  // Initialize Automated Boost Runner - Daily execution at 9am
+  try {
+    cron.schedule('0 9 * * *', async () => {
+      log("🔁 AutoBoost Runner executing daily boost checks...");
+      try {
+        await autoBoostRunnerWithRetry(3);
+        log("✅ AutoBoost Runner completed successfully");
+      } catch (error) {
+        log("❌ AutoBoost Runner failed: " + error);
+      }
+    }, {
+      scheduled: true,
+      timezone: "America/New_York"
+    });
+    log("🚀 AutoBoost Runner scheduled for daily execution at 9:00 AM EST");
+  } catch (error) {
+    log("Failed to initialize AutoBoost Runner: " + error);
   }
 
   // importantly only setup vite in development and after

@@ -1,0 +1,66 @@
+// 🔁 cron/autoBoostRunner.ts
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
+
+export const autoBoostRunner = async () => {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const { data: boosts } = await axios.get("http://localhost:3000/api/facebook/scheduled-boosts");
+
+    const todayBoosts = boosts.filter((b: any) => b.date.startsWith(today));
+    console.log(`📆 Found ${todayBoosts.length} boosts scheduled for today.`);
+
+    for (const boost of todayBoosts) {
+      try {
+        await axios.post("http://localhost:3000/api/facebook/boost-post", {
+          pagePostId: boost.postId,
+          budget: boost.budget || 10,
+          days: boost.days || 3,
+        });
+        console.log(`✅ Boosted: ${boost.postId}`);
+      } catch (e) {
+        console.error(`❌ Failed to boost ${boost.postId}`, e);
+      }
+    }
+  } catch (e) {
+    console.error("🛑 AutoBoostRunner Error:", e);
+  }
+};
+
+// 🧠 server/routes/recommendTimeSlots.ts
+import express from "express";
+import axios from "axios";
+
+const router = express.Router();
+const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+const ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+
+router.get("/facebook/recommend-time-slots", async (req, res) => {
+  try {
+    const insightsURL = `https://graph.facebook.com/v17.0/${PAGE_ID}/insights/page_impressions_by_day_time_band?access_token=${ACCESS_TOKEN}`;
+    const { data } = await axios.get(insightsURL);
+
+    const bands = data?.data?.[0]?.values?.[0]?.value || {};
+    const entries = Object.entries(bands).map(([band, impressions]) => {
+      const [day, hour] = band.split("_").map(Number);
+      const now = new Date();
+      const slotDate = new Date(now);
+      slotDate.setDate(now.getDate() + ((day + 7 - now.getDay()) % 7));
+      slotDate.setHours(hour);
+      slotDate.setMinutes(0);
+      return {
+        date: slotDate.toISOString(),
+        score: impressions,
+      };
+    });
+
+    const sorted = entries.sort((a, b) => b.score - a.score);
+    res.json(sorted.slice(0, 5));
+  } catch (e) {
+    console.error("RecommendTimeSlots Error:", e);
+    res.status(500).json({ error: "Unable to recommend time slots" });
+  }
+});
+
+export default router;

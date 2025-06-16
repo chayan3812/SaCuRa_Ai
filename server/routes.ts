@@ -60,6 +60,7 @@ import { aiStressTestInjector } from "./aiStressTest";
 import { weeklySlackReporter } from "./weeklySlackReporter";
 import { facebookAnalytics } from "./facebookAnalytics";
 import { conversionsAPI } from "./conversionsAPIService";
+import { facebookWebhooks } from "./facebookWebhooks";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -7368,6 +7369,176 @@ Prioritize by impact and feasibility.`;
       res.status(500).json({ message: "Failed to generate AI content" });
     }
   });
+
+  // ===== FACEBOOK WEBHOOKS ENDPOINTS =====
+  
+  // Facebook webhook verification endpoint
+  app.get('/api/facebook/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    const result = facebookWebhooks.handleVerification(
+      mode as string,
+      token as string,
+      challenge as string
+    );
+
+    if (result) {
+      console.log('Facebook webhook verified successfully');
+      res.status(200).send(challenge);
+    } else {
+      console.log('Facebook webhook verification failed');
+      res.status(403).send('Verification failed');
+    }
+  });
+
+  // Facebook webhook event receiver
+  app.post('/api/facebook/webhook', webhookLimiter, async (req, res) => {
+    try {
+      const signature = req.headers['x-hub-signature-256'] as string;
+      const body = JSON.stringify(req.body);
+
+      // Verify webhook signature for security
+      if (!facebookWebhooks.verifySignature(body, signature)) {
+        console.log('Invalid webhook signature');
+        return res.status(401).send('Unauthorized');
+      }
+
+      // Process the webhook event
+      await facebookWebhooks.processWebhookEvent(req.body);
+      
+      res.status(200).send('EVENT_RECEIVED');
+    } catch (error: any) {
+      console.error('Error processing Facebook webhook:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  // Subscribe to Facebook webhooks for a page
+  app.post('/api/facebook/webhook/subscribe', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId, accessToken, fields } = req.body;
+      
+      if (!pageId || !accessToken || !fields) {
+        return res.status(400).json({ 
+          error: 'pageId, accessToken, and fields are required' 
+        });
+      }
+
+      const defaultFields = [
+        'feed',
+        'messages',
+        'messaging_postbacks',
+        'message_deliveries',
+        'message_reads',
+        'messaging_optins',
+        'messaging_referrals',
+        'messaging_handovers',
+        'messaging_policy_enforcement',
+        'message_echoes',
+        'standby',
+        'messaging_account_linking',
+        'messaging_checkout_updates',
+        'messaging_pre_checkouts',
+        'messaging_payments'
+      ];
+
+      const subscriptionFields = fields.length > 0 ? fields : defaultFields;
+      
+      const success = await facebookWebhooks.subscribeToWebhooks(
+        pageId,
+        accessToken,
+        subscriptionFields
+      );
+
+      if (success) {
+        res.json({
+          message: 'Successfully subscribed to Facebook webhooks',
+          pageId,
+          fields: subscriptionFields
+        });
+      } else {
+        res.status(500).json({
+          error: 'Failed to subscribe to Facebook webhooks'
+        });
+      }
+    } catch (error: any) {
+      console.error('Error subscribing to webhooks:', error);
+      res.status(500).json({ 
+        error: 'Failed to subscribe to webhooks',
+        details: error.message
+      });
+    }
+  });
+
+  // Get webhook subscription status for a page
+  app.get('/api/facebook/webhook/status/:pageId', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pageId } = req.params;
+      const { accessToken } = req.query;
+      
+      if (!accessToken) {
+        return res.status(400).json({ 
+          error: 'accessToken query parameter is required' 
+        });
+      }
+
+      const status = await facebookWebhooks.getSubscriptionStatus(
+        pageId,
+        accessToken as string
+      );
+
+      res.json({
+        message: 'Webhook subscription status retrieved',
+        pageId,
+        subscriptions: status
+      });
+    } catch (error: any) {
+      console.error('Error getting webhook status:', error);
+      res.status(500).json({ 
+        error: 'Failed to get webhook status',
+        details: error.message
+      });
+    }
+  });
+
+  // Test webhook endpoint for development
+  app.post('/api/facebook/webhook/test', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const testEvent = {
+        object: 'page',
+        entry: [{
+          id: 'test_page_id',
+          time: Math.floor(Date.now() / 1000),
+          changes: [{
+            field: 'feed',
+            value: {
+              item: 'status',
+              verb: 'add',
+              post_id: 'test_post_' + Date.now(),
+              created_time: Math.floor(Date.now() / 1000)
+            }
+          }]
+        }]
+      };
+
+      await facebookWebhooks.processWebhookEvent(testEvent);
+      
+      res.json({
+        message: 'Test webhook event processed successfully',
+        testEvent
+      });
+    } catch (error: any) {
+      console.error('Error processing test webhook:', error);
+      res.status(500).json({ 
+        error: 'Failed to process test webhook',
+        details: error.message
+      });
+    }
+  });
+
+  const httpServer = createServer(app);
 
   return httpServer;
 }

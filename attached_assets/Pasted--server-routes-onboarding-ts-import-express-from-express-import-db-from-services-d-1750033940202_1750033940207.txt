@@ -1,0 +1,95 @@
+// 📦 server/routes/onboarding.ts
+import express from "express";
+import { db } from "../services/db";
+const router = express.Router();
+
+router.post("/onboarding/save", async (req, res) => {
+  const { pageId, goal, autopilot } = req.body;
+  try {
+    await db.onboarding.upsert({
+      where: { userId: req.user.id },
+      update: { pageId, goal, autopilot },
+      create: { userId: req.user.id, pageId, goal, autopilot },
+    });
+    res.json({ success: true });
+  } catch (e) {
+    console.error("❌ Onboarding Save Error:", e);
+    res.status(500).json({ error: "Failed to save onboarding config" });
+  }
+});
+
+export default router;
+
+// 📦 client/src/pages/OnboardingGate.tsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { OnboardingWizard } from "./OnboardingWizard";
+
+export const OnboardingGate: React.FC = () => {
+  const [loaded, setLoaded] = useState(false);
+  const [configured, setConfigured] = useState(false);
+
+  useEffect(() => {
+    axios.get("/api/onboarding/configured").then((res) => {
+      setConfigured(res.data.configured);
+      setLoaded(true);
+    });
+  }, []);
+
+  if (!loaded) return <p>Loading onboarding check...</p>;
+  return configured ? <p>✅ Onboarding complete.</p> : <OnboardingWizard />;
+};
+
+// 📦 server/routes/onboarding-configured.ts
+router.get("/onboarding/configured", async (req, res) => {
+  try {
+    const existing = await db.onboarding.findUnique({
+      where: { userId: req.user.id },
+    });
+    res.json({ configured: !!existing });
+  } catch (e) {
+    console.error("❌ Config Check Error:", e);
+    res.status(500).json({ error: true });
+  }
+});
+
+// 💳 client/src/pages/PricingPlans.tsx
+import React from "react";
+
+export const PricingPlans: React.FC = () => {
+  return (
+    <div className="max-w-5xl mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold text-center">💼 SaaS Pricing Plans</h1>
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="border p-4 rounded shadow space-y-2">
+          <h2 className="text-xl font-semibold">Free Tier</h2>
+          <ul className="list-disc pl-5 text-sm">
+            <li>Connect 1 FB Page</li>
+            <li>5 auto-posts/month</li>
+            <li>No boost automation</li>
+          </ul>
+          <button className="btn w-full mt-2">Get Started</button>
+        </div>
+        <div className="border p-4 rounded shadow space-y-2 bg-indigo-50">
+          <h2 className="text-xl font-semibold">Pro</h2>
+          <ul className="list-disc pl-5 text-sm">
+            <li>Up to 5 FB Pages</li>
+            <li>Unlimited posts</li>
+            <li>Boost automation + insights</li>
+            <li>Email + Slack reports</li>
+          </ul>
+          <button className="btn btn-primary w-full mt-2">Upgrade</button>
+        </div>
+        <div className="border p-4 rounded shadow space-y-2">
+          <h2 className="text-xl font-semibold">Enterprise</h2>
+          <ul className="list-disc pl-5 text-sm">
+            <li>Unlimited everything</li>
+            <li>Priority support</li>
+            <li>White-label dashboard</li>
+          </ul>
+          <button className="btn w-full mt-2">Contact Us</button>
+        </div>
+      </div>
+    </div>
+  );
+};

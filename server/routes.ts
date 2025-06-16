@@ -6899,6 +6899,127 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Onboarding API Routes for OnboardingWizard integration
+  app.post("/api/onboarding/save", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { pageId, goal, autopilot, budget, targetAudience, setupComplete } = req.body;
+
+      // Save onboarding configuration to user preferences
+      const user = await storage.getUser(userId);
+      if (user) {
+        await storage.updateUser(userId, {
+          ...user,
+          facebookPageId: pageId,
+          campaignGoal: goal,
+          autopilotEnabled: autopilot,
+          dailyBudget: budget,
+          targetAudience,
+          onboardingComplete: setupComplete
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        message: "Onboarding configuration saved successfully"
+      });
+    } catch (error) {
+      console.error("Error saving onboarding config:", error);
+      res.status(500).json({ message: "Failed to save onboarding configuration" });
+    }
+  });
+
+  app.get("/api/onboarding/status", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const user = await storage.getUser(userId);
+      res.json({ 
+        setupComplete: user?.onboardingComplete || false,
+        config: user ? {
+          pageId: user.facebookPageId,
+          goal: user.campaignGoal,
+          autopilot: user.autopilotEnabled,
+          budget: user.dailyBudget,
+          targetAudience: user.targetAudience
+        } : null
+      });
+    } catch (error) {
+      console.error("Error getting onboarding status:", error);
+      res.status(500).json({ message: "Failed to get onboarding status" });
+    }
+  });
+
+  app.post("/api/automation/initialize", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { pageId, enableAutoPosting, enableAutoBoosting } = req.body;
+
+      // Initialize automation by updating user settings
+      const user = await storage.getUser(userId);
+      if (user) {
+        await storage.updateUser(userId, {
+          ...user,
+          facebookPageId: pageId,
+          autoPostingEnabled: enableAutoPosting,
+          autoBoostingEnabled: enableAutoBoosting,
+          automationActive: true
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        message: "Automation initialized successfully"
+      });
+    } catch (error) {
+      console.error("Error initializing automation:", error);
+      res.status(500).json({ message: "Failed to initialize automation" });
+    }
+  });
+
+  // AI Content Generation Route for AutoContentRunner
+  app.get("/api/ai/content-optimizer/generate", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Get user's configuration for context
+      const user = await storage.getUser(userId);
+      const goal = user?.campaignGoal || 'engagement';
+      const audience = user?.targetAudience || 'general audience';
+
+      // Generate AI-optimized content based on user goals
+      const contentPrompt = `Create engaging ${goal}-focused social media content for ${audience}. Include relevant hashtags and make it compelling for Facebook.`;
+      
+      const aiContent = await aiService.generateContent(contentPrompt);
+
+      res.json({
+        content: {
+          text: aiContent,
+          hashtags: ['#Business', '#Growth', '#Innovation'],
+          recommendedBudget: user?.dailyBudget || 20,
+          type: 'ai_generated'
+        }
+      });
+    } catch (error) {
+      console.error("Error generating AI content:", error);
+      res.status(500).json({ message: "Failed to generate AI content" });
+    }
+  });
+
   return httpServer;
 }
 

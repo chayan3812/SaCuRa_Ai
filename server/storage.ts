@@ -168,6 +168,13 @@ export interface IStorage {
     avgResponseTime: number;
   }>;
   
+  // Automation Methods for AutoContentRunner
+  getAllUsers(): Promise<User[]>;
+  logAutoContentExecution(userId: string, details: any): Promise<void>;
+  logAutoContentError(userId: string, error: string): Promise<void>;
+  logAutoBoostExecution(userId: string, details: any): Promise<void>;
+  logAutoBoostError(userId: string, error: string): Promise<void>;
+  
   // AI Learning Analytics
   getAILearningMetrics(userId: string): Promise<{
     customerToneAnalysis: number;
@@ -1274,6 +1281,31 @@ export class DatabaseStorage implements IStorage {
       .values(boost)
       .returning();
     return result;
+  }
+
+  // Automation Methods for AutoContentRunner
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async logAutoContentExecution(userId: string, details: any): Promise<void> {
+    // Log to console for now, can be enhanced to store in database
+    console.log(`AutoContent execution for user ${userId}:`, details);
+  }
+
+  async logAutoContentError(userId: string, error: string): Promise<void> {
+    // Log to console for now, can be enhanced to store in database
+    console.error(`AutoContent error for user ${userId}:`, error);
+  }
+
+  async logAutoBoostExecution(userId: string, details: any): Promise<void> {
+    // Log to console for now, can be enhanced to store in database
+    console.log(`AutoBoost execution for user ${userId}:`, details);
+  }
+
+  async logAutoBoostError(userId: string, error: string): Promise<void> {
+    // Log to console for now, can be enhanced to store in database
+    console.error(`AutoBoost error for user ${userId}:`, error);
   }
 }
 

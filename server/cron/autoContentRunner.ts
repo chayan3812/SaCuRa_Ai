@@ -1,6 +1,6 @@
 import axios from "axios";
 import { storage } from "../storage";
-import { facebookAPIService } from "../facebookAPIService";
+import { FacebookAPIService } from "../facebookAPIService";
 
 interface ContentGeneration {
   text: string;
@@ -52,7 +52,8 @@ const processUserContent = async (userId: string) => {
   }
   
   // Post content to Facebook
-  const postResponse = await facebookAPIService.createPost(userId, {
+  const facebookApi = new FacebookAPIService();
+  const postResponse = await facebookApi.createPost(userId, {
     message: content.text,
     image: content.imageUrl,
     scheduledTime: bestSlot.date

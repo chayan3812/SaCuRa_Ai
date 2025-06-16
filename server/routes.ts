@@ -5037,14 +5037,67 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  // Test Conversions API setup
+  // Test Conversions API setup - Production ready
   app.get('/api/conversions/test-setup', devAuthMiddleware, async (req: any, res) => {
     try {
-      const setupResult = await conversionsAPI.testSetup();
+      // Test 1: Direct token validation with production credentials
+      const tokenResponse = await axios.get(
+        `https://graph.facebook.com/v19.0/me?access_token=${process.env.FB_PIXEL_ACCESS_TOKEN}`
+      );
+      
+      const testResults = [{
+        test: 'Access Token Validation',
+        status: 'passed',
+        details: `Token valid for: ${tokenResponse.data.name || 'Facebook User'}`
+      }];
+
+      // Test 2: Production pixel event test without crypto dependencies
+      try {
+        const pixelTestPayload = {
+          data: [{
+            event_name: 'PageView',
+            event_time: Math.floor(Date.now() / 1000),
+            action_source: 'website',
+            user_data: {
+              external_id: 'prod_test_user_' + Date.now(),
+              client_ip_address: '127.0.0.1',
+              client_user_agent: 'SaCuRa AI Production Test',
+            },
+            custom_data: {
+              content_name: 'Production API Test',
+              content_category: 'System Testing',
+            }
+          }],
+          partner_agent: 'SaCuRa AI Platform'
+        };
+
+        const pixelResponse = await axios.post(
+          `https://graph.facebook.com/v19.0/${process.env.FACEBOOK_PIXEL_ID}/events?access_token=${process.env.FB_PIXEL_ACCESS_TOKEN}`,
+          pixelTestPayload,
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        testResults.push({
+          test: 'Production Pixel Event Test',
+          status: 'passed',
+          details: 'Test event successfully sent to Facebook Pixel'
+        });
+      } catch (pixelError: any) {
+        testResults.push({
+          test: 'Production Pixel Event Test',
+          status: 'failed',
+          details: pixelError.response?.data?.error?.message || 'Pixel event test failed'
+        });
+      }
+
+      const allTestsPassed = testResults.every(result => result.status === 'passed');
       
       res.json({
-        message: 'Conversions API setup test completed',
-        ...setupResult
+        message: 'Production Conversions API test completed',
+        isValid: allTestsPassed,
+        testResults,
+        pixelId: process.env.FACEBOOK_PIXEL_ID,
+        environment: 'production'
       });
     } catch (error: any) {
       console.error('Error testing Conversions API setup:', error);

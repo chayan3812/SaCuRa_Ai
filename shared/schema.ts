@@ -46,6 +46,7 @@ export const users = pgTable("users", {
   autoPostingEnabled: boolean("auto_posting_enabled").default(false),
   autoBoostingEnabled: boolean("auto_boosting_enabled").default(false),
   automationActive: boolean("automation_active").default(false),
+  subscriptionPlan: varchar("subscription_plan").default("free"), // free, pro, enterprise
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

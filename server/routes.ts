@@ -5286,11 +5286,21 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/facebook/posts', devAuthMiddleware, async (req: any, res) => {
+  app.get('/api/facebook/posts', isAuthenticated, async (req: any, res) => {
     try {
       const { limit } = req.query;
       const posts = await facebookAPI.getRecentPosts(limit ? parseInt(limit as string) : 10);
-      res.json(posts);
+      
+      // Format posts for BoostPostPanel compatibility
+      const formattedPosts = {
+        data: posts.map((post: any) => ({
+          id: post.id,
+          message: post.message || post.story || '(No text content)',
+          created_time: post.created_time
+        }))
+      };
+      
+      res.json(formattedPosts);
     } catch (error) {
       console.error('Error fetching Facebook posts:', error);
       res.status(500).json({ error: 'Failed to fetch posts' });

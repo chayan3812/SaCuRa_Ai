@@ -14,6 +14,8 @@ import CircularProgressDashboard from "@/components/dashboard/CircularProgressDa
 import RealTimeDataVisualizer from "@/components/dashboard/RealTimeDataVisualizer";
 import FloatingActionPanel from "@/components/dashboard/FloatingActionPanel";
 import PlanBasedAITraining from "@/components/PlanBasedAITraining";
+import FacebookWebhookManager from "@/components/dashboard/FacebookWebhookManager";
+import FacebookLoginButton from "@/components/auth/FacebookLoginButton";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

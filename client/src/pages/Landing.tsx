@@ -1,464 +1,502 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import logoImage from "@/assets/logo.png";
-import { 
-  Bot, 
-  ChartLine, 
-  Megaphone, 
-  Headphones, 
-  Shield, 
-  Users, 
-  Search, 
-  Brain,
-  TrendingUp,
-  CheckCircle,
-  Star,
-  ArrowRight,
-  Play,
-  Zap,
-  Clock,
-  DollarSign,
-  Target
-} from "lucide-react";
+import { ArrowRight, CheckCircle, Star, Users, TrendingUp, MessageSquare, Zap, Target, Shield, Clock, Bot, Sparkles, BarChart3, Brain, Rocket, Globe, Lock, Award, Play, ExternalLink, ChevronRight, TrendingDown, DollarSign, MousePointer } from "lucide-react";
+import sacuraLogo from "@assets/SaCuRa_Ai_Logo_1750010758811.png";
 
 export default function Landing() {
-  const handleLogin = () => {
-    window.location.href = '/api/login';
-  };
-
-  const features = [
-    {
-      icon: Megaphone,
-      title: "Ad Optimizer",
-      description: "AI-driven ad optimization with real-time performance monitoring and budget recommendations",
-      color: "text-sacura-primary",
-      bgColor: "bg-sacura-primary/10"
-    },
-    {
-      icon: Headphones,
-      title: "Customer Service Automation",
-      description: "24/7 AI customer service with 0.8s average response time and human escalation",
-      color: "text-sacura-secondary",
-      bgColor: "bg-sacura-secondary/10"
-    },
-    {
-      icon: Shield,
-      title: "Restriction Prevention",
-      description: "Proactive policy compliance monitoring to prevent account restrictions and bans",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-100"
-    },
-    {
-      icon: Users,
-      title: "Employee Monitoring",
-      description: "Track team performance with response time alerts and productivity insights",
-      color: "text-purple-600",
-      bgColor: "bg-purple-100"
-    },
-    {
-      icon: Search,
-      title: "Competitor Analysis",
-      description: "Monitor competitor strategies and identify market opportunities",
-      color: "text-amber-600",
-      bgColor: "bg-amber-100"
-    },
-    {
-      icon: Brain,
-      title: "AI Insights",
-      description: "Advanced analytics with predictive recommendations and growth opportunities",
-      color: "text-pink-600",
-      bgColor: "bg-pink-100"
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: DollarSign,
-      title: "Reduce Ad Spend Waste",
-      description: "Save up to 40% on advertising costs with AI-optimized budget allocation",
-      stat: "40% Savings"
-    },
-    {
-      icon: Clock,
-      title: "Instant Customer Responses",
-      description: "AI handles 89% of customer inquiries with sub-second response times",
-      stat: "0.8s Response"
-    },
-    {
-      icon: Shield,
-      title: "Prevent Account Restrictions",
-      description: "94% success rate in preventing policy violations and account bans",
-      stat: "94% Prevention"
-    },
-    {
-      icon: TrendingUp,
-      title: "Increase Engagement",
-      description: "Boost engagement rates by up to 35% with AI-optimized content timing",
-      stat: "35% Increase"
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Chen",
-      role: "Marketing Director",
-      company: "TechCorp Solutions",
-      content: "SaCuRa AI transformed our Facebook marketing. We've seen a 50% increase in lead quality and our team can focus on strategy instead of monitoring.",
-      rating: 5
-    },
-    {
-      name: "Mike Rodriguez",
-      role: "Small Business Owner",
-      company: "Local Restaurant Chain",
-      content: "The AI customer service is incredible. It handles most inquiries perfectly, and when it escalates to us, we know it's important. Our response time improved dramatically.",
-      rating: 5
-    },
-    {
-      name: "Lisa Park",
-      role: "Digital Marketing Manager",
-      company: "E-commerce Startup",
-      content: "The restriction prevention feature saved our account twice. The AI caught policy issues before they became problems. Worth every penny.",
-      rating: 5
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
       {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      <header className="border-b bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <img 
-                src={logoImage} 
-                alt="SaCuRa AI Logo" 
-                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-              />
+            <div className="flex items-center space-x-3">
+              <img src={sacuraLogo} alt="SaCuRa AI" className="h-12 w-12 rounded-xl shadow-md" />
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-foreground">SaCuRa AI</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">Business Solutions</p>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SaCuRa AI</span>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">AI Marketing Automation</div>
               </div>
             </div>
-            <Button onClick={handleLogin} className="bg-sacura-primary hover:bg-sacura-primary/90 text-sm sm:text-base px-3 sm:px-4 py-2">
-              <span className="hidden sm:inline">Get Started</span>
-              <span className="sm:hidden">Start</span>
-              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
-            </Button>
+            
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Success Stories</a>
+              <a href="#about" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">About</a>
+              <Button variant="outline" onClick={() => window.location.href = '/api/login'} className="border-blue-200 hover:border-blue-300">
+                Sign In
+              </Button>
+              <Button onClick={() => window.location.href = '/api/login'} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+                Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </nav>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-sacura-primary/5 via-purple-50 to-background">
-        <div className="container mx-auto px-3 sm:px-4">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-blue-600/5 dark:to-purple-600/5"></div>
+        <div className="container mx-auto px-4 relative">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge variant="secondary" className="bg-sacura-primary/10 text-sacura-primary mb-4 sm:mb-6 text-xs sm:text-sm">
-              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              AI-Powered Facebook Marketing Automation
+            <Badge className="mb-6 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-700">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Revolutionary AI Marketing Platform
             </Badge>
             
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
-              The Ultimate AI Agent for 
-              <span className="text-sacura-primary"> Facebook Business</span>
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+              Transform Your <br />
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Facebook Marketing
+              </span><br />
+              with AI Automation
             </h1>
             
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 leading-relaxed px-2 sm:px-0">
-              Optimize ads, automate customer service, and prevent restrictions with our AI-powered platform. 
-              Transform your Facebook marketing with real-time automation that maximizes performance and minimizes risk.
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Automate content creation, optimize ad campaigns, and provide intelligent customer service with our advanced AI platform. 
+              Join thousands of businesses scaling their Facebook presence with zero manual effort.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button 
-                onClick={handleLogin} 
                 size="lg" 
-                className="bg-sacura-primary hover:bg-sacura-primary/90 text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto"
+                onClick={() => window.location.href = '/api/login'}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl px-8 py-4 text-lg"
               >
-                Start Free Trial
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-gray-300 hover:border-blue-300 px-8 py-4 text-lg"
+              >
+                <Play className="mr-2 h-5 w-5" />
                 Watch Demo
               </Button>
             </div>
 
-            {/* Key Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-16">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-sacura-primary mb-1 sm:mb-2">2.8K+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Businesses Trust Us</div>
+            <div className="flex items-center justify-center space-x-8 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                14-day free trial
               </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-sacura-secondary mb-1 sm:mb-2">89%</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">AI Response Rate</div>
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                No credit card required
               </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-sacura-accent mb-1 sm:mb-2">94%</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Issue Prevention</div>
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                Cancel anytime
               </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-1 sm:mb-2">0.8s</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Avg Response Time</div>
-              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">15,000+</div>
+              <div className="text-gray-600 dark:text-gray-300">Active Users</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">500M+</div>
+              <div className="text-gray-600 dark:text-gray-300">Posts Automated</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">85%</div>
+              <div className="text-gray-600 dark:text-gray-300">Cost Reduction</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">24/7</div>
+              <div className="text-gray-600 dark:text-gray-300">AI Monitoring</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-background">
+      <section id="features" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Powerful AI-Driven Features
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Powerful AI Features
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to automate, optimize, and scale your Facebook business presence
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Everything you need to automate and optimize your Facebook marketing strategy with cutting-edge AI technology.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="border hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className={`w-12 h-12 ${feature.bgColor} rounded-lg flex items-center justify-center mb-4`}>
-                      <Icon className={`${feature.color} w-6 h-6`} />
-                    </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
+              <CardHeader>
+                <Brain className="h-12 w-12 text-blue-600 mb-4" />
+                <CardTitle className="text-xl font-bold">AI Content Generation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Generate high-converting posts, captions, and ad copy with advanced AI that learns from your brand voice.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Brand voice learning</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Multi-format content</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Performance optimization</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
+              <CardHeader>
+                <Target className="h-12 w-12 text-purple-600 mb-4" />
+                <CardTitle className="text-xl font-bold">Smart Ad Optimization</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Automatically optimize ad campaigns with AI-driven bidding, targeting, and creative testing.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Real-time optimization</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Budget allocation</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />A/B testing automation</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
+              <CardHeader>
+                <MessageSquare className="h-12 w-12 text-green-600 mb-4" />
+                <CardTitle className="text-xl font-bold">Intelligent Customer Service</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  AI-powered inbox management with smart reply suggestions and automated customer interactions.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Auto-reply system</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Sentiment analysis</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Agent assistance</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20">
+              <CardHeader>
+                <BarChart3 className="h-12 w-12 text-orange-600 mb-4" />
+                <CardTitle className="text-xl font-bold">Advanced Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Deep insights into campaign performance, audience behavior, and ROI with predictive analytics.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Predictive modeling</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Custom dashboards</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Automated reports</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20">
+              <CardHeader>
+                <Shield className="h-12 w-12 text-red-600 mb-4" />
+                <CardTitle className="text-xl font-bold">Compliance Monitoring</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Automatic compliance checking and restriction monitoring to keep your accounts safe.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Policy compliance</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Account monitoring</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Risk assessment</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20">
+              <CardHeader>
+                <Rocket className="h-12 w-12 text-indigo-600 mb-4" />
+                <CardTitle className="text-xl font-bold">Growth Automation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Automated growth strategies with AI-driven audience expansion and engagement optimization.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Audience expansion</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Engagement boost</li>
+                  <li className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2" />Growth tracking</li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20 bg-muted/30">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-blue-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Measurable Business Impact
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Simple, Transparent Pricing
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              See real results with our AI-powered automation platform
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Choose the perfect plan for your business. All plans include our core AI features with scalable limits.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <Card key={index} className="text-center border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="w-16 h-16 bg-sacura-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon className="text-sacura-primary w-8 h-8" />
-                    </div>
-                    <div className="text-3xl font-bold text-sacura-primary mb-2">{benefit.stat}</div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
-                    <p className="text-sm text-muted-foreground">{benefit.description}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Starter Plan */}
+            <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold">Starter</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 dark:text-white mt-4">
+                  $29<span className="text-lg text-gray-500">/month</span>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">Perfect for small businesses</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Up to 100 posts/month</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />5 Facebook pages</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Basic AI content generation</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Email support</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Basic analytics</li>
+                </ul>
+                <Button className="w-full mt-6" variant="outline">
+                  Start Free Trial
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Professional Plan */}
+            <Card className="border-2 border-blue-500 shadow-xl hover:shadow-2xl transition-all duration-300 relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-blue-600 text-white px-4 py-1 text-sm">Most Popular</Badge>
+              </div>
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold">Professional</CardTitle>
+                <div className="text-4xl font-bold text-blue-600 mt-4">
+                  $79<span className="text-lg text-gray-500">/month</span>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">For growing businesses</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Up to 500 posts/month</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />20 Facebook pages</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Advanced AI features</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Smart customer service</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Priority support</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Advanced analytics</li>
+                </ul>
+                <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">
+                  Start Free Trial
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise Plan */}
+            <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold">Enterprise</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 dark:text-white mt-4">
+                  $199<span className="text-lg text-gray-500">/month</span>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">For large organizations</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Unlimited posts</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Unlimited pages</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Custom AI training</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />White-label options</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Dedicated support</li>
+                  <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-3" />Custom integrations</li>
+                </ul>
+                <Button className="w-full mt-6" variant="outline">
+                  Contact Sales
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-background">
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              How SaCuRa AI Works
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Loved by Thousands of Businesses
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Simple setup, powerful automation, measurable results
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              See how SaCuRa AI is transforming Facebook marketing for businesses of all sizes.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacura-primary rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
-                1
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Connect Your Pages</h3>
-              <p className="text-muted-foreground">
-                Securely connect your Facebook business pages and ad accounts with one-click OAuth integration
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacura-secondary rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">AI Learns & Monitors</h3>
-              <p className="text-muted-foreground">
-                Our AI analyzes your content, audience, and performance patterns while monitoring 24/7 for issues
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacura-accent rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Automate & Optimize</h3>
-              <p className="text-muted-foreground">
-                AI handles customer service, optimizes ad performance, and prevents policy violations automatically
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Trusted by Growing Businesses
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              See what our customers say about their results with SaCuRa AI
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-sacura-accent fill-current" />
-                    ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  "SaCuRa AI increased our Facebook engagement by 300% in just 2 months. The AI content generation is incredible!"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    S
                   </div>
-                  <p className="text-muted-foreground mb-6 italic">"{testimonial.content}"</p>
                   <div>
-                    <div className="font-semibold text-foreground">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                    <div className="text-sm text-sacura-primary">{testimonial.company}</div>
+                    <div className="font-semibold">Sarah Johnson</div>
+                    <div className="text-sm text-gray-500">Marketing Director, TechCorp</div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  "The automated customer service feature saved us 20 hours per week. Our response time improved drastically."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    M
+                  </div>
+                  <div>
+                    <div className="font-semibold">Mike Chen</div>
+                    <div className="text-sm text-gray-500">CEO, RetailPlus</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  "ROI improved by 150% with their smart ad optimization. Best marketing tool investment we've made."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    A
+                  </div>
+                  <div>
+                    <div className="font-semibold">Amanda Rodriguez</div>
+                    <div className="text-sm text-gray-500">Founder, CreativeAgency</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
-        {/* Enhanced Background Pattern */}
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%)] bg-[length:60px_60px]"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15),transparent_70%)]"></div>
-        
-        <div className="relative container mx-auto px-6 text-center">
-          {/* Enhanced Badge */}
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur-md rounded-full border border-yellow-400/30 text-yellow-300 text-base font-bold mb-8 shadow-lg">
-            <Zap className="w-5 h-5 mr-3 text-yellow-400" />
-            🔥 LIMITED TIME OFFER
-          </div>
-          
-          {/* Enhanced Main Heading */}
-          <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-8 leading-tight tracking-tight">
-            Ready to Transform Your
-            <br className="hidden sm:block" />
-            <span className="relative">
-              <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                Facebook Marketing?
-              </span>
-              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"></div>
-            </span>
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Transform Your Facebook Marketing?
           </h2>
-          
-          {/* Enhanced Description */}
-          <p className="text-xl sm:text-2xl text-gray-100 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
-            Join <span className="text-yellow-400 font-bold">5,000+</span> businesses using SaCuRa AI to automate Facebook marketing, 
-            <br className="hidden sm:block" />
-            reduce costs by <span className="text-green-400 font-bold">40%</span>, and drive <span className="text-blue-400 font-bold">3x better results</span> with intelligent automation.
+          <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Join thousands of businesses already using SaCuRa AI to automate their Facebook marketing and drive incredible results.
           </p>
-          
-          {/* Enhanced Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto mb-12">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-              <div className="text-4xl sm:text-5xl font-black text-green-400 mb-2">3x</div>
-              <div className="text-lg text-gray-200 font-semibold">Better ROI</div>
-              <div className="text-sm text-gray-400 mt-1">Average improvement</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-              <div className="text-4xl sm:text-5xl font-black text-blue-400 mb-2">40%</div>
-              <div className="text-lg text-gray-200 font-semibold">Cost Reduction</div>
-              <div className="text-sm text-gray-400 mt-1">Marketing spend saved</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-              <div className="text-4xl sm:text-5xl font-black text-purple-400 mb-2">24/7</div>
-              <div className="text-lg text-gray-200 font-semibold">AI Support</div>
-              <div className="text-sm text-gray-400 mt-1">Always monitoring</div>
-            </div>
-          </div>
-          
-          {/* Enhanced CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
-              onClick={handleLogin}
               size="lg" 
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-300 hover:to-orange-400 hover:scale-110 transition-all duration-300 text-xl px-12 py-6 shadow-2xl font-black group border-0 rounded-full"
+              onClick={() => window.location.href = '/api/login'}
+              className="bg-white text-blue-600 hover:bg-gray-50 shadow-xl px-8 py-4 text-lg"
             >
-              🚀 START FREE TRIAL NOW
-              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform duration-300" />
+              Start Your Free Trial <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            
             <Button 
-              variant="outline"
+              variant="outline" 
               size="lg"
-              className="border-3 border-white/40 hover:bg-white/20 hover:border-white/60 backdrop-blur-md text-xl px-12 py-6 rounded-full font-bold transition-all duration-300 text-[#ffffff] bg-[#3c83f6]"
-              onClick={() => {
-                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg"
             >
-              <Play className="w-6 h-6 mr-3" />
-              Watch Demo
+              Contact Sales
             </Button>
           </div>
-          
-          {/* Enhanced Trust Indicators */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
-              <CheckCircle className="w-5 h-5 mr-3 text-green-400" />
-              <span className="text-gray-200 font-medium">No Credit Card Required</span>
-            </div>
-            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
-              <Shield className="w-5 h-5 mr-3 text-blue-400" />
-              <span className="text-gray-200 font-medium">Enterprise Security</span>
-            </div>
-            <div className="flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
-              <Clock className="w-5 h-5 mr-3 text-purple-400" />
-              <span className="text-gray-200 font-medium">5-Minute Setup</span>
-            </div>
-          </div>
+          <p className="text-blue-100 mt-4 text-sm">
+            No credit card required • 14-day free trial • Cancel anytime
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-border py-12">
+      <footer className="bg-gray-900 text-white py-16">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center space-x-3 mb-8">
-            <div className="w-10 h-10 bg-sacura-primary rounded-lg flex items-center justify-center">
-              <Bot className="text-white w-6 h-6" />
-            </div>
+          <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h1 className="text-xl font-bold text-foreground">SaCuRa</h1>
-              <p className="text-sm text-muted-foreground">JAm AI</p>
+              <div className="flex items-center space-x-3 mb-4">
+                <img src={sacuraLogo} alt="SaCuRa AI" className="h-10 w-10 rounded-lg" />
+                <span className="text-2xl font-bold">SaCuRa AI</span>
+              </div>
+              <p className="text-gray-400 mb-4">
+                The most advanced AI-powered Facebook marketing automation platform.
+              </p>
+              <div className="flex space-x-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <ExternalLink className="h-4 w-4" />
+                </div>
+                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <ExternalLink className="h-4 w-4" />
+                </div>
+                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                  <ExternalLink className="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              </ul>
             </div>
           </div>
           
-          <div className="text-center text-muted-foreground">
-            <p className="mb-4">© 2024 SaCuRa Solutions. All rights reserved.</p>
-            <p className="text-sm">Dream | Transform | Reality</p>
+          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 SaCuRa AI. All rights reserved. Revolutionizing Facebook marketing with AI automation.</p>
           </div>
         </div>
       </footer>

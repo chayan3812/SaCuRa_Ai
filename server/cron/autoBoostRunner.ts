@@ -78,11 +78,7 @@ export const autoBoostRunner = async () => {
     console.error("🛑 AutoBoostRunner Critical Error:", error.message);
     
     // Log critical error for monitoring
-    await storage.logAutoBoostError?.({
-      date: new Date(),
-      error: error.message,
-      stack: error.stack
-    });
+    await storage.logAutoBoostError('system', error.message);
   }
 };
 

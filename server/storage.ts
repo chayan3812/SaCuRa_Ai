@@ -174,6 +174,7 @@ export interface IStorage {
   logAutoContentError(userId: string, error: string): Promise<void>;
   logAutoBoostExecution(userId: string, details: any): Promise<void>;
   logAutoBoostError(userId: string, error: string): Promise<void>;
+  updateScheduledBoostStatus(boostId: string, status: string): Promise<void>;
   
   // AI Learning Analytics
   getAILearningMetrics(userId: string): Promise<{
@@ -1306,6 +1307,13 @@ export class DatabaseStorage implements IStorage {
   async logAutoBoostError(userId: string, error: string): Promise<void> {
     // Log to console for now, can be enhanced to store in database
     console.error(`AutoBoost error for user ${userId}:`, error);
+  }
+
+  async updateScheduledBoostStatus(boostId: string, status: string): Promise<void> {
+    await db
+      .update(scheduledBoosts)
+      .set({ status })
+      .where(eq(scheduledBoosts.id, boostId));
   }
 }
 

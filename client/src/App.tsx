@@ -7,6 +7,11 @@ import { useAuth } from "@/hooks/useAuth";
 // Landing and Auth Pages
 import Landing from "@/pages/Landing";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
+import Terms from "@/pages/Terms";
+import Help from "@/pages/Help";
+import Docs from "@/pages/Docs";
 
 // Authenticated Pages
 import Dashboard from "@/pages/Dashboard";
@@ -63,6 +68,11 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/help" component={Help} />
+      <Route path="/docs" component={Docs} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/login" component={() => { window.location.href = '/api/login'; return null; }} />
       {isAuthenticated ? (

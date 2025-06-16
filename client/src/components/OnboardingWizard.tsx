@@ -249,11 +249,11 @@ export const OnboardingWizard: React.FC = () => {
                         Please connect your Facebook account first in the Facebook Setup page.
                       </p>
                       <Button 
-                        onClick={() => setLocation('/facebook-setup')} 
+                        onClick={() => window.location.href = '/api/facebook/auth'} 
                         className="mt-3"
                         variant="outline"
                       >
-                        Go to Facebook Setup
+                        Connect Facebook Account
                       </Button>
                     </div>
                   ) : (

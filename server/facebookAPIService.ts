@@ -48,10 +48,32 @@ interface PublishPostData {
 
 export class FacebookAPIService {
   private baseUrl = `https://graph.facebook.com/${API_VERSION}`;
+  private accessToken: string;
 
-  constructor() {
-    if (!PAGE_ID || !ACCESS_TOKEN) {
-      console.warn('Facebook API credentials not fully configured');
+  constructor(accessToken?: string) {
+    this.accessToken = accessToken || ACCESS_TOKEN || '';
+    if (!this.accessToken) {
+      console.warn('Facebook API credentials not configured');
+    }
+  }
+
+  async getPages(): Promise<any[]> {
+    try {
+      if (!this.accessToken) {
+        throw new Error('Facebook access token not configured');
+      }
+
+      const response = await axios.get(`${this.baseUrl}/me/accounts`, {
+        params: {
+          access_token: this.accessToken,
+          fields: 'id,name,access_token,category,follower_count'
+        }
+      });
+
+      return response.data.data || [];
+    } catch (error: any) {
+      console.error('Facebook getPages error:', error.response?.data || error.message);
+      throw new Error(`Failed to fetch pages: ${error.response?.data?.error?.message || error.message}`);
     }
   }
 

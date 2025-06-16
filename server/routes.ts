@@ -2,17 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import axios from "axios";
+import { FacebookAPIService } from "./facebookAPIService";
 import multer from "multer";
 import { runAutoFacebookPost, getAutoPostStatus, triggerManualAutoPost } from "./facebookAutoPost";
 import { advancedAdOptimizer, generateAdContent } from "./advancedAdOptimizer";
 import { adCampaignService } from "./meta/adCampaignService";
-import { 
-  FacebookAPIService, 
-  getFacebookOAuthUrl, 
-  exchangeCodeForToken, 
-  getLongLivedToken 
-} from "./facebook";
-import { facebookAPI } from "./facebookAPIService";
 import { 
   generateCustomerServiceResponse,
   generateAdOptimizationSuggestions,

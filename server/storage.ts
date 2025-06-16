@@ -78,6 +78,7 @@ export interface IStorage {
   
   // Facebook Pages
   createFacebookPage(page: InsertFacebookPage): Promise<FacebookPage>;
+  upsertFacebookPage(page: InsertFacebookPage): Promise<FacebookPage>;
   getFacebookPagesByUser(userId: string): Promise<FacebookPage[]>;
   getFacebookPageById(pageId: string): Promise<FacebookPage | undefined>;
   getFacebookPageByPageId(pageId: string): Promise<FacebookPage | undefined>;
@@ -343,6 +344,25 @@ export class DatabaseStorage implements IStorage {
   async createFacebookPage(page: InsertFacebookPage): Promise<FacebookPage> {
     const [newPage] = await db.insert(facebookPages).values(page).returning();
     return newPage;
+  }
+
+  async upsertFacebookPage(page: InsertFacebookPage): Promise<FacebookPage> {
+    const [upsertedPage] = await db
+      .insert(facebookPages)
+      .values(page)
+      .onConflictDoUpdate({
+        target: [facebookPages.userId, facebookPages.pageId],
+        set: {
+          pageName: page.pageName,
+          accessToken: page.accessToken,
+          category: page.category,
+          followerCount: page.followerCount,
+          isActive: page.isActive,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return upsertedPage;
   }
 
   async getFacebookPagesByUser(userId: string): Promise<FacebookPage[]> {

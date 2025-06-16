@@ -3,6 +3,7 @@
  * Production-ready service for server-side conversion tracking
  */
 import axios from 'axios';
+import crypto from 'crypto';
 import { APP_USER_CONFIG } from './appUserConfig';
 
 export interface ConversionEvent {

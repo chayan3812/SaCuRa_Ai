@@ -6274,6 +6274,60 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Enhanced Onboarding Routes with Validation
+  app.post('/api/onboarding/save', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { pageId, goal, autopilot, targetAudience, dailyBudget } = req.body;
+      
+      // Validate required fields
+      if (!pageId || !goal) {
+        return res.status(400).json({ error: "Page ID and campaign goal are required" });
+      }
+      
+      // Enhanced user configuration with additional fields
+      await storage.upsertUser({
+        id: userId,
+        pageId,
+        campaignGoal: goal,
+        autopilotEnabled: autopilot || false,
+        targetAudience: targetAudience || 'general audience',
+        dailyBudget: dailyBudget || 20
+      });
+      
+      console.log(`✅ Onboarding completed for user ${userId}: ${goal} campaign with ${autopilot ? 'autopilot enabled' : 'manual mode'}`);
+      res.json({ success: true, message: "Onboarding configuration saved successfully" });
+    } catch (error) {
+      console.error("Onboarding save error:", error);
+      res.status(500).json({ error: "Failed to save onboarding config" });
+    }
+  });
+
+  app.get('/api/onboarding/configured', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      const configured = !!(user?.pageId && user?.campaignGoal);
+      const setupComplete = configured && user?.autopilotEnabled !== undefined;
+      
+      res.json({ 
+        configured, 
+        setupComplete,
+        userConfig: configured ? {
+          pageId: user.pageId,
+          goal: user.campaignGoal,
+          autopilot: user.autopilotEnabled,
+          targetAudience: user.targetAudience,
+          dailyBudget: user.dailyBudget
+        } : null
+      });
+    } catch (error) {
+      console.error("Config check error:", error);
+      res.status(500).json({ error: true });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Initialize WebSocket service

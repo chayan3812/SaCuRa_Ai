@@ -49,6 +49,7 @@ import SystemHealth from "@/pages/SystemHealth";
 import NotFound from "@/pages/not-found";
 import AppLayout from "@/components/layout/AppLayout";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import OnboardingGate from "@/components/OnboardingGate";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -88,50 +89,52 @@ function Router() {
           <Route component={() => <Landing />} />
         </>
       ) : (
-        <AppLayout>
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/onboarding" component={OnboardingWizard} />
-            <Route path="/ads" component={AdOptimizer} />
-            <Route path="/auto-poster" component={AutoPoster} />
-            <Route path="/admin/auto-post-config" component={AutoPostAdmin} />
-            <Route path="/admin/facebook-ads" component={FacebookAdsAdmin} />
-            <Route path="/content-queue" component={ContentQueue} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/page-status" component={PageStatus} />
-            <Route path="/customer-service" component={CustomerService} />
-            <Route path="/smart-inbox" component={SmartInbox} />
-            <Route path="/ai-performance" component={AIPerformance} />
-            <Route path="/feedback-analytics" component={FeedbackAnalytics} />
-            <Route path="/ai-training" component={AITraining} />
-            <Route path="/ai-test" component={AITestDashboard} />
-            <Route path="/ai-optimizer" component={AISelfOptimizer} />
-            <Route path="/ai-version-manager" component={AIVersionManager} />
-            <Route path="/ai-model" component={AIModelDashboard} />
-            <Route path="/weekly-ai-intelligence" component={WeeklyAIIntelligence} />
-            <Route path="/agent-copilot" component={AgentCoPilot} />
-            <Route path="/sla-dashboard" component={SLADashboard} />
-            <Route path="/admin/ai-replay" component={AdminAIReplay} />
-            <Route path="/admin/ai-digest" component={AdminAIDigest} />
-            <Route path="/facebook" component={Facebook} />
-            <Route path="/admin/facebook-dashboard" component={Facebook} />
-            <Route path="/facebook-analytics" component={FacebookAnalytics} />
-            <Route path="/facebook-setup" component={FacebookSetup} />
-            <Route path="/facebook-conversions" component={FacebookConversions} />
-            <Route path="/facebook-ads" component={FacebookAds} />
-            <Route path="/marketing-api" component={MarketingAPI} />
-            <Route path="/restrictions" component={RestrictionMonitor} />
-            <Route path="/employees" component={EmployeeMonitor} />
-            <Route path="/competitors" component={CompetitorAnalysis} />
-            <Route path="/insights" component={AIInsights} />
-            <Route path="/hybrid-ai" component={HybridAI} />
-            <Route path="/ml-intelligence" component={MLIntelligence} />
-            <Route path="/system-health" component={SystemHealth} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/privacy-policy" component={PrivacyPolicy} />
-            <Route component={() => <Dashboard />} />
-          </Switch>
-        </AppLayout>
+        <OnboardingGate>
+          <AppLayout>
+            <Switch>
+              <Route path="/" component={Dashboard} />
+              <Route path="/onboarding" component={OnboardingWizard} />
+              <Route path="/ads" component={AdOptimizer} />
+              <Route path="/auto-poster" component={AutoPoster} />
+              <Route path="/admin/auto-post-config" component={AutoPostAdmin} />
+              <Route path="/admin/facebook-ads" component={FacebookAdsAdmin} />
+              <Route path="/content-queue" component={ContentQueue} />
+              <Route path="/analytics" component={Analytics} />
+              <Route path="/page-status" component={PageStatus} />
+              <Route path="/customer-service" component={CustomerService} />
+              <Route path="/smart-inbox" component={SmartInbox} />
+              <Route path="/ai-performance" component={AIPerformance} />
+              <Route path="/feedback-analytics" component={FeedbackAnalytics} />
+              <Route path="/ai-training" component={AITraining} />
+              <Route path="/ai-test" component={AITestDashboard} />
+              <Route path="/ai-optimizer" component={AISelfOptimizer} />
+              <Route path="/ai-version-manager" component={AIVersionManager} />
+              <Route path="/ai-model" component={AIModelDashboard} />
+              <Route path="/weekly-ai-intelligence" component={WeeklyAIIntelligence} />
+              <Route path="/agent-copilot" component={AgentCoPilot} />
+              <Route path="/sla-dashboard" component={SLADashboard} />
+              <Route path="/admin/ai-replay" component={AdminAIReplay} />
+              <Route path="/admin/ai-digest" component={AdminAIDigest} />
+              <Route path="/facebook" component={Facebook} />
+              <Route path="/admin/facebook-dashboard" component={Facebook} />
+              <Route path="/facebook-analytics" component={FacebookAnalytics} />
+              <Route path="/facebook-setup" component={FacebookSetup} />
+              <Route path="/facebook-conversions" component={FacebookConversions} />
+              <Route path="/facebook-ads" component={FacebookAds} />
+              <Route path="/marketing-api" component={MarketingAPI} />
+              <Route path="/restrictions" component={RestrictionMonitor} />
+              <Route path="/employees" component={EmployeeMonitor} />
+              <Route path="/competitors" component={CompetitorAnalysis} />
+              <Route path="/insights" component={AIInsights} />
+              <Route path="/hybrid-ai" component={HybridAI} />
+              <Route path="/ml-intelligence" component={MLIntelligence} />
+              <Route path="/system-health" component={SystemHealth} />
+              <Route path="/settings" component={Settings} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
+              <Route component={() => <Dashboard />} />
+            </Switch>
+          </AppLayout>
+        </OnboardingGate>
       )}
     </Switch>
   );

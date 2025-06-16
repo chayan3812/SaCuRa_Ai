@@ -48,6 +48,8 @@ import { advancedAISelfImprovement } from "./advancedAISelfImprovement";
 import { advancedAIEngine } from "./advancedAIEngine";
 import { sentimentAI } from "./sentimentAI";
 import { competitorAI } from "./competitorAI";
+import { optimizerContext } from "./optimizerContext";
+import { fetchTopPerformingPosts, analyzeUserPerformancePatterns, getTrainingDataQuality } from "./aiTrainingHelpers";
 import { intelligentTrainer } from "./intelligentTrainer";
 import { aiEngine } from "./aiEngine";
 import { hybridAI } from "./hybridAI";

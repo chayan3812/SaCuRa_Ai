@@ -6406,9 +6406,9 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/onboarding/configured', isAuthenticated, async (req: any, res) => {
+  app.get('/api/onboarding/configured', devAuthMiddleware, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user.claims.sub;
       
       if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
@@ -7095,9 +7095,9 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get("/api/onboarding/status", isAuthenticated, async (req, res) => {
+  app.get("/api/onboarding/status", devAuthMiddleware, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user.claims.sub;
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }

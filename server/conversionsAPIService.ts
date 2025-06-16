@@ -3,7 +3,7 @@
  * Production-ready service for server-side conversion tracking
  */
 import axios from 'axios';
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 import { APP_USER_CONFIG } from './appUserConfig';
 
 export interface ConversionEvent {
@@ -64,17 +64,16 @@ export class ConversionsAPIService {
    * Hash user data for privacy compliance
    */
   private hashUserData(userData: any): any {
-    const crypto = require('crypto');
     const hashedData = { ...userData };
 
     if (hashedData.email) {
-      hashedData.email = crypto.createHash('sha256').update(hashedData.email.toLowerCase().trim()).digest('hex');
+      hashedData.email = createHash('sha256').update(hashedData.email.toLowerCase().trim()).digest('hex');
     }
     if (hashedData.phone) {
-      hashedData.phone = crypto.createHash('sha256').update(hashedData.phone.replace(/\D/g, '')).digest('hex');
+      hashedData.phone = createHash('sha256').update(hashedData.phone.replace(/\D/g, '')).digest('hex');
     }
     if (hashedData.external_id) {
-      hashedData.external_id = crypto.createHash('sha256').update(hashedData.external_id.toString()).digest('hex');
+      hashedData.external_id = createHash('sha256').update(hashedData.external_id.toString()).digest('hex');
     }
 
     return hashedData;

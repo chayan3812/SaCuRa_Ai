@@ -1,15 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { OnboardingWizard } from "./OnboardingWizard";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 export const OnboardingGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { data: configStatus, isLoading, error } = useQuery({
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  
+  const { data: configStatus, isLoading: configLoading, error } = useQuery({
     queryKey: ['/api/onboarding/configured'],
     retry: false,
+    enabled: isAuthenticated, // Only run when user is authenticated
   });
 
-  if (isLoading) {
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show onboarding
+  if (!isAuthenticated) {
+    return <OnboardingWizard />;
+  }
+
+  // Show loading while checking configuration
+  if (configLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -20,15 +42,11 @@ export const OnboardingGate: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   }
 
+  // Handle configuration errors for authenticated users
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error checking configuration</p>
-          <p className="text-sm text-gray-600">Please refresh the page</p>
-        </div>
-      </div>
-    );
+    console.warn("Configuration check error:", error);
+    // If there's an error, assume setup is not complete and show onboarding
+    return <OnboardingWizard />;
   }
 
   // If setup is not complete, show onboarding wizard

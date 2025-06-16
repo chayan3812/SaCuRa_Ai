@@ -1,0 +1,94 @@
+// 🔌 backend/AutoContentRunner.ts
+import axios from "axios";
+import { generateAdContent } from "../services/advancedAdOptimizer";
+
+export const runAutoContentPost = async () => {
+  try {
+    const content = await generateAdContent();
+    const insights = await axios.get("http://localhost:3000/api/facebook/recommend-time-slots");
+    const bestSlot = insights.data?.[0]?.date;
+
+    const response = await axios.post("http://localhost:3000/api/facebook/post", {
+      message: content.text,
+      image: content.imageUrl,
+    });
+
+    const postId = response.data?.id;
+    if (postId && bestSlot) {
+      await axios.post("http://localhost:3000/api/facebook/scheduled-boosts", {
+        postId,
+        date: bestSlot,
+      });
+    }
+
+    console.log("✅ Auto-generated and scheduled AI content.");
+  } catch (e) {
+    console.error("❌ AutoContentRunner failed:", e);
+  }
+};
+
+// ✏️ client/src/pages/OnboardingWizard.tsx
+import React, { useState } from "react";
+import axios from "axios";
+
+export const OnboardingWizard: React.FC = () => {
+  const [step, setStep] = useState(1);
+  const [pageId, setPageId] = useState("");
+  const [goal, setGoal] = useState("");
+  const [auto, setAuto] = useState(true);
+
+  const handleFinish = async () => {
+    await axios.post("/api/onboarding/save", {
+      pageId,
+      goal,
+      autopilot: auto,
+    });
+    alert("🚀 Engine Initialized!");
+  };
+
+  return (
+    <div className="p-4 max-w-xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold">🧠 Facebook Ad Wizard</h1>
+      {step === 1 && (
+        <div className="space-y-2">
+          <p>🔗 Step 1: Connect Page</p>
+          <input
+            className="w-full border p-2 rounded"
+            placeholder="Enter your Facebook Page ID"
+            value={pageId}
+            onChange={(e) => setPageId(e.target.value)}
+          />
+          <button onClick={() => setStep(2)} className="btn">Next</button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="space-y-4">
+          <p>🎯 Step 2: Pick Your Goal</p>
+          <select
+            className="w-full border p-2 rounded"
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+          >
+            <option value="">-- Select --</option>
+            <option value="likes">More Likes</option>
+            <option value="clicks">Drive Clicks</option>
+            <option value="awareness">Product Awareness</option>
+          </select>
+          <button onClick={() => setStep(3)} className="btn">Next</button>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="space-y-4">
+          <p>🤖 Step 3: Enable AI Autopilot?</p>
+          <label className="flex items-center space-x-2">
+            <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} />
+            <span>Let AI generate and schedule content for me</span>
+          </label>
+          <button onClick={handleFinish} className="btn-primary">Launch Engine</button>
+        </div>
+      )}
+    </div>
+  );
+};

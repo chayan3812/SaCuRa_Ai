@@ -21,9 +21,11 @@ interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
-  postId: string;
+  postId?: string;
   budget?: number;
   status?: string;
+  isAISuggestion?: boolean;
+  rank?: number;
 }
 
 interface TimeSlotRecommendation {
@@ -37,6 +39,7 @@ interface TimeSlotRecommendation {
 
 export const BoostCalendar: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [suggestions, setSuggestions] = useState<CalendarEvent[]>([]);
   const [recommendations, setRecommendations] = useState<TimeSlotRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
@@ -79,6 +82,18 @@ export const BoostCalendar: React.FC = () => {
       
       if (data.recommendedSlots) {
         setRecommendations(data.recommendedSlots);
+        
+        // Convert recommendations to calendar events with green overlay
+        const suggestionEvents = data.recommendedSlots.map((slot: TimeSlotRecommendation, index: number) => ({
+          title: `🔥 AI Suggestion #${slot.rank}`,
+          start: new Date(slot.date),
+          end: new Date(slot.date),
+          isAISuggestion: true,
+          rank: slot.rank,
+          allDay: false
+        }));
+        
+        setSuggestions(suggestionEvents);
       }
     } catch (error) {
       console.error('Error loading time slot recommendations:', error);
@@ -207,16 +222,20 @@ export const BoostCalendar: React.FC = () => {
           <div style={{ height: 600 }}>
             <Calendar
               localizer={localizer}
-              events={events}
+              events={[...events, ...suggestions]}
               startAccessor="start"
               endAccessor="end"
               style={{ height: '100%' }}
-              eventPropGetter={(event) => ({
+              eventPropGetter={(event: CalendarEvent) => ({
                 style: {
-                  backgroundColor: event.status === 'active' ? '#10b981' : 
+                  backgroundColor: event.isAISuggestion ? '#d1fae5' : 
+                                  event.status === 'active' ? '#10b981' : 
                                   event.status === 'failed' ? '#ef4444' : '#3b82f6',
-                  borderColor: event.status === 'active' ? '#059669' : 
+                  borderColor: event.isAISuggestion ? '#a7f3d0' :
+                              event.status === 'active' ? '#059669' : 
                               event.status === 'failed' ? '#dc2626' : '#2563eb',
+                  color: event.isAISuggestion ? '#047857' : '#ffffff',
+                  fontWeight: event.isAISuggestion ? 'bold' : 'normal'
                 }
               })}
               views={['month', 'week', 'day']}

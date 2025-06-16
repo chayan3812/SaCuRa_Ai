@@ -3,7 +3,7 @@
  * Tests Configuration ID 1595617591110969 integration
  */
 
-const axios = require('axios');
+import axios from 'axios';
 
 class FacebookBusinessConfigTester {
   constructor() {

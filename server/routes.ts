@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Facebook OAuth routes
-  app.get('/api/facebook/auth', devAuthMiddleware, async (req: any, res) => {
+  app.get('/api/facebook/auth', async (req: any, res) => {
     try {
       const { createTokenManager } = await import('./facebookTokenManager');
       const tokenManager = createTokenManager();
@@ -4497,7 +4497,7 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  app.get('/api/facebook/auth-url', devAuthMiddleware, async (req: any, res) => {
+  app.get('/api/facebook/auth-url', async (req: any, res) => {
     try {
       const { createTokenManager } = await import('./facebookTokenManager');
       const tokenManager = createTokenManager();

@@ -62,17 +62,13 @@ function Router() {
 
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="/privacy-policy" component={PrivacyPolicy} />
-          <Route path="/login" component={() => { window.location.href = '/api/login'; return null; }} />
-          <Route component={() => <Landing />} />
-        </>
-      ) : (
+      <Route path="/" component={Landing} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/login" component={() => { window.location.href = '/api/login'; return null; }} />
+      {isAuthenticated ? (
         <AppLayout>
           <Switch>
-            <Route path="/" component={Dashboard} />
+            <Route path="/dashboard" component={Dashboard} />
             <Route path="/ads" component={AdOptimizer} />
             <Route path="/auto-poster" component={AutoPoster} />
             <Route path="/admin/auto-post-config" component={AutoPostAdmin} />
@@ -109,11 +105,10 @@ function Router() {
             <Route path="/ml-intelligence" component={MLIntelligence} />
             <Route path="/system-health" component={SystemHealth} />
             <Route path="/settings" component={Settings} />
-            <Route path="/privacy-policy" component={PrivacyPolicy} />
-            <Route component={() => <Dashboard />} />
           </Switch>
         </AppLayout>
-      )}
+      ) : null}
+      <Route component={() => <Landing />} />
     </Switch>
   );
 }

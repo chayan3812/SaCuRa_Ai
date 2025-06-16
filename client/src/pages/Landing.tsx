@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, CheckCircle, Star, Users, TrendingUp, MessageSquare, Zap, Target, Shield, Clock, Bot, Sparkles, BarChart3, Brain, Rocket, Globe, Lock, Award, Play, ExternalLink, ChevronRight, TrendingDown, DollarSign, MousePointer } from "lucide-react";
 import sacuraLogo from "@assets/SaCuRa_Ai_Logo_1750010758811.png";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Landing() {
+  const { isAuthenticated } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
       {/* Header */}
@@ -24,12 +26,25 @@ export default function Landing() {
               <a href="#pricing" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Pricing</a>
               <a href="#testimonials" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">Success Stories</a>
               <a href="#about" className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors">About</a>
-              <Button variant="outline" onClick={() => window.location.href = '/api/login'} className="border-blue-200 hover:border-blue-300">
-                Sign In
-              </Button>
-              <Button onClick={() => window.location.href = '/api/login'} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
-                Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Button variant="outline" onClick={() => window.location.href = '/dashboard'} className="border-blue-200 hover:border-blue-300">
+                    Go to Dashboard
+                  </Button>
+                  <Button variant="outline" onClick={() => window.location.href = '/api/logout'} className="border-gray-200 hover:border-gray-300">
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => window.location.href = '/api/login'} className="border-blue-200 hover:border-blue-300">
+                    Sign In
+                  </Button>
+                  <Button onClick={() => window.location.href = '/api/login'} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+                    Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         </div>

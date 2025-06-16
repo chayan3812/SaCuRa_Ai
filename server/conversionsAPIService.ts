@@ -52,12 +52,16 @@ export class ConversionsAPIService {
   private pixelId: string;
   private baseUrl: string;
   private appUserId: string;
+  private configurationId: string;
 
   constructor() {
     this.accessToken = process.env.FB_PIXEL_ACCESS_TOKEN || APP_USER_CONFIG.conversionsToken;
     this.pixelId = APP_USER_CONFIG.pixelId;
     this.appUserId = APP_USER_CONFIG.appUserId;
-    this.baseUrl = `https://graph.facebook.com/v18.0/${this.pixelId}/events`;
+    this.configurationId = '1595617591110969'; // Production Configuration ID
+    this.baseUrl = `https://graph.facebook.com/v21.0/${this.pixelId}/events`;
+    
+    console.log(`Facebook Conversions API configured with ID: ${this.configurationId}`);
   }
 
   /**
@@ -80,9 +84,9 @@ export class ConversionsAPIService {
   }
 
   /**
-   * Send single conversion event
+   * Send single conversion event with Configuration ID
    */
-  async trackEvent(event: ConversionEvent): Promise<{ success: boolean; response?: any; error?: string }> {
+  async trackEvent(event: ConversionEvent): Promise<{ success: boolean; response?: any; error?: string; configurationId?: string }> {
     try {
       // Add App User ID for proper attribution
       event.user_data.fb_login_id = this.appUserId;
@@ -95,19 +99,26 @@ export class ConversionsAPIService {
         partner_agent: 'SaCuRa AI Platform',
       };
 
+      // Enhanced headers with Configuration ID for advanced tracking
+      const headers = {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+        'X-FB-Configuration-ID': this.configurationId,
+      };
+
       const response = await axios.post(this.baseUrl, payload, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         params: {
           access_token: this.accessToken,
         },
       });
 
+      console.log(`Conversion event tracked with Configuration ID: ${this.configurationId}`);
+      
       return {
         success: true,
         response: response.data,
+        configurationId: this.configurationId,
       };
     } catch (error: any) {
       console.error('Conversions API Error:', error.response?.data || error.message);

@@ -6290,7 +6290,7 @@ Prioritize by impact and feasibility.`;
       // Enhanced user configuration with additional fields
       await storage.upsertUser({
         id: userId,
-        pageId,
+        facebookPageId: pageId,
         campaignGoal: goal,
         autopilotEnabled: autopilot || false,
         targetAudience: targetAudience || 'general audience',
@@ -6307,17 +6307,22 @@ Prioritize by impact and feasibility.`;
 
   app.get('/api/onboarding/configured', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+      
       const user = await storage.getUser(userId);
       
-      const configured = !!(user?.pageId && user?.campaignGoal);
+      const configured = !!(user?.facebookPageId && user?.campaignGoal);
       const setupComplete = configured && user?.autopilotEnabled !== undefined;
       
       res.json({ 
         configured, 
         setupComplete,
         userConfig: configured ? {
-          pageId: user.pageId,
+          pageId: user.facebookPageId,
           goal: user.campaignGoal,
           autopilot: user.autopilotEnabled,
           targetAudience: user.targetAudience,
@@ -6326,7 +6331,7 @@ Prioritize by impact and feasibility.`;
       });
     } catch (error) {
       console.error("Config check error:", error);
-      res.status(500).json({ error: true });
+      res.status(500).json({ error: "Failed to check configuration" });
     }
   });
 

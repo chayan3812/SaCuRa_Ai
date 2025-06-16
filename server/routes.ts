@@ -48,6 +48,7 @@ import { fetchTopPerformingPosts, analyzeUserPerformancePatterns, getTrainingDat
 import { intelligentTrainer } from "./intelligentTrainer";
 import { aiEngine } from "./aiEngine";
 import { hybridAI } from "./hybridAI";
+import { facebookDataDeletion } from "./facebookDataDeletion";
 import { stressTestEngine } from "./stressTestRetrainedAI";
 import { openAIFineTuning } from "./openAIFineTuning";
 import { explainableAI } from "./explainableAI";
@@ -7563,3 +7564,150 @@ function getPotentialImpact(severity: string): string {
   };
   return impacts[severity as keyof typeof impacts] || 'Positive impact on page health';
 }
+
+  // Facebook Data Deletion Callback (Production Compliance)
+  app.post("/api/facebook/data-deletion", async (req, res) => {
+    try {
+      const { signed_request } = req.body;
+      
+      if (!signed_request) {
+        return res.status(400).json({ error: "Missing signed_request parameter" });
+      }
+
+      const result = await facebookDataDeletion.processDataDeletionRequest(signed_request);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Data deletion callback error:", error);
+      res.status(500).json({ error: "Failed to process data deletion request" });
+    }
+  });
+
+  // Data Deletion Status Check
+  app.get("/api/facebook/data-deletion/status/:confirmationCode", async (req, res) => {
+    try {
+      const { confirmationCode } = req.params;
+      const status = await facebookDataDeletion.getDeletionStatus(confirmationCode);
+      res.json(status);
+    } catch (error) {
+      console.error("Error checking deletion status:", error);
+      res.status(500).json({ error: "Failed to check deletion status" });
+    }
+  });
+
+  // Facebook Access Token Management
+  app.post("/api/facebook/auth/token", isAuthenticated, async (req, res) => {
+    try {
+      const { token, permissions } = req.body;
+      const userId = (req.user as any)?.claims?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!token) {
+        return res.status(400).json({ message: "Access token is required" });
+      }
+
+      // Verify token with Facebook API
+      try {
+        const response = await axios.get(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email`);
+        const facebookUser = response.data;
+
+        // Store or update user's Facebook token and info
+        await storage.updateUserFacebookToken?.(userId, {
+          accessToken: token,
+          facebookUserId: facebookUser.id,
+          facebookName: facebookUser.name,
+          facebookEmail: facebookUser.email,
+          permissions: permissions || [],
+          tokenCreatedAt: new Date(),
+          tokenExpiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // 60 days
+        });
+
+        res.json({
+          success: true,
+          message: "Facebook token stored successfully",
+          user: {
+            id: facebookUser.id,
+            name: facebookUser.name,
+            email: facebookUser.email
+          },
+          permissions: permissions || []
+        });
+
+      } catch (apiError) {
+        console.error("Facebook API token validation error:", apiError);
+        res.status(400).json({ 
+          message: "Invalid Facebook access token",
+          error: "Token verification failed"
+        });
+      }
+
+    } catch (error) {
+      console.error("Error storing Facebook token:", error);
+      res.status(500).json({ message: "Failed to store Facebook token" });
+    }
+  });
+
+  // Get Facebook Token Status
+  app.get("/api/facebook/auth/status", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const facebookAuth = await storage.getUserFacebookAuth?.(userId);
+      
+      if (!facebookAuth) {
+        return res.json({
+          connected: false,
+          message: "No Facebook account connected"
+        });
+      }
+
+      // Check if token is still valid
+      const isExpired = facebookAuth.tokenExpiresAt && new Date() > facebookAuth.tokenExpiresAt;
+      
+      res.json({
+        connected: !isExpired,
+        facebookUser: {
+          id: facebookAuth.facebookUserId,
+          name: facebookAuth.facebookName,
+          email: facebookAuth.facebookEmail
+        },
+        permissions: facebookAuth.permissions || [],
+        tokenExpiry: facebookAuth.tokenExpiresAt,
+        isExpired
+      });
+
+    } catch (error) {
+      console.error("Error checking Facebook auth status:", error);
+      res.status(500).json({ message: "Failed to check Facebook auth status" });
+    }
+  });
+
+  // Revoke Facebook Access
+  app.delete("/api/facebook/auth/revoke", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      // Remove Facebook auth data
+      await storage.removeUserFacebookAuth?.(userId);
+
+      res.json({
+        success: true,
+        message: "Facebook access revoked successfully"
+      });
+
+    } catch (error) {
+      console.error("Error revoking Facebook access:", error);
+      res.status(500).json({ message: "Failed to revoke Facebook access" });
+    }
+  });

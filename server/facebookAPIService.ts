@@ -116,6 +116,33 @@ export class FacebookAPIService {
     }
   }
 
+  async createPost(userId: string, postData: { message: string; image?: string; scheduledTime?: Date }): Promise<{ id: string }> {
+    try {
+      if (!PAGE_ID || !ACCESS_TOKEN) {
+        throw new Error('Facebook credentials not configured');
+      }
+
+      const publishData: PublishPostData = {
+        message: postData.message,
+        picture: postData.image
+      };
+
+      if (postData.scheduledTime) {
+        publishData.scheduled_publish_time = Math.floor(postData.scheduledTime.getTime() / 1000);
+      }
+
+      const response = await axios.post(`${this.baseUrl}/${PAGE_ID}/feed`, {
+        ...publishData,
+        access_token: ACCESS_TOKEN
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Facebook createPost error:', error.response?.data || error.message);
+      throw new Error(`Failed to create post: ${error.response?.data?.error?.message || error.message}`);
+    }
+  }
+
   async getRecentPosts(limit: number = 10): Promise<FacebookPost[]> {
     try {
       if (!PAGE_ID || !ACCESS_TOKEN) {

@@ -66,7 +66,7 @@ export const autoBoostRunner = async () => {
     `);
 
     // Log the execution for monitoring
-    await storage.logAutoBoostExecution?.({
+    await storage.logAutoBoostExecution('system', {
       date: new Date(),
       totalProcessed: totalBoosts,
       successful: successfulBoosts,

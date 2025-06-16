@@ -23,7 +23,7 @@ export const runAutoContentPost = async () => {
         await processUserContent(user.id);
       } catch (error) {
         console.error(`❌ Failed to process content for user ${user.id}:`, error);
-        await storage.logAutoContentError(user.id, error as Error);
+        await storage.logAutoContentError(user.id, error instanceof Error ? error.message : String(error));
       }
     }
     
@@ -74,8 +74,7 @@ const processUserContent = async (userId: string) => {
     console.log(`💰 Budget: $${content.recommendedBudget || 20}`);
     
     // Log successful execution
-    await storage.logAutoContentExecution({
-      userId,
+    await storage.logAutoContentExecution(userId, {
       postId,
       scheduledTime: bestSlot.date,
       budget: content.recommendedBudget || 20,

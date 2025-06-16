@@ -1,0 +1,98 @@
+// 📊 CampaignMonitor.tsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+export const CampaignMonitor: React.FC = () => {
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [statusMap, setStatusMap] = useState<any>({});
+
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      // You could replace this with DB fetch or hardcoded demo
+      const ids = JSON.parse(localStorage.getItem("campaignIds") || "[]");
+      setCampaigns(ids);
+    };
+    loadCampaigns();
+  }, []);
+
+  const fetchStatus = async (id: string) => {
+    const { data } = await axios.get(`/api/facebook/campaign-status/${id}`);
+    setStatusMap((prev: any) => ({ ...prev, [id]: data }));
+  };
+
+  return (
+    <div className="p-4 max-w-4xl mx-auto space-y-6">
+      <h2 className="text-2xl font-bold">📊 Campaign Monitor</h2>
+      <ul className="space-y-4">
+        {campaigns.map((id) => (
+          <li key={id} className="border p-4 rounded">
+            <div className="flex justify-between">
+              <span>Campaign ID: {id}</span>
+              <button
+                className="text-blue-600 underline"
+                onClick={() => fetchStatus(id)}
+              >
+                Refresh Status
+              </button>
+            </div>
+            <pre className="bg-gray-100 mt-2 p-2 rounded text-sm">
+              {JSON.stringify(statusMap[id] || {}, null, 2)}
+            </pre>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// 📅 BoostCalendar.tsx
+import React, { useState, useEffect } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import axios from "axios";
+
+const localizer = momentLocalizer(moment);
+
+export const BoostCalendar: React.FC = () => {
+  const [events, setEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios.get("/api/facebook/scheduled-boosts").then((res) => {
+      setEvents(
+        res.data.map((boost: any) => ({
+          title: `Boost: ${boost.postId}`,
+          start: new Date(boost.date),
+          end: new Date(boost.date),
+          ...boost,
+        }))
+      );
+    });
+  }, []);
+
+  const handleSelect = async ({ start }: any) => {
+    const postId = prompt("Enter Post ID to schedule boost:");
+    if (!postId) return;
+    await axios.post("/api/facebook/scheduled-boosts", {
+      postId,
+      date: start,
+    });
+    alert("Scheduled boost added!");
+    location.reload();
+  };
+
+  return (
+    <div className="p-4 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">📅 Scheduled Boost Calendar</h2>
+      <Calendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: 600 }}
+        selectable
+        onSelectSlot={handleSelect}
+      />
+    </div>
+  );
+};

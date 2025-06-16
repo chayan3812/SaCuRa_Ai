@@ -249,6 +249,19 @@ export const contentQueue = pgTable("content_queue", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Scheduled Boosts
+export const scheduledBoosts = pgTable("scheduled_boosts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  postId: varchar("post_id").notNull(),
+  date: timestamp("date").notNull(),
+  budget: decimal("budget", { precision: 10, scale: 2 }),
+  status: varchar("status", { enum: ["scheduled", "active", "completed", "cancelled"] }).notNull().default("scheduled"),
+  campaignId: varchar("campaign_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // AI Training Data - Missing table identified in audit
 export const aiTrainingData = pgTable("ai_training_data", {
   id: uuid("id").primaryKey().defaultRandom(),

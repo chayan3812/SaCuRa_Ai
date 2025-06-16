@@ -6092,6 +6092,42 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Scheduled boosts endpoints
+  app.get('/api/facebook/scheduled-boosts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const scheduledBoosts = await storage.getScheduledBoosts(userId);
+      res.json(scheduledBoosts);
+    } catch (error) {
+      console.error('Error fetching scheduled boosts:', error);
+      res.status(500).json({ error: 'Failed to fetch scheduled boosts' });
+    }
+  });
+
+  app.post('/api/facebook/scheduled-boosts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { postId, date, budget } = req.body;
+      
+      if (!postId || !date) {
+        return res.status(400).json({ error: 'Post ID and date are required' });
+      }
+
+      const scheduledBoost = await storage.createScheduledBoost({
+        userId,
+        postId,
+        date: new Date(date),
+        budget: budget || null,
+        status: 'scheduled'
+      });
+
+      res.json(scheduledBoost);
+    } catch (error) {
+      console.error('Error creating scheduled boost:', error);
+      res.status(500).json({ error: 'Failed to schedule boost' });
+    }
+  });
+
   app.get('/api/facebook/post-engagement/:postId', devAuthMiddleware, async (req: any, res) => {
     try {
       const { postId } = req.params;

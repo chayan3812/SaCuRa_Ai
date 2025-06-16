@@ -35,6 +35,7 @@ export class FacebookAuthService {
   private loginCallbacks: ((response: FacebookLoginResponse) => void)[] = [];
   private currentUser: FacebookUserInfo | null = null;
   private currentToken: string | null = null;
+  private configurationId = '1595617591110969'; // Facebook Business Configuration ID
 
   static getInstance(): FacebookAuthService {
     if (!FacebookAuthService.instance) {
@@ -135,10 +136,14 @@ export class FacebookAuthService {
         return;
       }
 
+      // Facebook Login for Business Configuration
       window.FB.login((response: FacebookLoginResponse) => {
         this.handleStatusChange(response);
         resolve(response);
-      }, { scope: permissions.join(',') });
+      }, { 
+        scope: permissions.join(','),
+        config_id: this.configurationId // Business Configuration ID: 1595617591110969
+      });
     });
   }
 

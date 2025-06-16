@@ -7608,6 +7608,64 @@ Prioritize by impact and feasibility.`;
     }
   });
 
+  // Facebook Business Configuration Management
+  app.get("/api/facebook/business-config", async (req, res) => {
+    try {
+      res.json({
+        configurationId: '1595617591110969',
+        appId: process.env.FACEBOOK_APP_ID,
+        pixelId: process.env.FB_PIXEL_ACCESS_TOKEN ? '1311177013673064' : null,
+        features: {
+          loginForBusiness: true,
+          conversionsAPI: true,
+          advancedMatching: true,
+          serverSideEvents: true
+        },
+        permissions: [
+          'email',
+          'pages_show_list',
+          'pages_read_engagement',
+          'pages_manage_posts',
+          'pages_messaging',
+          'pages_read_user_content',
+          'publish_to_groups'
+        ],
+        status: 'active'
+      });
+    } catch (error: any) {
+      console.error("Business config error:", error);
+      res.status(500).json({ 
+        error: "Failed to retrieve business configuration",
+        details: error.message
+      });
+    }
+  });
+
+  // Configuration Validation Endpoint
+  app.post("/api/facebook/validate-config", async (req, res) => {
+    try {
+      const { configId, permissions } = req.body;
+      
+      const isValidConfig = configId === '1595617591110969';
+      const hasRequiredPermissions = permissions && permissions.includes('email');
+      
+      res.json({
+        valid: isValidConfig && hasRequiredPermissions,
+        configurationId: configId,
+        validatedPermissions: permissions || [],
+        recommendations: !hasRequiredPermissions ? ['Add email permission for user identification'] : [],
+        status: isValidConfig ? 'Configuration ID verified' : 'Invalid Configuration ID'
+      });
+    } catch (error: any) {
+      console.error("Config validation error:", error);
+      res.status(500).json({ 
+        valid: false,
+        error: "Failed to validate configuration",
+        details: error.message
+      });
+    }
+  });
+
   return httpServer;
 }
 

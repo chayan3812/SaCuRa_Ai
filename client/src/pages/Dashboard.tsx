@@ -16,6 +16,7 @@ import FloatingActionPanel from "@/components/dashboard/FloatingActionPanel";
 import PlanBasedAITraining from "@/components/PlanBasedAITraining";
 import FacebookWebhookManager from "@/components/dashboard/FacebookWebhookManager";
 import FacebookLoginButton from "@/components/auth/FacebookLoginButton";
+import FacebookBusinessConfig from "@/components/dashboard/FacebookBusinessConfig";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardMetrics } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -334,6 +335,9 @@ export default function Dashboard() {
               
               {/* Quick Actions */}
               <QuickActions />
+              
+              {/* Facebook Business Configuration */}
+              <FacebookBusinessConfig />
               
               {/* AI Learning Progress */}
               <AILearningProgress />

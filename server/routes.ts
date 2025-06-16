@@ -1105,10 +1105,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Facebook OAuth Routes
   app.get('/api/facebook/auth', devAuthMiddleware, (req: any, res) => {
     const appId = process.env.FACEBOOK_APP_ID;
-    const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
-    const scopes = 'pages_manage_posts,pages_read_engagement,pages_show_list,business_management';
+    // Use production Replit URL for Facebook OAuth redirect
+    const redirectUri = 'https://sa-cura-live-sopiahank.replit.app/api/facebook/callback';
+    const scopes = 'pages_manage_posts,pages_read_engagement,pages_show_list,business_management,pages_manage_metadata,pages_messaging';
     
-    const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
+    const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?` +
       `client_id=${appId}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `scope=${encodeURIComponent(scopes)}&` +
@@ -1128,10 +1129,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const appId = process.env.FACEBOOK_APP_ID;
       const appSecret = process.env.FACEBOOK_APP_SECRET;
-      const redirectUri = `${req.protocol}://${req.get('host')}/api/facebook/callback`;
+      const redirectUri = 'https://sa-cura-live-sopiahank.replit.app/api/facebook/callback';
 
       // Exchange code for access token
-      const tokenResponse = await axios.get(`https://graph.facebook.com/v18.0/oauth/access_token`, {
+      const tokenResponse = await axios.get(`https://graph.facebook.com/v21.0/oauth/access_token`, {
         params: {
           client_id: appId,
           client_secret: appSecret,

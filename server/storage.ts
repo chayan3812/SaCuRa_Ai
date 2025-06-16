@@ -45,6 +45,9 @@ import {
   type PostingSchedule,
   type InsertPostingSchedule,
   scheduledPosts,
+  scheduledBoosts,
+  type ScheduledBoost,
+  type InsertScheduledBoost,
   competitorData,
   aiLearningData,
   facebookAdAccounts,
@@ -135,6 +138,10 @@ export interface IStorage {
   markPostAsPublished(id: string, facebookPostId?: string): Promise<void>;
   createScheduledPost(postData: any): Promise<any>;
   deleteScheduledPost(id: string): Promise<void>;
+  
+  // Scheduled Boosts for Campaign Calendar
+  getScheduledBoosts(userId: string): Promise<ScheduledBoost[]>;
+  createScheduledBoost(boost: InsertScheduledBoost): Promise<ScheduledBoost>;
   
   // 👁️ Enhanced by AI on 2025-06-15 — Feature: RestrictionMonitor
   getAllFacebookPages(): Promise<FacebookPage[]>;
@@ -1250,6 +1257,23 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(aiReplyFailures)
       .orderBy(desc(aiReplyFailures.createdAt));
+  }
+
+  // Scheduled Boosts for Campaign Calendar
+  async getScheduledBoosts(userId: string): Promise<ScheduledBoost[]> {
+    return await db
+      .select()
+      .from(scheduledBoosts)
+      .where(eq(scheduledBoosts.userId, userId))
+      .orderBy(desc(scheduledBoosts.date));
+  }
+
+  async createScheduledBoost(boost: InsertScheduledBoost): Promise<ScheduledBoost> {
+    const [result] = await db
+      .insert(scheduledBoosts)
+      .values(boost)
+      .returning();
+    return result;
   }
 }
 

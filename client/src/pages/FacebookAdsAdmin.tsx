@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, BarChart3, Settings, Zap } from "lucide-react";
+import { Rocket, BarChart3, Settings, Zap, Calendar, TrendingUp } from "lucide-react";
 import { BoostPostPanel } from "@/components/BoostPostPanel";
 import { AutoPostConfig } from "@/components/AutoPostConfig";
+import { CampaignMonitor } from "@/components/CampaignMonitor";
+import { BoostCalendar } from "@/components/BoostCalendar";
 
 const FacebookAdsAdmin: React.FC = () => {
   return (
@@ -31,7 +33,7 @@ const FacebookAdsAdmin: React.FC = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="auto-posting" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="auto-posting" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
             Auto-Posting
@@ -40,9 +42,13 @@ const FacebookAdsAdmin: React.FC = () => {
             <Rocket className="h-4 w-4" />
             Boost Posts
           </TabsTrigger>
+          <TabsTrigger value="campaign-monitor" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Monitor & Schedule
+          </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
-            Campaign Analytics
+            Analytics
           </TabsTrigger>
         </TabsList>
 
@@ -62,6 +68,109 @@ const FacebookAdsAdmin: React.FC = () => {
               <AutoPostConfig />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Campaign Monitor & Schedule Tab */}
+        <TabsContent value="campaign-monitor" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  Live Campaign Monitor
+                </CardTitle>
+                <CardDescription>
+                  Real-time tracking of your active Facebook ad campaigns with live insights
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CampaignMonitor />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                  Boost Scheduling Calendar
+                </CardTitle>
+                <CardDescription>
+                  Schedule future post boosts with drag-and-drop calendar interface
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BoostCalendar />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions Grid */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Campaign Controls</CardTitle>
+                <CardDescription>
+                  Manage active campaigns in real-time
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 border rounded-lg bg-muted/50">
+                  <h4 className="font-medium mb-2">Available Actions</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Pause/Resume campaigns</li>
+                    <li>• Adjust daily budgets</li>
+                    <li>• Monitor spend rates</li>
+                    <li>• Track performance metrics</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Schedule Management</CardTitle>
+                <CardDescription>
+                  Plan and organize boost campaigns
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 border rounded-lg bg-muted/50">
+                  <h4 className="font-medium mb-2">Calendar Features</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Drag dates to schedule boosts</li>
+                    <li>• Set custom budgets per event</li>
+                    <li>• Link to specific post IDs</li>
+                    <li>• View upcoming campaigns</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Integration Status</CardTitle>
+                <CardDescription>
+                  Current system capabilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Meta Marketing API</span>
+                    <Badge variant="secondary">Connected</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Campaign Monitoring</span>
+                    <Badge variant="secondary">Active</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Boost Scheduling</span>
+                    <Badge variant="secondary">Ready</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Boost Posts Tab */}

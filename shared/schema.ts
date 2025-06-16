@@ -262,6 +262,9 @@ export const scheduledBoosts = pgTable("scheduled_boosts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export type ScheduledBoost = typeof scheduledBoosts.$inferSelect;
+export type InsertScheduledBoost = typeof scheduledBoosts.$inferInsert;
+
 // AI Training Data - Missing table identified in audit
 export const aiTrainingData = pgTable("ai_training_data", {
   id: uuid("id").primaryKey().defaultRandom(),

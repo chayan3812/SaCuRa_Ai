@@ -19,6 +19,32 @@
     fbq('track', 'PageView');
     </script>
     <!-- End Meta Pixel Code -->
+    <!-- Facebook SDK Integration -->
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1089937202820114',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v21.0'
+        });
+          
+        FB.AppEvents.logPageView();
+        
+        // Check login status on page load
+        FB.getLoginStatus(function(response) {
+          window.statusChangeCallback && window.statusChangeCallback(response);
+        });
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
   </head>
   <body>
     <noscript><img height="1" width="1" style="display:none"

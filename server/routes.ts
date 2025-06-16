@@ -7538,8 +7538,6 @@ Prioritize by impact and feasibility.`;
     }
   });
 
-  const httpServer = createServer(app);
-
   return httpServer;
 }
 

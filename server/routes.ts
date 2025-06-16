@@ -59,7 +59,7 @@ import { slaMonitor } from "./slaMonitor";
 import { aiStressTestInjector } from "./aiStressTest";
 import { weeklySlackReporter } from "./weeklySlackReporter";
 import { facebookAnalytics } from "./facebookAnalytics";
-import { initializeConversionsAPI, getConversionsAPIService, autoTrackConversion } from "./conversionsAPIService";
+import { conversionsAPI } from "./conversionsAPIService";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4916,19 +4916,15 @@ Prioritize by impact and feasibility.`;
         return res.status(400).json({ error: 'eventName and userData are required' });
       }
 
-      const service = getConversionsAPIService();
-      if (!service) {
-        return res.status(500).json({ error: 'Conversions API not initialized' });
-      }
-
-      const result = await service.trackCustomEvent(eventName, userData, customData, actionSource);
+      const { conversionsAPI } = await import('./conversionsAPIService');
+      const result = await conversionsAPI.trackCustomEvent(eventName, userData, customData, actionSource);
       
       res.json({
         message: 'Event tracked successfully',
         eventName,
         result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error tracking conversion event:', error);
       res.status(500).json({ error: 'Failed to track conversion event' });
     }
@@ -4942,12 +4938,8 @@ Prioritize by impact and feasibility.`;
         return res.status(400).json({ error: 'userData, value, and currency are required' });
       }
 
-      const service = getConversionsAPIService();
-      if (!service) {
-        return res.status(500).json({ error: 'Conversions API not initialized' });
-      }
-
-      const result = await service.trackPurchase(userData, purchaseData);
+      const { conversionsAPI } = await import('./conversionsAPIService');
+      const result = await conversionsAPI.trackPurchase(userData, purchaseData);
       
       res.json({
         message: 'Purchase tracked successfully',
@@ -4955,7 +4947,7 @@ Prioritize by impact and feasibility.`;
         currency: purchaseData.currency,
         result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error tracking purchase:', error);
       res.status(500).json({ error: 'Failed to track purchase' });
     }
@@ -4969,18 +4961,14 @@ Prioritize by impact and feasibility.`;
         return res.status(400).json({ error: 'userData is required' });
       }
 
-      const service = getConversionsAPIService();
-      if (!service) {
-        return res.status(500).json({ error: 'Conversions API not initialized' });
-      }
-
-      const result = await service.trackLead(userData, leadData);
+      const { conversionsAPI } = await import('./conversionsAPIService');
+      const result = await conversionsAPI.trackLead(userData, leadData);
       
       res.json({
         message: 'Lead tracked successfully',
         result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error tracking lead:', error);
       res.status(500).json({ error: 'Failed to track lead' });
     }
@@ -4994,18 +4982,13 @@ Prioritize by impact and feasibility.`;
         return res.status(400).json({ error: 'userData is required' });
       }
 
-      const service = getConversionsAPIService();
-      if (!service) {
-        return res.status(500).json({ error: 'Conversions API not initialized' });
-      }
-
-      const result = await service.trackPageView(userData, customData);
+      const result = await conversionsAPI.trackPageView(userData, customData);
       
       res.json({
         message: 'Page view tracked successfully',
         result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error tracking page view:', error);
       res.status(500).json({ error: 'Failed to track page view' });
     }
@@ -5046,21 +5029,34 @@ Prioritize by impact and feasibility.`;
         return res.status(400).json({ error: 'events array is required' });
       }
 
-      const service = getConversionsAPIService();
-      if (!service) {
-        return res.status(500).json({ error: 'Conversions API not initialized' });
-      }
-
-      const result = await service.batchTrackEvents(events);
+      const result = await conversionsAPI.batchTrackEvents(events);
       
       res.json({
         message: `Batch of ${events.length} events tracked successfully`,
         eventsCount: events.length,
         result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error tracking batch events:', error);
       res.status(500).json({ error: 'Failed to track batch events' });
+    }
+  });
+
+  // Test Conversions API setup
+  app.get('/api/conversions/test-setup', devAuthMiddleware, async (req: any, res) => {
+    try {
+      const setupResult = await conversionsAPI.testSetup();
+      
+      res.json({
+        message: 'Conversions API setup test completed',
+        ...setupResult
+      });
+    } catch (error: any) {
+      console.error('Error testing Conversions API setup:', error);
+      res.status(500).json({ 
+        error: 'Failed to test Conversions API setup',
+        details: error.message
+      });
     }
   });
 

@@ -15,10 +15,10 @@ export interface AppUserConfiguration {
 
 export const APP_USER_CONFIG: AppUserConfiguration = {
   appUserId: '4026499934285415',
-  pixelId: '1230928114675791',
-  accessToken: process.env.FACEBOOK_ACCESS_TOKEN || '',
-  conversionsToken: process.env.FACEBOOK_CONVERSIONS_TOKEN || '',
-  marketingApiToken: 'EAA5OFJJFbmcBOzmmAyZBVwwUajJ8iME21pNPNhKaZCeBZCCw77Q0Li4KJ8MNjeqwfys3SXZCkneqAHaX9Kc1R7XgSelFVyoXZCiEwxueuzaPZAmqyWGugDTrPq4rvhFWejsaDybuIThJOrPZAZClt7z2bFoY7ZC5yKO6X1hY2hgTNW7cx9kJ9i0gu2um2EILGy9kG7umt',
+  pixelId: '1311177013673064',
+  accessToken: process.env.FACEBOOK_ACCESS_TOKEN || process.env.FB_PIXEL_ACCESS_TOKEN || '',
+  conversionsToken: process.env.FB_PIXEL_ACCESS_TOKEN || '',
+  marketingApiToken: process.env.FB_PIXEL_ACCESS_TOKEN || '',
   appId: '4026499934285415',
   appSecret: '0426b1ae64c6f5951bd8f974e9492ec4',
 };

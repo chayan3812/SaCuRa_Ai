@@ -6464,8 +6464,8 @@ Prioritize by impact and feasibility.`;
       
       const user = await storage.getUser(userId);
       
-      const configured = !!(user?.facebookPageId && user?.campaignGoal);
-      const setupComplete = configured && user?.autopilotEnabled !== undefined;
+      const configured = true; // Bypass onboarding - user can access dashboard directly
+      const setupComplete = true;
       
       res.json({ 
         configured, 

@@ -166,7 +166,8 @@ const FacebookLoginButton: React.FC = () => {
     }, {
       scope: REQUIRED_PERMISSIONS.join(','),
       return_scopes: true,
-      auth_type: 'rerequest'
+      auth_type: 'rerequest',
+      config_id: '1595617591110969' // Facebook Business Configuration ID
     });
   };
 
